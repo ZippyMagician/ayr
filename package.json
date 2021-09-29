@@ -1,0 +1,29 @@
+{
+  "name": "umbr",
+  "version": "0.1.0",
+  "description": "Toy array language",
+  "main": "umbr.js",
+  "scripts": {
+    "test": "node umbr.js -u \"1 2 3+4 5 6\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZippyMagician/UMBR.git"
+  },
+  "keywords": [
+    "umbr",
+    "array",
+    "apl",
+    "parser",
+    "language"
+  ],
+  "author": "Joshua Barnett",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ZippyMagician/UMBR/issues"
+  },
+  "homepage": "https://github.com/ZippyMagician/UMBR#readme",
+  "bin": {
+    "umbr": "./umbr.js"
+  }
+}
