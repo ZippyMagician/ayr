@@ -15,13 +15,13 @@ function A(d,r,b=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.
 fix(this)}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.incomp=1;}
 MoD.prototype.bind=function(...v){
-  if(v[0]!=null)this.bd.push(...v);
+  if(v[1]!=null)this.bd.push(...v);
   return this;
 }
 MoD.prototype.call=function(...a){
   if(this.bd.length){this.f2=this.f2.bind(...this.bd);return this.f2.call(0,a[0])}
   else if(a.length>1)return this.f2.call(0,a[0],a[1]);
-  else return this.f1.call(a[0]);
+  else return this.f1.call(0,a[0]);
 }
 A.prototype.rank=function(r){
   switch(r){
@@ -55,16 +55,23 @@ A.prototype.toString=function(){
   }
   return S;
 }
+Number.prototype.call=function(...v){return this;}
+Number.prototype.bind=function(...v){return this;}
+Number.prototype.ds=0;
+Array.prototype.ds=1;
+A.prototype.bind=function(...v){return this;}
+A.prototype.call=function(...v){return this;}
 const pon=(d,f,r,a,b)=>{
   if(!d){
     if(r>=a.ds)return f(a);
     else if(r==1){let n=a.rank(1).d.map(n=>pon(0,f,0,n));return new A(n.flat(),a.r,a.b)}
     else return new A(a.d.map(n=>f(n)),a.r,a.b);
   }else{
-    if(JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
+    if(JSON.stringify(a.r)!=JSON.stringify(b.r)&&a.ds>r&&b.ds>r)err(1);
+    if(a.ds<b.ds)return pon(d,f,r,b,a)//lower last
     if(r>=a.ds)return f(a,b);
-    else if(r==1){let b=b.rank(1);let n=a.rank(1).d.map((n,i)=>pon(0,f,0,n,b.d[i]));return new A(n.flat(),a.r,a.b)}
-    else return new A(a.d.map((n,i)=>f(n,b.d[i])),a.r,a.b);
+    else if(r==1){let c=b.ds==r?b:b.rank(1);let n=a.rank(1).d.map((n,i)=>pon(0,f,0,n,b.ds==r?c:c.d[i]));return new A(n.flat(),a.r,a.b)}
+    else return new A(a.d.map((n,i)=>f(n,b.ds==r?b:b.d[i])),a.r,a.b);
   }
 }
 ,err=id=>{
@@ -76,11 +83,15 @@ const pon=(d,f,r,a,b)=>{
     case 4:console.error("[4] FILE ERROR");break;
     default:console.error("[_] ERROR");break;
   }
-  process.exit(1);
+  process.exit(id);
 }
+,mod=(f,f2)=>
+  f2?new MoD(f.bind(0),f2.bind(0)):f instanceof MoD?(f.f1=f.f1.bind(0),f.f2=f.f2.bind(0),f):new MoD(A=>f.call(A),(A,B)=>f.call(A,B))
 ,syms={
-  "+":new MoD(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>a+b,0)),
-  "-":new MoD(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>a-b,0)),
+  "+":mod(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>a+b,0)),
+  "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>a-b,0)),
+  "]":mod(a=>a,(a,b)=>b),
+  "[":mod(a=>a,(a,b)=>a),
 }
 ,bdrs={
   '.':[(a,b)=>r=>a(b(r)),(a,b)=>(l,r)=>a(l,b(r))],
@@ -136,31 +147,47 @@ strand=t=>{
       tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))
       b=[]
     }
+    else tn.push(t[i]);
   return tn;
 },
-ptrain=t=>{
+ptrain=(t,G=0)=>{
   if(t.length==1)return t[0];
   let tn=[];
-  for(let i=t.length-1;i>=0;i--){
-    if(i>=2){t-=2;tn.push(new MoD(
-      (A=>t[i+1].call(t[i].call(A),t[i+2].call(A))).bind(0),
-      ((A,B)=>t[i+1].call(t[i].call(A,B),t[i+2].call(A,B))).bind(0),
-    ))}else{t-=1;tn.push(new MoD(
-      (A=>t[i].call(t[i+1].call(A))).bind(0),
-      ((A,B)=>t[i].call(A,t[i+1].call(B))).bind(0),
-    ))}
+  if(G){//train
+    for(let i=t.length-1;i>=0;i--){
+      if(i>=2){i-=2;tn.push(mod(
+        A=>t[i+1].call(t[i].call(A),t[i+2].call(A)),
+        (A,B)=>t[i+1].call(t[i].call(A,B),t[i+2].call(A,B)),
+      ))}else{
+        i-=1;
+        if(!(t[i]instanceof MoD))tn.push(mod(A=>t[i+1].call(t[i],A),(A,B)=>err(0)));
+        else tn.push(mod(
+          A=>t[i].call(t[i+1].call(A)),
+          (A,B)=>t[i].call(A,t[i+1].call(B)),
+        ))
+      }
+    }
+    return ptrain(tn,G);
+  }else{//normal
+    tn.push(t[t.length-1]);
+    for(let i=t.length-2;i>=0;i--){
+      if(t[i-1]!=null&&!(t[i-1]instanceof MoD)){
+        let x=tn.pop();
+        i--;
+        tn.push(mod(A=>t[i+1].call(t[i].call(),x.call()),(A,B)=>t[i+1].call(t[i].call(),x.call())));
+      }else {let x=tn.pop();tn.push(mod(A=>t[i].call(x.call()),(A,B)=>t[i].call(x.call())))}
+    }
+    return tn.pop();
   }
-  return ptrain(tn);
 }
-exec=t=>{
+exec=(t,G=0)=>{
   let q=[],
       fq=[],
       env={};
   for(let i=0;i<t.length;i++){
     let o=t[i];
     if(o.t==9&&o.v=='\n'&&fq.length){
-      if(q.length)console.log(ptrain(fq).call(q.pop()).toString())
-      else err(0)
+      if(!G)console.log(ptrain(fq).call().toString())
       fq=[]
     }
     if(o.t==7){
@@ -179,21 +206,22 @@ exec=t=>{
           let t=ptrain(b.v);
           if(t.incomp)fq.push(syms[o.v].bind(0,q.pop()),t);
           else {
-            q.push(ptrain(fq).call(...(q.length?[q.pop(),t.call()]:[t.call()])))
+            fq.push(ptrain(fq).call(t.call()));
             fq=[]
           }
         }
-      } else fq.push(syms[o.v].bind(0,q.pop()));
+      } else fq.push(syms[o.v]);
     }else if(o.t<2||o.t==4){
-      if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false))console.log(o.v.toString());
-      else q.push(o.v);
+      if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
+        if(G&&nnw(t,i)[0]+1>=t.length)return o.v.toString();
+        else if(!G)console.log(o.v.toString())
+      }else fq.push(o.v);
     }
   }
-  if(fq.length)console.log(ptrain(fq).call(q.pop()).toString())
-  q.map(n=>console.log(n.toString()))
+  if(fq.length){let x=ptrain(fq).call();if(G)return x;else console.log(x.toString())}
 }
 f.readFile(
   __dirname+"/"+process.argv[2],
   'utf8',
-  (e,d)=>e?err(4):console.log(strand(lex(d.replace(/\r\n/g,"\n").trim())))
+  (e,d)=>e?err(4):exec(strand(lex(d.replace(/\r\n/g,"\n").trim())))
 )
