@@ -11,8 +11,7 @@
 //  8 -> group
 //  9 -> whitespace
 let f=require('fs')
-function A(d,r,b=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;
-fix(this)}
+function A(d,r,b=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this)}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.incomp=1;}
 MoD.prototype.bind=function(...v){
   if(v[1]!=null)this.bd.push(...v);
@@ -81,7 +80,7 @@ const pon=(d,f,r,a,b)=>{
     case 2:console.error("[2] DOMAIN ERROR");break;
     case 3:console.error("[3] NAME ERROR");break;
     case 4:console.error("[4] FILE ERROR");break;
-    default:console.error("[_] ERROR");break;
+    default:console.error(`[${id}] GENERIC ERROR`);break;
   }
   process.exit(id);
 }
