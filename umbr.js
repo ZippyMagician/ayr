@@ -135,15 +135,31 @@ const pon=(d,f,r,a,b)=>{
 // TODO: This should work for groups too
 strand=t=>{
   let tn=[],
-      b=[];
+      b=[],
+      bn=[];
   for(let i=0;i<=t.length;i++)
-    if(t[i]!=null&&(t[i].t<2||t[i].t==7))b.push(t[i]);
+    if(t[i]!=null&&t[i].t==5){bn.push(b);b=[]}
+    else if(t[i]!=null&&(t[i].t<2||t[i].t==7))b.push(t[i]);
     else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3)&&b.length==1)
       tn.push(...(t[i]!=null?[b.pop(),t[i]]:[b.pop()]));
     else if((t[i]==null||!(t[i].t==9&&t[i].v==' '))&&b.length){
-      for(x in b)if(b[x].t==1)b[x]=new A(b[x].v,[b[x].v.length],1);else b[x]=b[x].v;
-      let a=new A(b,b.length,0);
-      tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))
+      if(bn.length){
+        let s,bx=0;
+        bn=bn.concat([b]);
+        if(!bn.reduce((acc,x)=>acc&&x.length==bn[0].length)){
+          s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?new A(n.v,n.v.length,1):n.v),n.length,1));
+          bx=1;
+        }else{
+          s=bn.flat().map(n=>n.t==1||n.t==4?new A(n.v,n.v.length,1):n.v);
+        }
+        let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,s.length])};
+        tn.push(...(t[i]!=null?[t4,t[i]]:[t4]))
+        bn=[]
+      }else{
+        for(x in b)if(b[x].t==1)b[x]=new A(b[x].v,[b[x].v.length],1);else b[x]=b[x].v;
+        let a=new A(b,b.length,0);
+        tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))
+      }
       b=[]
     }
     else tn.push(t[i]);
