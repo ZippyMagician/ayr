@@ -24,9 +24,9 @@ MoD.prototype.call=function(...a){
 }
 A.prototype.rank=function(r){
   switch(r){
-    case 0:return this.d;
+    case 0:return new A(this.d,this.r,this.b);
     case 1:return chnk(this.d,this.r[this.r.length-1]);
-    case 2:return chnk(chnk(this.d,this.r[this.r.length-1]),this.r[this.r.length-2]);
+    case 2:return chnk(chnk(this.d,this.r[this.r.length-2]),this.r[this.r.length-1]);
     default:err(1);
   }
 }
@@ -60,17 +60,23 @@ Number.prototype.ds=0;
 Array.prototype.ds=1;
 A.prototype.bind=function(...v){return this;}
 A.prototype.call=function(...v){return this;}
-const pon=(d,f,r,a,b)=>{
+const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
+,sb=arr=>arr instanceof A&&arr.ds==1&&arr.r[0]==1
+,pon=(d,f,r,a,b)=>{
   if(!d){
-    if(r>=a.ds)return f(a);
-    else if(r==1){let n=a.rank(1).d.map(n=>pon(0,f,0,n));return new A(n.flat(),a.r,a.b)}
+    if(bc(a)&&r<a.ds)return new A(a.rank(r).d.map(n=>pon(d,f,r,n)),a.r,a.b);
+    else if(r>=a.ds)return f(a);
+    else if(r<a.ds)return new A(a.rank(r).d.map(n=>pon(d,f,r,n)),a.r,a.b);
     else return new A(a.d.map(n=>f(n)),a.r,a.b);
   }else{
-    if(JSON.stringify(a.r)!=JSON.stringify(b.r)&&a.ds>r&&b.ds>r)err(1);
+    //console.log(a,b,a.ds,b.ds,r);
+    if(a.ds>r&&b.ds>r&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
     if(a.ds<b.ds)return pon(d,f,r,b,a)//lower last
-    if(r>=a.ds)return f(a,b);
-    else if(r==1){let c=b.ds==r?b:b.rank(1);let n=a.rank(1).d.map((n,i)=>pon(0,f,0,n,b.ds==r?c:c.d[i]));return new A(n.flat(),a.r,a.b)}
-    else return new A(a.d.map((n,i)=>f(n,b.ds==r?b:b.d[i])),a.r,a.b);
+    else if(bc(a)||r<a.ds&&!sb(a)){
+      //console.log("FOUND THIS", a.rank(a.ds));
+      return new A(a.rank(r).d.map((v,i)=>pon(d,f,r,v,sb(b)?b.d[0]:b.ds==0?b:b.rank(r)[i])),a.r,a.b);
+    }else if((r>=a.ds||sb(a))&&(r>=b.ds||sb(b)))return f(sb(a)?a.d[0]:a,sb(b)?b.d[0]:b);
+    else return new A(a.rank(r).d.map((v,i)=>pon(d,f,r,v,b.ds==0?b:b.d[i])),a.r,a.b);
   }
 }
 ,err=id=>{
@@ -103,7 +109,7 @@ const pon=(d,f,r,a,b)=>{
     if(i+s>a.length){b=1;n=n.map(e=>eval('e.b=1;e'))}
     x=a.slice(i,Math.min(a.length,i+s));n.push(new A(x,Math.min(a.length,i+s)-i))
   };
-  return new A(n,[b?1:s,n.length],b);
+  return new A(n,n.length==1?1:[1,n.length],b);
 }
 ,fix=a=>{
   let f=0;for(v of a.d)if(v instanceof A&&v.b)f=1;if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1))
@@ -152,7 +158,7 @@ strand=t=>{
         }else{
           s=bn.flat().map(n=>n.t==1||n.t==4?new A(n.v,n.v.length,1):n.v);
         }
-        let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,s.length])};
+        let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,bn.length])};
         tn.push(...(t[i]!=null?[t4,t[i]]:[t4]))
         bn=[]
       }else{
