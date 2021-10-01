@@ -139,9 +139,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     s=s.slice(test&&test[0].length||1);
   }
   return toks;
-},
+}
 // TODO: This should work for groups too
-strand=t=>{
+,strand=t=>{
   let tn=[],
       b=[],
       bn=[];
@@ -172,8 +172,8 @@ strand=t=>{
     }
     else tn.push(t[i]);
   return tn;
-},
-ptrain=(t,G=0)=>{
+}
+,ptrain=(t,G=0)=>{
   if(t.length==1)return t[0];
   let tn=[];
   if(G){//train
@@ -203,7 +203,7 @@ ptrain=(t,G=0)=>{
     return tn.pop();
   }
 }
-exec=(t,G=0)=>{
+,exec=(t,G=0)=>{
   let q=[],
       fq=[],
       env={};
