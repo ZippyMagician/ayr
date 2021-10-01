@@ -97,6 +97,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>a-b,0)),
   "]":mod(a=>a,(a,b)=>b),
   "[":mod(a=>a,(a,b)=>a),
+  "<":mod(a=>a instanceof A?(a.b=1,a):new A([a],[1],1),pon.bind(0,1,(a,b)=>+(a<b),99)),
+  ">":mod(a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,pon.bind(0,1,(a,b)=>+(a>b),99))
 }
 ,bdrs={
   '.':[(a,b)=>r=>a(b(r)),(a,b)=>(l,r)=>a(l,b(r))],
@@ -230,7 +232,8 @@ exec=(t,G=0)=>{
             fq.push(ptrain(fq).call(t.call()));
             fq=[]
           }
-        }
+        }else if(fq.length)fq.push(syms[o.v].call(b.v))
+        else console.log(syms[o.v].call(b.v).toString())
       } else fq.push(syms[o.v]);
     }else if(o.t<2||o.t==4){
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
