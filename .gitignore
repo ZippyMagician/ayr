@@ -1,1 +1,6 @@
+# Test files
 *.u
+
+# Node.js files
+node_modules/
+package-lock.json

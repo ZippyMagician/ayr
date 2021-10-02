@@ -25,5 +25,8 @@
   "homepage": "https://github.com/ZippyMagician/UMBR#readme",
   "bin": {
     "umbr": "./umbr.js"
+  },
+  "dependencies": {
+    "minimist": "^1.2.5"
   }
 }
