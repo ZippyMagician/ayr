@@ -160,12 +160,12 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         if(!bn.reduce((acc,x)=>acc&&x.length==bn[0].length)){
           s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?new A(n.v,n.v.length,1):n.v),n.length,1));
           bx=1;
-        }else s=bn.flat().map(n=>n.t==1||n.t==4?new A(n.v,n.v.length,1):n.v);
+        }else s=bn.flat().map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v);
         let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,bn.length])};
         tn.push(...(t[i]!=null?[t4,t[i]]:[t4]))
         bn=[]
       }else{
-        b=b.map(n=>n.t==1?new A(n.v,[n.v.length],1):n.v);
+        b=b.map(n=>n.t==1?new A(n.v.d,n.v.r[0],1):n.v);
         let a=new A(b,b.length,0);
         tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))
       }
@@ -239,13 +239,13 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   }
   if(fq.length){let x=ptrain(fq).call();if(G)return x;else if(x!=null)console.log(x.toString())}
 }
-if(argv._[0]=='help'||argv.h||argv.help)console.log(`UMBR ${require('./package.json').version}:
+if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
-    umbr <file> - run a file
-    umbr -u <code> - run the code`),process.exit(0);
+    ayr <file> - run a file
+    ayr -u <code> - run the code`),process.exit(0);
 if(argv.u)exec(strand(lex(argv.u)))
 else if(!argv._.length){
-  console.log(`UMBR ${require('./package.json').version}: type 'exit' to exit`)
+  console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`)
   while((inp=rl.question('\t'))&&inp!="exit")exec(strand(lex(inp)))
 }else f.readFile(
   __dirname+"/"+argv._[0],

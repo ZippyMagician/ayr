@@ -1,17 +1,17 @@
 {
-  "name": "umbr",
+  "name": "ayr",
   "version": "0.1.0",
   "description": "Toy array language",
-  "main": "umbr.js",
+  "main": "ayr.js",
   "scripts": {
-    "test": "node umbr.js -u \"1 2 3+4 5 6\""
+    "test": "node ayr.js -u \"1 2 3+4 5 6\""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZippyMagician/UMBR.git"
+    "url": "git+https://github.com/ZippyMagician/ayr.git"
   },
   "keywords": [
-    "umbr",
+    "ayr",
     "array",
     "apl",
     "parser",
@@ -20,11 +20,11 @@
   "author": "Joshua Barnett",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ZippyMagician/UMBR/issues"
+    "url": "https://github.com/ZippyMagician/ayr/issues"
   },
-  "homepage": "https://github.com/ZippyMagician/UMBR#readme",
+  "homepage": "https://github.com/ZippyMagician/ayr#readme",
   "bin": {
-    "umbr": "./umbr.js"
+    "ayr": "./ayr.js"
   },
   "dependencies": {
     "minimist": "^1.2.5",
