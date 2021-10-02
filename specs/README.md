@@ -4,14 +4,14 @@
 What follows is an in-depth look at the specs of the `ayr` array language, so any individual can gain knowledge of how the language works.
 
 ## Table of Contents
-* [Array model](#Array_Model)
-* [Basic syntax](#Basic_Syntax)
-* [User functions](#User_Functions)
-* [Monadic symbols](#Monadic_Symbols)
-* [Dyadic symbols](#Dyadic_Symbols)
-* [Monadic binders](#Monadic_Binders)
-* [Dyadic binders](#Dyadic_Binders)
-* [Library functions](#Library_Functions)
+* [Array model](#array-model)
+* [Basic syntax](#basic-syntax)
+* [User functions](#user-functions)
+* [Monadic symbols](#monadic-symbols)
+* [Dyadic symbols](#dyadic-symbols)
+* [Monadic binders](#monadic-binders)
+* [Dyadic binders](#dyadic-binders)
+* [Library functions](#library-functions)
 
 ## Array Model
 `ayr` uses the boxed array model, similar to [APL](https://dyalog.com) and [J](https://jsoftware.com). Values can be scalars, vectors, or matrices. These correspond to rank 0, 1, and 2 data respectively. 
