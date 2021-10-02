@@ -104,6 +104,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   '.':[(a,b)=>r=>a(b(r)),(a,b)=>(l,r)=>a(l,b(r))],
   '"':[(a,b)=>r=>a(b(r)),(a,b)=>(l,r)=>a(b(l,r))]
 }
+,env={
+  put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
+}
 ,chnk=(a,s)=>{
   let n=[],
       b=0;
@@ -129,7 +132,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       toks=[];
   while(s){
     if(test=/^(_?[0-9]*\.?[0-9]+)/.exec(s))toks.push({t:0,v:+test[1].replace(/_/g,'-')});
-    else if(test=/^'((?:[^']|\\')*)'/.exec(s))toks.push({t:1,v:test[1].split("").map(c=>c.charCodeAt(0))});
+    else if(test=/^'((?:[^']|\\')*)'/.exec(s))toks.push({t:1,v:new A(test[1].split("").map(c=>c.charCodeAt(0)),test[1].length)});
     else if(test=/^;/.exec(s))toks.push({t:5});
     else if(test=/^:/.exec(s))toks.push({t:6});
     else if(test=RegExp(`^(${Object.keys(syms).map(resc).join('|')})`).exec(s))toks.push({t:2,v:test[1]});
@@ -147,8 +150,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       bn=[];
   for(let i=0;i<=t.length;i++)
     if(t[i]!=null&&t[i].t==5){bn.push(b);b=[]}
-    else if(t[i]!=null&&(t[i].t<2||t[i].t==7))b.push(t[i]);
-    else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3)&&b.length==1)
+    else if(t[i]!=null&&(t[i].t<2||(t[i].t==7&&!env[t[i].v].incomp)))b.push(t[i]);
+    else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7)&&b.length==1)
       tn.push(...(t[i]!=null?[b.pop(),t[i]]:[b.pop()]));
     else if((t[i]==null||!(t[i].t==9&&t[i].v==' '))&&b.length){
       if(bn.length){
@@ -157,9 +160,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         if(!bn.reduce((acc,x)=>acc&&x.length==bn[0].length)){
           s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?new A(n.v,n.v.length,1):n.v),n.length,1));
           bx=1;
-        }else{
-          s=bn.flat().map(n=>n.t==1||n.t==4?new A(n.v,n.v.length,1):n.v);
-        }
+        }else s=bn.flat().map(n=>n.t==1||n.t==4?new A(n.v,n.v.length,1):n.v);
         let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,bn.length])};
         tn.push(...(t[i]!=null?[t4,t[i]]:[t4]))
         bn=[]
@@ -204,9 +205,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   }
 }
 ,exec=(t,G=0)=>{
-  let q=[],
-      fq=[],
-      env={};
+  let fq=[]
   for(let i=0;i<t.length;i++){
     let o=t[i];
     if(o.t==9&&o.v=='\n'&&fq.length){
@@ -215,12 +214,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     }
     if(o.t==7){
       if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);err(5)} // TODO: declaration
-      else if(env[o.v]&&env[o.v].incomp){
-        if(env[o.v].m==1)fq.push(env[o.v]);
-        else if(!q.length)err(0);
-        else fq.push(env[o.v].bind(0,q.pop()));
-      } else if(env[o.v]!=null)q.push(env[o.v]);
-      else err(3);
+      else if(env[o.v]&&env[o.v].incomp)fq.push(env[o.v])
+      else if(env[o.v]!=null)q.push(env[o.v])
+      else err(3)
     }else if(o.t==2){
       if(inst(nnw(t,i)[1])){
         let b;
@@ -241,7 +237,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       }else fq.push(o.v);
     }
   }
-  if(fq.length){let x=ptrain(fq).call();if(G)return x;else console.log(x.toString())}
+  if(fq.length){let x=ptrain(fq).call();if(G)return x;else if(x!=null)console.log(x.toString())}
 }
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`UMBR ${require('./package.json').version}:
 Usage:
