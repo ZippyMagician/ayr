@@ -27,6 +27,7 @@
     "umbr": "./umbr.js"
   },
   "dependencies": {
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.5",
+    "readline-sync": "^1.4.10"
   }
 }
