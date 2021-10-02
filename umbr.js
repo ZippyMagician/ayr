@@ -11,7 +11,8 @@
 //  8 -> group
 //  9 -> whitespace
 let f=require('fs'),
-    argv=require('minimist')(process.argv.slice(2));
+    argv=require('minimist')(process.argv.slice(2)),
+    rl=require('readline-sync');
 function A(d,r,b=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this)}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.incomp=1;}
 MoD.prototype.bind=function(...v){
@@ -53,7 +54,7 @@ A.prototype.toString=function(){
       if(this.b)S=S.trim()+' ]';break;
     default:err(1);
   }
-  return S;
+  return S.trim();
 }
 Number.prototype.call=function(...v){return this;}
 Number.prototype.bind=function(...v){return this;}
@@ -70,12 +71,10 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     else if(r<a.ds)return new A(a.rank(r).d.map(n=>pon(d,f,r,n)),a.r,a.b);
     else return new A(a.d.map(n=>f(n)),a.r,a.b);
   }else{
-    //console.log(a,b,a.ds,b.ds,r);
     if(a.ds>r&&b.ds>r&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
     if(a.ds<b.ds)return pon(d,f,r,b,a)//lower last
     else if(bc(a)||r<a.ds&&!sb(a)){
-      //console.log("FOUND THIS", a.rank(a.ds));
-      return new A(a.rank(r).d.map((v,i)=>pon(d,f,r,v,sb(b)?b.d[0]:b.ds==0?b:b.rank(r)[i])),a.r,a.b);
+      return new A(a.rank(r).d.map((v,i)=>pon(d,f,r,v,sb(b)?b.d[0]:b.ds==0?b:b.rank(r).d[i])),a.r,a.b);
     }else if((r>=a.ds||sb(a))&&(r>=b.ds||sb(b)))return f(sb(a)?a.d[0]:a,sb(b)?b.d[0]:b);
     else return new A(a.rank(r).d.map((v,i)=>pon(d,f,r,v,b.ds==0?b:b.d[i])),a.r,a.b);
   }
@@ -124,7 +123,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   while(t[i+o]&&t[i+o].t==9)o++;
   return t[i+o]?[i+o,t[i+o]]:[i+o,t[i+o-1]];
 }
-,inst=o=>o.t<2||o.t==8
+,inst=o=>o.t<2||o.t==4||o.t==8
 ,lex=s=>{
   let test,
       toks=[];
@@ -165,7 +164,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         tn.push(...(t[i]!=null?[t4,t[i]]:[t4]))
         bn=[]
       }else{
-        for(x in b)if(b[x].t==1)b[x]=new A(b[x].v,[b[x].v.length],1);else b[x]=b[x].v;
+        b=b.map(n=>n.t==1?new A(n.v,[n.v.length],1):n.v);
         let a=new A(b,b.length,0);
         tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))
       }
@@ -175,7 +174,6 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   return tn;
 }
 ,ptrain=(t,G=0)=>{
-  console.log(t);
   if(t.length==1)return t[0];
   let tn=[];
   if(G){//train
@@ -235,7 +233,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
             fq=[]
           }
         }else fq.push(syms[o.v],b.v)
-      } else fq.push(syms[o.v]);
+      }else fq.push(syms[o.v]);
     }else if(o.t<2||o.t==4){
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
         if(G&&nnw(t,i)[0]+1>=t.length)return o.v.toString();
@@ -250,7 +248,10 @@ Usage:
     umbr <file> - run a file
     umbr -u <code> - run the code`),process.exit(0);
 if(argv.u)exec(strand(lex(argv.u)))
-else f.readFile(
+else if(!argv._.length){
+  console.log(`UMBR ${require('./package.json').version}: type 'exit' to exit`)
+  while((inp=rl.question('\t'))&&inp!="exit")exec(strand(lex(inp)))
+}else f.readFile(
   __dirname+"/"+argv._[0],
   'utf8',
   (e,d)=>e?err(4):exec(strand(lex(d.replace(/\r\n/g,"\n").trim())))
