@@ -136,7 +136,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,fix=a=>{
   let f=+a.d.reduce((acc,x)=>acc||x instanceof A&&x.b,false);if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1))
 }
-,str=s=>s.toString()
+,str=s=>s instanceof A&&s.str?String.fromCharCode(...s.d):s.toString()
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
 ,nnw=(t,i)=>{
   let o=1;
@@ -183,7 +183,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         tn.push(...(t[i]!=null?[t4,t[i]]:[t4]))
         bn=[]
       }else{
-        b=b.map(n=>n.t==1?new A(n.v.d,n.v.r[0],1):n.v);
+        b=b.map(n=>n.t==1?new A(n.v.d,n.v.r[0],1,1):n.v);
         let a=new A(b,b.length,0);
         tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))
       }
