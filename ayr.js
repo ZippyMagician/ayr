@@ -13,7 +13,8 @@
 let f=require('fs'),
     argv=require('minimist')(process.argv.slice(2)),
     rl=require('readline-sync');
-function A(d,r,b=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this)}
+function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
+if(this.d.length==1&&this.d[0].b)this.d[0].b=0}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.incomp=1;}
 MoD.prototype.bind=function(...v){
   if(v[1]!=null)this.bd.push(...v);
@@ -37,7 +38,7 @@ A.prototype.toString=function(){
   let r=this.r.reverse();
   while(r.length>1)this.d=chnk(this.d,r.pop());
   switch(this.ds){
-    case 1:S+=`${this.b?'[ ':''}${this.d.map(str).join(" ")}${this.b?' ]':''}`;break;
+    case 1:S+=`${this.b?'[ ':''}${this.str?String.fromCharCode(...this.d):this.d.map(str).join(" ")}${this.b?' ]':''}`;break;
     case 2:
       let l=Math.max(...this.d.d.map(n=>Math.max(...n.d.map(r=>str(r).length))))
       let f=1,
@@ -56,8 +57,8 @@ A.prototype.toString=function(){
   }
   return S.trim();
 }
-Number.prototype.call=function(...v){return this;}
-Number.prototype.bind=function(...v){return this;}
+Number.prototype.call=function(...v){return +this;}
+Number.prototype.bind=function(...v){return +this;}
 Number.prototype.ds=0;
 Array.prototype.ds=1;
 A.prototype.bind=function(...v){return this;}
@@ -101,7 +102,15 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   "]":mod(a=>a,(a,b)=>b),
   "[":mod(a=>a,(a,b)=>a),
   "<":mod(a=>a instanceof A?(a.b=1,a):new A([a],[1],1),pon.bind(0,1,(a,b)=>+(a<b),0)),
-  ">":mod(a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,pon.bind(0,1,(a,b)=>+(a>b),0))
+  ">":mod(a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,pon.bind(0,1,(a,b)=>+(a>b),0)),
+  "$":mod(a=>a instanceof A?narr(a.r):narr([0]),(a,b)=>{
+    let nr=a instanceof A?a.d:[a]
+    b=carr(b);
+    let [lo,ln]=[b.r.reduce((a,b)=>a*b,1),nr.reduce((a,b)=>a*b,1)]
+    if(lo==ln){b.r=nr;return b}
+    else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);return b}
+    else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
+  })
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>a.call(b.call(l)),(l,r)=>a.call(b.call(l,r)))),
@@ -125,7 +134,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   return new A(n,n.length==1?1:[1,n.length],b);
 }
 ,fix=a=>{
-  let f=0;for(v of a.d)if(v instanceof A&&v.b)f=1;if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1))
+  let f=+a.d.reduce((acc,x)=>acc||x instanceof A&&x.b,false);if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1))
 }
 ,str=s=>s.toString()
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
@@ -140,7 +149,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       toks=[];
   while(s){
     if(test=/^(_?[0-9]*\.?[0-9]+)/.exec(s))toks.push({t:0,v:+test[1].replace(/_/g,'-')});
-    else if(test=/^'((?:[^']|\\')*)'/.exec(s))toks.push({t:1,v:new A(test[1].split("").map(c=>c.charCodeAt(0)),test[1].length)});
+    else if(test=/^'((?:[^']|\\')*)'/.exec(s))toks.push({t:1,v:new A(test[1].split("").map(c=>c.charCodeAt(0)),test[1].length,0,1)});
     else if(test=/^;/.exec(s))toks.push({t:5});
     else if(test=/^:/.exec(s))toks.push({t:6});
     else if(test=RegExp(`^(${Object.keys(syms).map(resc).join('|')})`).exec(s))toks.push({t:2,v:test[1]});
@@ -159,14 +168,15 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   for(let i=0;i<=t.length;i++)
     if(t[i]!=null&&t[i].t==5){bn.push(b);b=[]}
     else if(t[i]!=null&&(t[i].t<2||(t[i].t==7&&!env[t[i].v].incomp)))b.push(t[i]);
-    else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7)&&b.length==1)
+    else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7)&&b.length==1&&bn.length==0)
       tn.push(...(t[i]!=null?[b.pop(),t[i]]:[b.pop()]));
     else if((t[i]==null||!(t[i].t==9&&t[i].v==' '))&&b.length){
       if(bn.length){
         let s,bx=0;
         bn=bn.concat([b]);
-        if(!bn.reduce((acc,x)=>acc&&x.length==bn[0].length)){
-          s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?new A(n.v,n.v.length,1):n.v),n.length,1));
+        if(!bn.reduce((acc,x)=>acc&&x.length==bn[0].length)
+          ||bn.reduce((acc,x)=>acc||(x[0] instanceof A&&x[0].d.length != bn[0].length))){
+          s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v),n.length,1));
           bx=1;
         }else s=bn.flat().map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v);
         let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,bn.length])};
