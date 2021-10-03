@@ -45,7 +45,7 @@ hello
 ```
 *The way output is stylized is implementation dependant*
 
-A symbol refers to a built in ascii symbol that denotes a monadic/dyadic operation. A binder refers to a symbol that monadically and/or dyadically takes a symbol on does something with them. For example, take the `+` (add) symbol, `-` (subtract/negate) symbol, `>` (first) symbol, and the `.` (compose) binder
+A symbol refers to a built in ascii symbol that denotes a monadic/dyadic operation. A binder refers to a symbol that monadically and/or dyadically takes a symbol on does something with them. For example, take the `+` (add) symbol, `-` (subtract/negate) symbol, `>` (first) symbol, and the `&` (atop) binder
 
 ### Examples
 ```
@@ -53,7 +53,7 @@ A symbol refers to a built in ascii symbol that denotes a monadic/dyadic operati
 4 5
     > 1 2 3
 1
-    1 2 3 -.+ 4 5 6
+    1 2 3 -&+ 4 5 6
 -5 -7 -9
 ```
 
@@ -83,10 +83,10 @@ They are defined with the syntax `<name> : <expression>`
     [   ->   left arg       r99
 
 ## Monadic Binders
-TODO
+    "   ->   each
 
 ## Dyadic Binders
-TODO
+    &   ->   atop
 
 ## Library Functions
     put A   ->    print A
