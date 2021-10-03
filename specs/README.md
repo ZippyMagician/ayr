@@ -73,6 +73,7 @@ They are defined with the syntax `<name> : <expression>`
     >   ->   first                                   r99
     ]   ->   identity                                r99
     [   ->   identity                                r99
+    $   ->   shape                                   r99
 
 ## Dyadic Symbols
     +   ->   add            r0
@@ -81,6 +82,7 @@ They are defined with the syntax `<name> : <expression>`
     >   ->   greater than   r0
     ]   ->   right arg      r99
     [   ->   left arg       r99
+    $   ->   reshape        r99
 
 ## Monadic Binders
     "   ->   each
