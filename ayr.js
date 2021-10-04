@@ -25,6 +25,7 @@ MoD.prototype.call=function(...a){
   else if(a.length>1)return this.f2.call(0,...a);
   else return this.f1.call(0,a[0]);
 }
+MoD.prototype.clone=function(){return new MoD(this.f1,this.f2)}
 A.prototype.rank=function(r){
   switch(r){
     case 0:return new A(this.d,this.r,this.b);
@@ -97,8 +98,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,mod=(f,f2)=>
   f2?new MoD(f.bind(0),f2.bind(0)):f instanceof MoD?(f.f1=f.f1.bind(0),f.f2=f.f2.bind(0),f):new MoD(A=>f.call(A),(A,B)=>f.call(A,B))
 ,syms={
-  "+":mod(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>a+b,0)),
-  "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>a-b,0)),
+  "+":mod(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>(console.log("ADD",a,b),a+b),0)),
+  "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>(console.log("SUB",a,b),a-b),0)),
   "]":mod(a=>a,(a,b)=>b),
   "[":mod(a=>a,(a,b)=>a),
   "<":mod(a=>a instanceof A?(a.b=1,a):new A([a],[1],1),pon.bind(0,1,(a,b)=>+(a<b),0)),
@@ -117,9 +118,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
    ,(l,r)=>l==null||r==null?err(0):!a.incomp||!b.incomp?err(0):a.call(b.call(l,r)))
   ),
-  '"':op(1,f=>mod(l=>l==null?err(0):narr(l.rank(l.ds-1).d.map(n=>f.call(n))),(l,r)=>{
+  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([l],1,1):narr(l.rank(l.ds-1).d.map(n=>f.call(n))),(l,r)=>{
     if(l==null||r==null)err(0)
-    if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)))}
+    else if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)))}
     else if(r.ds==0||sb(r)){let v=carr(l);return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)))}
     else if(JSON.stringify(a.r)==JSON.stringify(b.r)){let F=a.rank(a.ds-1),S=b.rank(b.ds-1);return narr(F.d.map((n,i)=>F.call(n,S.d[i])))}
     else err(1)
@@ -144,7 +145,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,str=s=>s.toString()
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
-,mex=f=>{try{return f.call()}catch(e){return f}}
+,mex=f=>f.incomp?f:f.call()
 ,nnw=(t,i)=>{
   let o=1;
   while(t[i+o]&&t[i+o].t==9)o++;
@@ -221,22 +222,25 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,ptrain=(t,G=0)=>{
   if(t.length==1)return t[0];
+  if(!t[t.length-1].incomp)G=0
   let tn=[];
+  // TODO: preprocess and bind constants
   if(G){//train
-    for(let i=t.length-1;i>=0;i--){
-      if(i>=2){i-=2;tn.push(mod(
+    tn=JSON.parse(JSON.stringify(t))
+    for(let i=tn.length-1;i>=0;){
+      if(i>=2&&t[i-1].incomp){i-=2;tn.splice(i,0,mod(
         A=>t[i+1].call(t[i].call(A),t[i+2].call(A)),
         (A,B)=>t[i+1].call(t[i].call(A,B),t[i+2].call(A,B)),
-      ))}else{
+      ))}else if(i>=1){
         i-=1;
-        if(!(t[i]instanceof MoD))tn.push(mod(A=>t[i+1].call(t[i],A),(A,B)=>err(0)));
-        else tn.push(mod(
+        if(!t[i].incomp)tn.splice(i,0,mod(A=>t[i+1].call(t[i],A),(A,B)=>err(0)));
+        else tn.splice(i,0,mod(
           A=>t[i].call(t[i+1].call(A)),
           (A,B)=>t[i].call(A,t[i+1].call(B)),
         ))
-      }
+      }else i--
     }
-    return ptrain(tn,G);
+    return tn[0]
   }else{//normal
     tn.push(t[t.length-1]);
     for(let i=t.length-2;i>=0;i--){
@@ -246,7 +250,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         tn.push(mod(A=>t[i+1].call(t[i].call(),x.call()),(A,B)=>t[i+1].call(t[i].call(),x.call())));
       }else {let x=tn.pop();tn.push(mod(A=>t[i].call(x.call()),(A,B)=>t[i].call(x.call())))}
     }
-    return tn.pop();
+    let x = tn.pop();
+    x.incomp=0;
+    return x
   }
 }
 ,exec=(t,G=0)=>{
