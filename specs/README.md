@@ -7,10 +7,9 @@ What follows is an in-depth look at the specs of the `ayr` array language, so an
 * [Array model](#array-model)
 * [Basic syntax](#basic-syntax)
 * [User functions](#user-functions)
-* [Monadic symbols](#monadic-symbols)
-* [Dyadic symbols](#dyadic-symbols)
-* [Monadic binders](#monadic-binders)
-* [Dyadic binders](#dyadic-binders)
+* [Trains](#trains)
+* [Symbols](#symbols)
+* [Binders](#binders)
 * [Library functions](#library-functions)
 
 ## Array Model
@@ -29,9 +28,11 @@ What follows is an in-depth look at the specs of the `ayr` array language, so an
 ```
 
 ## Basic syntax
-General types come in the form of signed floats and strings, which may or may not be scalar values. A vector, similar to **APL**, is denoted with a series of these general values separated by spaces. To create a matrix, you can currently use `;` to separate vectors. In the future, grouping (`()`) will accomplish the same thing.
+General types come in the form of signed floats and strings, which may or may not be scalar values. A vector, similar to **APL**, is denoted with a series of these general values separated by spaces. To create a matrix, you can currently use `;` to separate vectors or grouping (`()`) similar to how APL generally does it.
 
-Currently, strings are outputted as a vector of numbers. In the future, they will displayed as an actual string instead
+Incomplete operations within groups **or** assigned to a variable are called [Trains](#trains).
+
+Binders are left-assosciative, while symbols are right-assosciative.
 
 ### Examples
 ```
@@ -41,7 +42,7 @@ Currently, strings are outputted as a vector of numbers. In the future, they wil
 hello
     _4 'hello' ; 1 2
 [ -4 ] [ 104 105 ] 
-      [ 1 ]       [ 2 ]
+ [ 1 ]       [ 2 ]
 ```
 *The way output is stylized is implementation dependant*
 
@@ -66,29 +67,41 @@ User functions refer to, as the name implies, functions defined by the user. For
 ```
 They are defined with the syntax `<name> : <expression>`
 
-## Monadic Symbols
-    +   ->   currently unary plus in js, undecided   r0
-    -   ->   negate                                  r0
-    <   ->   box value                               r99
-    >   ->   first                                   r99
-    ]   ->   identity                                r99
-    [   ->   identity                                r99
-    $   ->   shape                                   r99
+## Trains
+*Key: lowercase letters represent symbols and uppercase represent immediates*
 
-## Dyadic Symbols
-    +   ->   add            r0
-    -   ->   subtract       r0
-    <   ->   less than      r0
-    >   ->   greater than   r0
-    ]   ->   right arg      r99
-    [   ->   left arg       r99
-    $   ->   reshape        r99
+```
+(f g) A          -> f g A
+A (f g) B        -> A f g B
+(A f) B          -> A f B
+(f g h) A        -> (f A) g h A
+A (f g h) B      -> (A f B) g A h B
+(f g h i) A      -> f (g A) h i A
+..etc
+```
+Note that this is not an exhaustive list, there may be some edge cases not included.
 
-## Monadic Binders
-    "   ->   each
+## Symbols
+|  Symbol  |   Monadic  | Rank |    Dyadic    |  Rank |
+|:--------:|:----------:|:----:|:------------:|:-----:|
+|  ```+``` |     Abs    |   0  |      Add     |  0 0  |
+|  ```-``` |   Negate   |   0  |   Subtract   |  0 0  |
+|  ```*``` |   Signum   |   0  |   Multiply   |  0 0  |
+|  ```%``` | Reciprocal |   0  |    Divide    |  0 0  |
+|  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |
+|  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |
+| ```<:``` |    Floor   |   0  |    Less/Eq   |  0 0  |
+| ```>:``` |    Ceil    |   0  |  Greater/Eq  |  0 0  |
+|  ```^``` |     Exp    |   0  |      Pow     |  0 0  |
+|  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |
+|  ```[``` |  Identity  |  99  |     Left     | 99 99 |
+|  ```]``` |  Identity  |  99  |     Right    | 99 99 |
 
-## Dyadic Binders
-    &   ->   atop
+## Binders
+|  Binder |   Usage   | Monadic | Dyadic |        Notes       |
+|:-------:|:---------:|:-------:|:------:|:------------------:|
+| ```"``` |  ```u"``` |   Each  |  Each  |                    |
+| ```&``` | ```u&v``` |  Beside |  Atop  | Binds if immediate |
 
 ## Library Functions
     put A   ->    print A
