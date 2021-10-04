@@ -85,14 +85,13 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,err=id=>{
   switch(id){
-    case 0:console.error("[0] ARG ERROR");break;
-    case 1:console.error("[1] RANK ERROR");break;
-    case 2:console.error("[2] DOMAIN ERROR");break;
-    case 3:console.error("[3] NAME ERROR");break;
-    case 4:console.error("[4] FILE ERROR");break;
-    default:console.error(`[${id}] GENERIC ERROR`);break;
+    case 0:throw("[0] ARG ERROR")
+    case 1:throw("[1] RANK ERROR")
+    case 2:throw("[2] DOMAIN ERROR")
+    case 3:throw("[3] NAME ERROR")
+    case 4:throw("[4] FILE ERROR");break;
+    default:throw(`[${id}] GENERIC ERROR`)
   }
-  process.exit(id);
 }
 ,mod=(f,f2)=>
   f2?new MoD(f.bind(0),f2.bind(0)):f instanceof MoD?(f.f1=f.f1.bind(0),f.f2=f.f2.bind(0),f):new MoD(A=>f.call(A),(A,B)=>f.call(A,B))
@@ -113,8 +112,12 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   })
 }
 ,bdrs={
-  '&':op(0,(a,b)=>mod(l=>a.call(b.call(l)),(l,r)=>a.call(b.call(l,r)))),
-  '"':op(1,f=>mod(l=>narr(l.rank(l.ds-1).d.map(n=>f.call(n))),(l,r)=>{
+  '&':op(0,(a,b)=>mod(
+    l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
+   ,(l,r)=>l==null||r==null?err(0):!a.incomp||!b.incomp?err(0):a.call(b.call(l,r)))
+  ),
+  '"':op(1,f=>mod(l=>l==null?err(0):narr(l.rank(l.ds-1).d.map(n=>f.call(n))),(l,r)=>{
+    if(l==null||r==null)err(0)
     if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)))}
     else if(r.ds==0||sb(r)){let v=carr(l);return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)))}
     else if(JSON.stringify(a.r)==JSON.stringify(b.r)){let F=a.rank(a.ds-1),S=b.rank(b.ds-1);return narr(F.d.map((n,i)=>F.call(n,S.d[i])))}
@@ -183,8 +186,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         tn.push(...(t[i]!=null?[t4,t[i]]:[t4]))
         bn=[]
       }else{
-        b=b.map(n=>n.t==1?new A(n.v.d,n.v.r[0],1,1):n.v);
-        let a=new A(b,b.length,0);
+        let a=narr(b.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v))
         tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))
       }
       b=[]
@@ -227,7 +229,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   for(let i=0;i<t.length;i++){
     let o=t[i];
     if(o.t==9&&o.v=='\n'&&fq.length){
-      if(!G)console.log(ptrain(fq).call().toString())
+      let x=ptrain(fq).call();
+      if(!G&&x!=null)console.log(x.toString())
       fq=[]
     }
     if(o.t==7){
@@ -264,16 +267,17 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   }
   if(fq.length){let x=ptrain(fq).call();if(G)return x;else if(x!=null)console.log(x.toString())}
 }
+,run=d=>{try{exec(strand(lex(d)))}catch(e){console.error(e)}}
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
     ayr <file> - run a file
     ayr -u <code> - run the code`),process.exit(0);
-if(argv.u)exec(strand(lex(argv.u)))
+if(argv.u)run(argv.u)
 else if(!argv._.length){
   console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`)
-  while((inp=rl.question('\t'))&&inp!="exit")exec(strand(lex(inp)))
+  while((inp=rl.question('\t'))&&inp!="exit")run(inp)
 }else f.readFile(
   __dirname+"/"+argv._[0],
   'utf8',
-  (e,d)=>e?err(4):exec(strand(lex(d.replace(/\r\n/g,"\n").trim())))
+  (e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim())
 )
