@@ -245,6 +245,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     }
     return tn[0]
   }else{//normal
+    if(t[t.length-1].incomp)return ptrain(t,1);
     tn.push(t[t.length-1]);
     for(let i=t.length-2;i>=0;i--){
       if(t[i-1]!=null&&!(t[i-1]instanceof MoD)){
@@ -297,7 +298,11 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       }else fq.push(o.v);
     }
   }
-  if(fq.length){let x=ptrain(fq,G);if(G)return mex(x);else {x=x.call();if(x!=null)console.log(x.toString())}}
+  if(fq.length){
+    if(fq[fq.length-1].incomp)err(0)
+    else var x=ptrain(fq,G)
+    if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}
+  }
 }
 ,run=d=>{try{exec(strand(grp(lex(d))))}catch(e){console.error(e)}}
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
