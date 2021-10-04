@@ -89,7 +89,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     case 1:throw("[1] RANK ERROR")
     case 2:throw("[2] DOMAIN ERROR")
     case 3:throw("[3] NAME ERROR")
-    case 4:throw("[4] FILE ERROR");break;
+    case 4:throw("[4] FILE ERROR")
+    case 5:throw("[5] GROUP ERROR")
     default:throw(`[${id}] GENERIC ERROR`)
   }
 }
@@ -143,12 +144,13 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,str=s=>s.toString()
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
+,mex=f=>{try{return f.call()}catch(e){return f}}
 ,nnw=(t,i)=>{
   let o=1;
   while(t[i+o]&&t[i+o].t==9)o++;
   return t[i+o]?[i+o,t[i+o]]:[i+o,t[i+o-1]];
 }
-,inst=o=>o.t<2||o.t==4||o.t==8
+,inst=o=>o.t<2||o.t==4||o.t==7&&!env[o.v].incomp||o.t==8&&!o.v.incomp
 ,lex=s=>{
   let test,
       toks=[];
@@ -161,19 +163,40 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     else if(test=RegExp(`^(${Object.keys(bdrs).map(resc).join('|')})`).exec(s))toks.push({t:3,v:test[1]});
     else if(test=/^(\s)/.exec(s))toks.push({t:9,v:test[1]});
     else if(test=/^([a-zA-Z]+)/.exec(s))toks.push({t:7,v:test[1]});
+    else if(test=/^\(|\)/.exec(s))toks.push({t:2,v:test[0]})
+    else err(3)
     s=s.slice(test&&test[0].length||1);
   }
   return toks;
 }
-// TODO: This should work for groups too
+,grp=t=>{
+  let tn=[]
+      ,b=[]
+      ,ig=0
+      ,oc=0;
+  for(let i=0;i<=t.length;i++){
+    if(ig){
+      if(t[i]==null)err(5)
+      else if(t[i].t==2&&t[i].v=='('){b.push(t[i]);oc++}
+      else if(t[i].t==2&&t[i].v==')'){
+        if(oc==0){tn.push({t:8,v:exec(strand(grp(b)),1)});ig=0;oc=0;b=[]}
+        else{b.push(t[i]);oc--}
+      }else b.push(t[i])
+    }else if(t[i]!=null&&t[i].t==2&&t[i].v=='(')ig=1
+    else if(t[i]!=null&&t[i].t==2&&t[i].v==')')err(5)
+    else if(t[i]!=null)tn.push(t[i])
+  }
+  return tn
+}
 ,strand=t=>{
-  let tn=[],
-      b=[],
-      bn=[];
+  if(t.length==1)return t
+  let tn=[]
+      ,b=[]
+      ,bn=[];
   for(let i=0;i<=t.length;i++)
     if(t[i]!=null&&t[i].t==5){bn.push(b);b=[]}
-    else if(t[i]!=null&&(t[i].t<2||(t[i].t==7&&!env[t[i].v].incomp)))b.push(t[i]);
-    else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7)&&b.length==1&&bn.length==0)
+    else if(t[i]!=null&&inst(t[i]))b.push(t[i]);
+    else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7||t[i].t==8)&&b.length==1&&bn.length==0)
       tn.push(...(t[i]!=null?[b.pop(),t[i]]:[b.pop()]));
     else if((t[i]==null||!(t[i].t==9&&t[i].v==' '))&&b.length){
       if(bn.length){
@@ -194,7 +217,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       b=[]
     }
     else tn.push(t[i]);
-  return tn;
+  return tn.filter(n=>n!=null);//sometimes happens
 }
 ,ptrain=(t,G=0)=>{
   if(t.length==1)return t[0];
@@ -231,7 +254,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   for(let i=0;i<t.length;i++){
     let o=t[i];
     if(o.t==9&&o.v=='\n'&&fq.length){
-      let x=ptrain(fq).call();
+      let x=ptrain(fq,G).call();
       if(!G&&x!=null)console.log(x.toString())
       fq=[]
     }
@@ -240,19 +263,17 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       else if(env[o.v]&&env[o.v].incomp)fq.push(env[o.v])
       else if(env[o.v]!=null)q.push(env[o.v])
       else err(3)
-    }else if(o.t==2){
-      if(inst(nnw(t,i)[1])){
-        let b;
-        [i,b]=nnw(t,i);
+    }else if(o.t==2||o.t==8&&o.v.incomp){
+      let [ni,b]=nnw(t,i);
+      if(inst(b)||b.t==8){
+        i=ni
         if(b.t==8){
-          let t=ptrain(b.v);
-          if(t.incomp)fq.push(syms[o.v].bind(0,q.pop()),t);
+          if(b.v.incomp)fq.push((o.t==8?o.v:syms[o.v]).bind(0,q.pop()),ptrain(b.v,1));
           else {
-            fq.push(ptrain(fq).call(t.call()));
-            fq=[]
+            fq.push(o.t==8?o.v:syms[o.v],b.v)
           }
-        }else fq.push(syms[o.v],b.v)
-      }else fq.push(syms[o.v]);
+        }else fq.push(o.t==8?o.v:syms[o.v],b.v)
+      }else fq.push(o.t==8?o.v:syms[o.v]);
     }else if(o.t==3){
       if(!fq.length)err(0)
       else if(!bdrs[o.v].m){
@@ -260,16 +281,16 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         if(!inst(f)&&f.t!=2)err(0);
         fq.push(bdrs[o.v].call(fq.pop(),inst(f)?f.v:syms[f.v]))
       }else fq.push(bdrs[o.v].call(fq.pop()))
-    }else if(o.t<2||o.t==4){
+    }else if(o.t<2||o.t==4||o.t==8){
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
-        if(G&&nnw(t,i)[0]+1>=t.length)return o.v.toString();
+        if(G&&nnw(t,i)[0]+1>=t.length)return o.v;
         else if(!G)console.log(o.v.toString())
       }else fq.push(o.v);
     }
   }
-  if(fq.length){let x=ptrain(fq).call();if(G)return x;else if(x!=null)console.log(x.toString())}
+  if(fq.length){let x=ptrain(fq,G);if(G)return mex(x);else {x=x.call();if(x!=null)console.log(x.toString())}}
 }
-,run=d=>{try{exec(strand(lex(d)))}catch(e){console.error(e)}}
+,run=d=>{try{exec(strand(grp(lex(d))))}catch(e){console.error(e)}}
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
     ayr <file> - run a file
