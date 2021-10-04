@@ -137,9 +137,11 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   return new A(n,n.length==1?1:[1,n.length],b);
 }
 ,fix=a=>{
-  let f=+a.d.reduce((acc,x)=>acc||x instanceof A&&x.b,false);if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1))
+  let f=a.d.reduce((acc,x)=>acc||x instanceof A,false)
+  if(f)f=a.d.length>1&&a.d.slice(1).reduce((acc,b)=>acc||JSON.stringify(a.d[0].r)!=JSON.stringify(b.r),false)
+  if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1))
 }
-,str=s=>s instanceof A&&s.str?String.fromCharCode(...s.d):s.toString()
+,str=s=>s.toString()
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
 ,nnw=(t,i)=>{
   let o=1;
@@ -178,7 +180,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         let s,bx=0;
         bn=bn.concat([b]);
         if(!bn.reduce((acc,x)=>acc&&x.length==bn[0].length)
-          ||bn.reduce((acc,x)=>acc||(x[0] instanceof A&&x[0].d.length != bn[0].length))){
+          ||bn.reduce((acc,x)=>acc||(x[0] instanceof A&&x[0].d.length!=bn[0].length),false)){
           s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v),n.length,1));
           bx=1;
         }else s=bn.flat().map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v);
