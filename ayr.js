@@ -17,15 +17,16 @@ function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length
 if(this.d.length==1&&this.d[0].b)this.d[0].b=0}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.incomp=1;}
 MoD.prototype.bind=function(...v){
-  if(v[1]!=null)this.bd.push(...v);
+  this.bd.push(...v);
   return this;
 }
 MoD.prototype.call=function(...a){
-  if(this.bd.length){this.f2=this.f2.bind(...this.bd);return this.f2.call(0,a[0])}
+  if(this.bd.length+a.length>2)err(0)
+  else if(this.bd.length){return this.f2.call(0,...this.bd,a[0])}
   else if(a.length>1)return this.f2.call(0,...a);
   else return this.f1.call(0,a[0]);
 }
-MoD.prototype.clone=function(){return new MoD(this.f1,this.f2)}
+MoD.prototype.clone=function(){let mod=new MoD(this.f1,this.f2);mod.bd=this.bd;return mod}
 A.prototype.rank=function(r){
   switch(r){
     case 0:return new A(this.d,this.r,this.b);
@@ -58,10 +59,13 @@ A.prototype.toString=function(){
   }
   return S.trim();
 }
+A.prototype.clone=function(){return new A(this.d.map(n=>n.clone()),this.r,this.b,this.str)}
 Number.prototype.call=function(...v){return +this;}
 Number.prototype.bind=function(...v){return +this;}
+Number.prototype.clone=function(){return +this;}
 Number.prototype.ds=0;
 Array.prototype.ds=1;
+Array.prototype.clone=function(){return this;}
 A.prototype.bind=function(...v){return this;}
 A.prototype.call=function(...v){return this;}
 const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
@@ -98,8 +102,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,mod=(f,f2)=>
   f2?new MoD(f.bind(0),f2.bind(0)):f instanceof MoD?(f.f1=f.f1.bind(0),f.f2=f.f2.bind(0),f):new MoD(A=>f.call(A),(A,B)=>f.call(A,B))
 ,syms={
-  "+":mod(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>(console.log("ADD",a,b),a+b),0)),
-  "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>(console.log("SUB",a,b),a-b),0)),
+  "+":mod(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>a+b,0)),
+  "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>a-b,0)),
   "]":mod(a=>a,(a,b)=>b),
   "[":mod(a=>a,(a,b)=>a),
   "<":mod(a=>a instanceof A?(a.b=1,a):new A([a],[1],1),pon.bind(0,1,(a,b)=>+(a<b),0)),
@@ -224,17 +228,16 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   if(t.length==1)return t[0];
   if(!t[t.length-1].incomp)G=0
   let tn=[];
-  // TODO: preprocess and bind constants
   if(G){//train
-    tn=JSON.parse(JSON.stringify(t))
+    for(let i=t.length-1;i>=0;i--)
+      if(i>=1&&t[i].incomp&&!t[i-1].incomp){t.splice(i-1,2,t[i].bind(t[i-1]));i--}
+    tn=t.map(n=>n.clone())
     for(let i=tn.length-1;i>=0;){
       if(i>=2&&t[i-1].incomp){i-=2;tn.splice(i,0,mod(
         A=>t[i+1].call(t[i].call(A),t[i+2].call(A)),
         (A,B)=>t[i+1].call(t[i].call(A,B),t[i+2].call(A,B)),
       ))}else if(i>=1){
-        i-=1;
-        if(!t[i].incomp)tn.splice(i,0,mod(A=>t[i+1].call(t[i],A),(A,B)=>err(0)));
-        else tn.splice(i,0,mod(
+        i-=1;tn.splice(i,0,mod(
           A=>t[i].call(t[i+1].call(A)),
           (A,B)=>t[i].call(A,t[i+1].call(B)),
         ))
@@ -304,7 +307,13 @@ Usage:
 if(argv.u)run(argv.u)
 else if(!argv._.length){
   console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`)
-  while((inp=rl.question('\t'))&&inp!="exit")run(inp)
+  while((inp=rl.question('\t'))&&inp!="exit"){
+    run(inp)
+    //what the fuck javascript
+    Object.values(syms).forEach(mod=>{mod.bd=[]})
+    Object.values(bdrs).forEach(mod=>{mod.bd=[]})
+    Object.values(env).forEach(mod=>{if(mod.incomp)mod.bd=[]})
+  }
 }else f.readFile(
   __dirname+"/"+argv._[0],
   'utf8',
