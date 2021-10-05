@@ -28,7 +28,7 @@ MoD.prototype.call=function(...a){
 }
 MoD.prototype.clone=function(){let mod=new MoD(this.f1,this.f2);mod.bd=this.bd;return mod}
 A.prototype.rank=function(r){
-  switch(r){
+  switch(Math.min(r,this.ds-1)){
     case 0:return new A(this.d,this.r,this.b);
     case 1:return chnk(this.d,this.r[this.r.length-1]);
     case 2:return chnk(chnk(this.d,this.r[this.r.length-2]),this.r[this.r.length-1]);
@@ -72,20 +72,23 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,sb=arr=>arr instanceof A&&arr.ds==1&&arr.r[0]==1
 ,op=(m,f)=>{let x=new MoD(m?f:null,m?null:f);x.m=m;return x}
 ,carr=v=>v instanceof A?v:new A([v],1)
-,narr=a=>new A(a,a.length)
+,narr=(a,b=0,ba=0)=>new A(ba?a.map(n=>n instanceof A?(n.b=1,n):new A([n],1,1)):a,a.length,b)
 ,pon=(d,f,r,a,b)=>{
+  if(typeof r!='object')r=[r,r]
   if(!d){
-    if(bc(a)&&r<a.ds)return narr(a.rank(r).d.map(n=>pon(d,f,r,n)));
-    else if(r>=a.ds)return f(a);
-    else if(r<a.ds)return narr(a.rank(r).d.map(n=>pon(d,f,r,n)));
-    else return narr(a.d.map(n=>f(n)));
+    a=carr(a)
+    if(bc(a)&&r[1]<a.ds)return narr(a.rank(r[1]).d.map(n=>pon(d,f,r,n)))
+    else if(r[1]>=a.ds)return f(a)
+    else if(r[1]<a.ds)return narr(a.rank(r[1]).d.map(n=>pon(d,f,r,n)))
+    else return narr(a.d.map(n=>f(n)))
   }else{
-    if(a.ds>r&&b.ds>r&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
-    if(a.ds<b.ds)return pon(d,f,r,b,a)//lower last
-    else if(bc(a)||r<a.ds&&!sb(a)){
-      return narr(a.rank(r).d.map((v,i)=>pon(d,f,r,v,sb(b)?b.d[0]:b.ds==0?b:b.rank(r).d[i])));
-    }else if((r>=a.ds||sb(a))&&(r>=b.ds||sb(b)))return f(sb(a)?a.d[0]:a,sb(b)?b.d[0]:b);
-    else return narr(a.rank(r).d.map((v,i)=>pon(d,f,r,v,b.ds==0?b:b.d[i])));
+    a=carr(a),b=carr(b);
+    if(a.ds-1>r[0]&&b.ds-1>r[1]&&r[0]==r[1]&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
+    else{
+      let na=r[0]>a.ds-1?new A([a],1):r[0]==0&&sb(a)?a.d[0]:a.rank(r[0])
+         ,nb=r[1]>b.ds-1?new A([b],1):r[1]==0&&sb(b)?b.d[0]:b.rank(r[1])
+      return narr(na.d.map((v,i)=>f(v,nb.d[i])),0,1)
+    }
   }
 }
 ,err=id=>{
@@ -104,29 +107,29 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,syms={
   "+":mod(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>a+b,0)),
   "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>a-b,0)),
-  "]":mod(a=>a,(a,b)=>b),
-  "[":mod(a=>a,(a,b)=>a),
-  "<":mod(a=>a instanceof A?(a.b=1,a):new A([a],[1],1),pon.bind(0,1,(a,b)=>+(a<b),0)),
-  ">":mod(a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,pon.bind(0,1,(a,b)=>+(a>b),0)),
-  "$":mod(a=>a instanceof A?narr(a.r):narr([0]),(a,b)=>{
+  "]":mod(pon.bind(0,0,a=>a,99),pon.bind(0,1,(a,b)=>b,99)),
+  "[":mod(pon.bind(0,0,a=>a,99),pon.bind(0,1,(a,b)=>a,99)),
+  "<":mod(pon.bind(0,0,a=>a instanceof A?(a.b=1,a):new A([a],[1],1)),pon.bind(0,1,(a,b)=>+(a<b),0)),
+  ">":mod(pon.bind(0,0,a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a),pon.bind(0,1,(a,b)=>+(a>b),0)),
+  "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),99),pon.bind(0,1,(a,b)=>{
     let nr=a instanceof A?a.d:[a]
     b=carr(b);
     let [lo,ln]=[b.r.reduce((a,b)=>a*b,1),nr.reduce((a,b)=>a*b,1)]
-    if(lo==ln){b.r=nr;return b}
-    else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);return b}
+    if(lo==ln){b.r=nr;b.ds=nr.length;return b}
+    else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);b.ds=nr.length;return b}
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
-  })
+  },99))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(
     l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
    ,(l,r)=>l==null||r==null?err(0):!a.incomp||!b.incomp?err(0):a.call(b.call(l,r)))
   ),
-  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([l],1,1):narr(l.rank(l.ds-1).d.map(n=>f.call(n))),(l,r)=>{
+  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([l],1,1):narr(l.rank(l.ds-1).d.map(n=>f.call(n)),0,1),(l,r)=>{
     if(l==null||r==null)err(0)
-    else if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)))}
-    else if(r.ds==0||sb(r)){let v=carr(l);return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)))}
-    else if(JSON.stringify(a.r)==JSON.stringify(b.r)){let F=a.rank(a.ds-1),S=b.rank(b.ds-1);return narr(F.d.map((n,i)=>F.call(n,S.d[i])))}
+    else if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)),0,1)}
+    else if(r.ds==0||sb(r)){let v=carr(l);return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)),0,1)}
+    else if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])),0,1)}
     else err(1)
   }))
 }
