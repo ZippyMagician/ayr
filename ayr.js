@@ -10,6 +10,9 @@
 //  7 -> var
 //  8 -> group
 //  9 -> whitespace
+
+const { fail } = require('assert');
+
 //TODO: Higher rank data should be supported
 let f=require('fs'),
     argv=require('minimist')(process.argv.slice(2)),
@@ -31,8 +34,8 @@ MoD.prototype.clone=function(){let mod=new MoD(this.f1,this.f2);mod.bd=this.bd;r
 A.prototype.rank=function(r){
   switch(Math.min(r,this.ds-1)){
     case 0:return new A(this.d,this.r,this.b);
-    case 1:return chnk(this.d,this.r[this.r.length-1]);
-    case 2:return chnk(chnk(this.d,this.r[this.r.length-2]),this.r[this.r.length-1]);
+    case 1:return chnk(this.d,this.r[0]);
+    case 2:return chnk(chnk(this.d,this.r[0]),this.r[1]);
     default:err(1);
   }
 }
@@ -49,12 +52,12 @@ A.prototype.toString=function(){
       if(this.b){S+='[ ';ind=2}
       for(x of this.d.d){
         if(!f)S+=' '.repeat(ind);else f=0;if(x.b)S+='[ ';for(y of x.d)S+=(x.b?" ":" ".repeat(l-str(y).length))+str(y)+" ";
-        if(x.b)S=S.trim()+']';S+='\n';
+        if(x.b)S=S.trimEnd()+']';S+='\n';
       }
-      if(this.b)S=S.trim()+' ]';break;
+      if(this.b)S=S.trimEnd()+' ]';break;
     default:err(1);
   }
-  return S.trim();
+  return S.trimEnd();
 }
 A.prototype.clone=function(){return new A(this.d.map(n=>n.clone()),this.r,this.b,this.str)}
 Number.prototype.call=function(...v){return +this;}
@@ -75,14 +78,18 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   if(!d){
     a=carr(a)
     if(a.ds-1>r[1])err(1);
-    else{let na=r[1]>a.ds-1?new A([a],1):r[1]==0&&sb(a)?a:a.rank(r[1]);return narr(na.d.map(f))}
+    else{let na=r[1]>a.ds-1?new A([a],1):r[1]==0&&sb(a)?a:a.rank(r[1]);return new A(na.d.map(f),a.r,a.b,a.str)}
   }else{
     a=carr(a),b=carr(b);
-    if(a.ds-1>r[0]&&b.ds-1>r[1]&&r[0]==r[1]&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
+    if(a.ds-1>=r[0]&&b.ds-1>=r[1]&&r[0]==r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
     else{
-      let na=r[0]>a.ds-1?new A([a],1):r[0]==0&&sb(a)?a:a.rank(r[0])
-         ,nb=r[1]>b.ds-1?new A([b],1):r[1]==0&&sb(b)?b:b.rank(r[1])
-      return narr(na.d.map((v,i)=>f(v,nb.d[i])))
+      if((a.ds==r[0]||r[0]==0&&sb(a))&&(b.ds==r[1]||r[1]==0&&sb(b)))return f(sb(a)?a.d[0]:a,sb(b)?b.d[0]:b)
+      let aln=a.r.reduce((a,b)=>a*b,1);
+      if(aln<b.r.reduce((a,b)=>a*b,1))return pon(d,f,r.reverse(),b,a)
+      let rb=new A([...Array(aln).fill(sb(b)?b.d[0]:b)],aln)
+          ,na=r[0]>a.ds-1?new A([a],1):r[0]==0&&sb(a)?a:a.rank(r[0])
+          ,nb=r[1]>b.ds-1?rb:r[1]==0&&sb(b)?rb:b.rank(r[1])
+      return new A(na.d.map((v,i)=>pon(d,f,r,v,nb.d[i])),a.r,a.b,a.str)
     }
   }
 }
@@ -125,13 +132,16 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
    ,(l,r)=>l==null||r==null?err(0):!a.incomp||!b.incomp?err(0):a.call(b.call(l,r)))
   ),
-  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([l],1,1):narr(l.rank(l.ds-1).d.map(n=>f.call(n)),0,1),(l,r)=>{
-    if(l==null||r==null)err(0)
-    else if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)),0,1)}
-    else if(r.ds==0||sb(r)){let v=carr(l);return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)),0,1)}
-    else if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])),0,1)}
-    else err(1)
-  }))
+  '"':op(1,f=>mod(l=>
+      l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>(sf=f.call(n),sf instanceof A)?(sf.b=1,sf):new A([sf],1,1)),l.r,l.b,l.str)
+      ,(l,r)=>{
+        if(l==null||r==null)err(0)
+        else if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)),0,1)}
+        else if(r.ds==0||sb(r)){let v=carr(l);return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)),0,1)}
+        else if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])),0,1)}
+        else err(1)
+      }
+  ))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
@@ -215,7 +225,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
           s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v),n.length,1));
           bx=1;
         }else s=bn.flat().map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v);
-        let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,bn.length])};
+        let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,bn.length],0)};
         tn.push(...(t[i]!=null?[t4,t[i]]:[t4]))
         bn=[]
       }else{
