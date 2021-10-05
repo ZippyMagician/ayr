@@ -106,7 +106,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,syms={
   "+":mod(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>+a+ +b,0)),
   "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>+a-+b,0)),
-  "*":mod(pon.bind(0,0,a=>a==0?0:a>0?1:-1,0),pon.bind(0,1,(a,b)=>+a*+b)),
+  "*":mod(pon.bind(0,0,a=>a==0?0:a>0?1:-1,0),pon.bind(0,1,(a,b)=>+a*+b,0)),
   "%":mod(pon.bind(0,0,a=>1/+a,0),pon.bind(0,1,(a,b)=>+a/+b,0)),
   "]":mod(pon.bind(0,0,a=>a,99),pon.bind(0,1,(a,b)=>b,99)),
   "[":mod(pon.bind(0,0,a=>a,99),pon.bind(0,1,(a,b)=>a,99)),
@@ -138,7 +138,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         else if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])),0,1)}
         else err(1)
       }
-  ))
+  )),
+  "`":op(1,f=>mod(l=>f.call(l,l),(l,r)=>f.call(r,l)))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
