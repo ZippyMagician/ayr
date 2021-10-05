@@ -10,9 +10,6 @@
 //  7 -> var
 //  8 -> group
 //  9 -> whitespace
-
-const { fail } = require('assert');
-
 //TODO: Higher rank data should be supported
 let f=require('fs'),
     argv=require('minimist')(process.argv.slice(2)),
