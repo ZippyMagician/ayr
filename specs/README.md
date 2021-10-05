@@ -96,6 +96,9 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 |  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |
 |  ```[``` |  Identity  |  99  |     Left     | 99 99 |
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |
+|  ```~``` |  One-Range |   0  |     Index    | 0 99  |
+| ```<.``` | Sort Ascending | 1 |     TBD     |  TBD  |
+| ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Dyadic |        Notes       |
@@ -103,6 +106,8 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```"``` |  ```u"``` |   Each  |  Each  |                    |
 | ```&``` | ```u&v``` |  Beside |  Atop  | Binds if immediate |
 | ``` ` ``` | ```u` ``` | Commute | Flip |                    |
+| ```/``` |  ```u/``` |  Reduce | Pairwise Reduce |           |
+| ```\``` |  ```u\``` |   Scan  |  Table |                    |
 
 ## Library Functions
     put A   ->    print A
