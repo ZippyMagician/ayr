@@ -77,17 +77,18 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   if(typeof r!='object')r=[r,r]
   if(!d){
     a=carr(a)
-    if(bc(a)&&r[1]<a.ds)return narr(a.rank(r[1]).d.map(n=>pon(d,f,r,n)))
-    else if(r[1]>=a.ds)return f(a)
-    else if(r[1]<a.ds)return narr(a.rank(r[1]).d.map(n=>pon(d,f,r,n)))
-    else return narr(a.d.map(n=>f(n)))
+    if(a.ds-1>r[1])err(1);
+    else{
+      let na=r[1]>a.ds-1?new A([a],1):r[1]==0&&sb(a)?a:a.rank(r[1])
+      return narr(na.d.map(f))
+    }
   }else{
     a=carr(a),b=carr(b);
     if(a.ds-1>r[0]&&b.ds-1>r[1]&&r[0]==r[1]&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
     else{
-      let na=r[0]>a.ds-1?new A([a],1):r[0]==0&&sb(a)?a.d[0]:a.rank(r[0])
-         ,nb=r[1]>b.ds-1?new A([b],1):r[1]==0&&sb(b)?b.d[0]:b.rank(r[1])
-      return narr(na.d.map((v,i)=>f(v,nb.d[i])),0,1)
+      let na=r[0]>a.ds-1?new A([a],1):r[0]==0&&sb(a)?a:a.rank(r[0])
+         ,nb=r[1]>b.ds-1?new A([b],1):r[1]==0&&sb(b)?b:b.rank(r[1])
+      return narr(na.d.map((v,i)=>f(v,nb.d[i])))
     }
   }
 }
@@ -172,8 +173,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     else if(test=/^'((?:[^']|\\')*)'/.exec(s))toks.push({t:1,v:new A(test[1].split("").map(c=>c.charCodeAt(0)),test[1].length,0,1)});
     else if(test=/^;/.exec(s))toks.push({t:5});
     else if(test=/^:/.exec(s))toks.push({t:6});
-    else if(test=RegExp(`^(${Object.keys(syms).map(resc).join('|')})`).exec(s))toks.push({t:2,v:test[1]});
-    else if(test=RegExp(`^(${Object.keys(bdrs).map(resc).join('|')})`).exec(s))toks.push({t:3,v:test[1]});
+    else if(test=RegExp(`^(${Object.keys(syms).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))toks.push({t:2,v:test[1]});
+    else if(test=RegExp(`^(${Object.keys(bdrs).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))toks.push({t:3,v:test[1]});
     else if(test=/^(\s)/.exec(s))toks.push({t:9,v:test[1]});
     else if(test=/^([a-zA-Z]+)/.exec(s))toks.push({t:7,v:test[1]});
     else if(test=/^\(|\)/.exec(s))toks.push({t:2,v:test[0]})
@@ -312,7 +313,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}
   }
 }
-,run=d=>{try{exec(strand(grp(lex(d))))}catch(e){console.error(e)}}
+,run=d=>{if(argv.debug)
+  (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))))
+  else{try{exec(strand(grp(lex(d))))}catch(e){console.error(e)}}}
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
     ayr <file> - run a file
