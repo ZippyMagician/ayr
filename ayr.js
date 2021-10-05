@@ -105,12 +105,17 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,mod=(f,f2)=>
   f2?new MoD(f.bind(0),f2.bind(0)):f instanceof MoD?(f.f1=f.f1.bind(0),f.f2=f.f2.bind(0),f):new MoD(A=>f.call(A),(A,B)=>f.call(A,B))
 ,syms={
-  "+":mod(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>a+b,0)),
-  "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>a-b,0)),
+  "+":mod(pon.bind(0,0,a=>+a,0),pon.bind(0,1,(a,b)=>+a+ +b,0)),
+  "-":mod(pon.bind(0,0,a=>-a,0),pon.bind(0,1,(a,b)=>+a-+b,0)),
+  "*":mod(pon.bind(0,0,a=>a==0?0:a>0?1:-1,0),pon.bind(0,1,(a,b)=>+a*+b)),
+  "%":mod(pon.bind(0,0,a=>1/+a,0),pon.bind(0,1,(a,b)=>+a/+b,0)),
   "]":mod(pon.bind(0,0,a=>a,99),pon.bind(0,1,(a,b)=>b,99)),
   "[":mod(pon.bind(0,0,a=>a,99),pon.bind(0,1,(a,b)=>a,99)),
   "<":mod(pon.bind(0,0,a=>a instanceof A?(a.b=1,a):new A([a],[1],1)),pon.bind(0,1,(a,b)=>+(a<b),0)),
   ">":mod(pon.bind(0,0,a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a),pon.bind(0,1,(a,b)=>+(a>b),0)),
+  "<:":mod(pon.bind(0,0,a=>Math.floor(+a),0),pon.bind(0,1,(a,b)=>+(a<=b))),
+  ">:":mod(pon.bind(0,0,a=>Math.ceil(+a),0),pon.bind(0,1,(a,b)=>+(a>=b),0)),
+  "^":mod(pon.bind(0,0,a=>2.7184*+a,0),pon.bind(0,1,(a,b)=>(+a)**+b,0)),
   "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),99),pon.bind(0,1,(a,b)=>{
     let nr=a instanceof A?a.d:[a]
     b=carr(b);
