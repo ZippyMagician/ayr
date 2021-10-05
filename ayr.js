@@ -10,6 +10,7 @@
 //  7 -> var
 //  8 -> group
 //  9 -> whitespace
+//TODO: Higher rank data should be supported
 let f=require('fs'),
     argv=require('minimist')(process.argv.slice(2)),
     rl=require('readline-sync');
@@ -43,17 +44,13 @@ A.prototype.toString=function(){
     case 1:S+=`${this.b?'[ ':''}${this.str?String.fromCharCode(...this.d):this.d.map(str).join(" ")}${this.b?' ]':''}`;break;
     case 2:
       let l=Math.max(...this.d.d.map(n=>Math.max(...n.d.map(r=>str(r).length))))
-      let f=1,
-          ind=0;
+          ,f=1
+          ,ind=0;
       if(this.b){S+='[ ';ind=2}
       for(x of this.d.d){
-        if(!f)S+=' '.repeat(ind);
-        else f=0;
-        if(x.b)S+='[ ';
-        for(y of x.d)S+=(x.b?" ":" ".repeat(l-str(y).length))+str(y)+" ";
-        if(x.b)S=S.trim()+']';
-        S+='\n';
-      };
+        if(!f)S+=' '.repeat(ind);else f=0;if(x.b)S+='[ ';for(y of x.d)S+=(x.b?" ":" ".repeat(l-str(y).length))+str(y)+" ";
+        if(x.b)S=S.trim()+']';S+='\n';
+      }
       if(this.b)S=S.trim()+' ]';break;
     default:err(1);
   }
@@ -78,10 +75,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   if(!d){
     a=carr(a)
     if(a.ds-1>r[1])err(1);
-    else{
-      let na=r[1]>a.ds-1?new A([a],1):r[1]==0&&sb(a)?a:a.rank(r[1])
-      return narr(na.d.map(f))
-    }
+    else{let na=r[1]>a.ds-1?new A([a],1):r[1]==0&&sb(a)?a:a.rank(r[1]);return narr(na.d.map(f))}
   }else{
     a=carr(a),b=carr(b);
     if(a.ds-1>r[0]&&b.ds-1>r[1]&&r[0]==r[1]&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
@@ -278,7 +272,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       fq=[]
     }
     if(o.t==7){
-      if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);err(5)} // TODO: declaration
+      if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);err(5)}//TODO: declarations
       else if(env[o.v]&&env[o.v].incomp)fq.push(env[o.v])
       else if(env[o.v]!=null)q.push(env[o.v])
       else err(3)
@@ -287,22 +281,20 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       if(inst(b)||b.t==8){
         i=ni
         if(b.t==8){
-          if(b.v.incomp)fq.push((o.t==8?o.v:syms[o.v]).bind(0,q.pop()),ptrain(b.v,1));
-          else {
-            fq.push(o.t==8?o.v:syms[o.v],b.v)
-          }
+          if(b.v.incomp)fq.push((o.t==8?o.v:syms[o.v]).bind(0,q.pop()),ptrain(b.v,1))
+          else fq.push(o.t==8?o.v:syms[o.v],b.v)
         }else fq.push(o.t==8?o.v:syms[o.v],b.v)
-      }else fq.push(o.t==8?o.v:syms[o.v]);
+      }else fq.push(o.t==8?o.v:syms[o.v])
     }else if(o.t==3){
       if(!fq.length)err(0)
       else if(!bdrs[o.v].m){
-        [i,f]=nnw(t,i);
-        if(!inst(f)&&f.t!=2)err(0);
+        [i,f]=nnw(t,i)
+        if(!inst(f)&&f.t!=2)err(0)
         fq.push(bdrs[o.v].call(fq.pop(),inst(f)?f.v:syms[f.v]))
       }else fq.push(bdrs[o.v].call(fq.pop()))
     }else if(o.t<2||o.t==4||o.t==8){
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
-        if(G&&nnw(t,i)[0]+1>=t.length)return o.v;
+        if(G&&nnw(t,i)[0]+1>=t.length)return o.v
         else if(!G)console.log(o.v.toString())
       }else fq.push(o.v);
     }
