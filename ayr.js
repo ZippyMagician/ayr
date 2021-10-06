@@ -333,7 +333,10 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
     ayr <file> - run a file
-    ayr -u <code> - run the code`),process.exit(0);
+    ayr -u <code> - run the code
+
+Args:
+    --debug - Debug code (for internal use)`),process.exit(0);
 if(argv.u)run(argv.u)
 else if(!argv._.length){
   console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`)
