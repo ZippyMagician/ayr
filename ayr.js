@@ -25,7 +25,7 @@ MoD.prototype.clone=function(){let mod=new MoD(this.f1,this.f2);mod.bd=this.bd;r
 A.prototype.clone=function(){return new A(this.d,this.r,this.b,this.str)}
 A.prototype.rank=function(r){
   switch(Math.min(r,this.ds)){
-    case 0:return new A(this.d,this.fr,this.b);
+    case 0:return new A(this.d,this.r,this.b);
     case 1:return chnk(this.d,this.r[0]);
     case 2:return chnk(chnk(this.d,this.r[0]),this.r[1]);
     default:err(1);
