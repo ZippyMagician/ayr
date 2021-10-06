@@ -28,8 +28,9 @@ MoD.prototype.call=function(...a){
   else return this.f1.call(0,a[0]);
 }
 MoD.prototype.clone=function(){let mod=new MoD(this.f1,this.f2);mod.bd=this.bd;return mod}
+A.prototype.clone=function(){return new A(this.d,this.r,this.b,this.str)}
 A.prototype.rank=function(r){
-  switch(Math.min(r,this.ds-1)){
+  switch(Math.min(r,this.ds)){
     case 0:return new A(this.d,this.r,this.b);
     case 1:return chnk(this.d,this.r[0]);
     case 2:return chnk(chnk(this.d,this.r[0]),this.r[1]);
@@ -68,25 +69,25 @@ A.prototype.call=function(...v){return this;}
 const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,sb=arr=>arr instanceof A&&arr.ds==1&&arr.r[0]==1
 ,op=(m,f)=>{let x=new MoD(m?f:null,m?null:f);x.m=m;return x}
-,carr=v=>v instanceof A?v:new A([v],1)
+,carr=(v,b=0)=>v instanceof A?b?(v.b=1,v):v:new A([v],1,b)
 ,narr=(a,b=0,ba=0)=>new A(ba?a.map(n=>n instanceof A?(n.b=1,n):new A([n],1,1)):a,a.length,b)
 ,pon=(d,f,r,a,b)=>{
   if(typeof r!='object')r=[r,r]
   if(!d){
     a=carr(a)
     if(a.ds-1>r[1])err(1);
-    else{let na=r[1]>a.ds-1?new A([a],1):r[1]==0&&sb(a)?a:a.rank(r[1]);return new A(na.d.map(f),a.r,a.b,a.str)}
+    else if(r[1]>a.ds-1||r[1]==0&&sb(a))return f(sb(a)?a.d[0]:a);
+    else return new A(a.rank(r[1]).d.map(f),a.r,a.b,a.str)
   }else{
     a=carr(a),b=carr(b);
-    if(a.ds-1>=r[0]&&b.ds-1>=r[1]&&r[0]==r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
+    if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
     else{
-      if((a.ds==r[0]||r[0]==0&&sb(a))&&(b.ds==r[1]||r[1]==0&&sb(b)))return f(sb(a)?a.d[0]:a,sb(b)?b.d[0]:b)
-      let aln=a.r.reduce((a,b)=>a*b,1);
-      if(aln<b.r.reduce((a,b)=>a*b,1))return pon(d,f,r.reverse(),b,a)
-      let rb=new A([...Array(aln).fill(sb(b)?b.d[0]:b)],aln)
-          ,na=r[0]>a.ds-1?new A([a],1):r[0]==0&&sb(a)?a:a.rank(r[0])
-          ,nb=r[1]>b.ds-1?rb:r[1]==0&&sb(b)?rb:b.rank(r[1])
-      return new A(na.d.map((v,i)=>pon(d,f,r,v,nb.d[i])),a.r,a.b,a.str)
+      let aln=a.rank(r[0]).r.reduce((a,b)=>a*b,1)
+          ,bln=b.rank(r[1]).r.reduce((a,b)=>a*b,1)
+      if((r[0]>a.ds-1||sb(a)&&r[0]==0)&&(r[1]>b.ds-1||sb(b)))return f(sb(a)&&r[0]==0?a.d[0]:a,sb(b)&&r[1]==0?b.d[0]:b)
+      if(aln>bln)return new A(a.rank(r[0]).d.map(v=>pon(d,f,r,v,sb(b)?b.d[0]:b)),a.r,a.b,a.str)
+      else if(bln>aln)return new A(b.rank(r[1]).d.map(v=>pon(d,f,r,sb(a)?a.d[0]:a,v)),b.r,b.b,b.str)
+      else return new A(a.rank(r[0]).d.map((v,i)=>pon(d,f,r,v,r[1]==0&&sb(b)?b.d[0]:b.rank(r[1]).d[i])),a.r,a.b,a.str)
     }
   }
 }
@@ -122,7 +123,12 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     if(lo==ln){b.r=nr;b.ds=nr.length;return b}
     else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);b.ds=nr.length;return b}
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
-  },99))
+  },99)),
+  "~":mod(pon.bind(0,0,a=>narr([...Array(+a)].map((_,i)=>i+1)),0),pon.bind(0,1,(a,b)=>{
+    let m=carr(b).rank(b.ds-1),i
+    if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
+    else let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)
+  },[0,99]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(
@@ -313,9 +319,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}
   }
 }
-,run=d=>{if(argv.debug)
+,run=d=>exec(strand(grp(lex(d))))/*{if(argv.debug)
   (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))))
-  else{try{exec(strand(grp(lex(d))))}catch(e){console.error(e)}}}
+  else{try{exec(strand(grp(lex(d))))}catch(e){console.error(e)}}}*/
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
     ayr <file> - run a file
