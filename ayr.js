@@ -127,7 +127,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   "~":mod(pon.bind(0,0,a=>narr([...Array(+a)].map((_,i)=>i+1)),0),pon.bind(0,1,(a,b)=>{
     let m=carr(b).rank(b.ds-1),i
     if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
-    else let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)
+    else{let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
   },[0,99]))
 }
 ,bdrs={
@@ -145,7 +145,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         else err(1)
       }
   )),
-  "`":op(1,f=>mod(l=>f.call(l,l),(l,r)=>f.call(r,l)))
+  "`":op(1,f=>mod(l=>f.call(l,l),(l,r)=>f.call(r,l))),
+  "/":op(1,f=>mod(l=>{let x=carr(l);return x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0])},(l,r)=>err(2)))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
@@ -314,7 +315,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     }
   }
   if(fq.length){
-    if(fq[fq.length-1].incomp)err(0)
+    if(!G&&fq[fq.length-1].incomp)err(0)
     else var x=ptrain(fq,G)
     if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}
   }
