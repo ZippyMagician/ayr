@@ -107,7 +107,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```&``` | ```u&v``` |  Beside |  Atop  | Binds if immediate |
 | ``` ` ``` | ```u` ``` | Commute | Flip |                    |
 | ```/``` |  ```u/``` |  Reduce | N-wise Reduce |             |
-| ```\``` |  ```u\``` |   Scan  |  Table |                    |
+| ```\``` |  ```u\``` |   Scan  |  Table |      TODO          |
 
 ## Library Functions
     put A   ->    print A

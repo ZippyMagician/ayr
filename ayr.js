@@ -146,7 +146,10 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       }
   )),
   "`":op(1,f=>mod(l=>f.call(l,l),(l,r)=>f.call(r,l))),
-  "/":op(1,f=>mod(l=>{let x=carr(l);return x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0])},(l,r)=>err(2)))
+  "/":op(1,f=>mod(pon.bind(0,0,x=>x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0]),1),pon.bind(0,1,(l,r)=>{
+    let p=0;if(l<0)l=Math.abs(l,p=1)
+    let n=[];for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((acc,v)=>f.call(acc,v),r.d[i]));return narr(n)
+  },[0,1])))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
