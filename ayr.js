@@ -149,7 +149,11 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   "/":op(1,f=>mod(pon.bind(0,0,x=>x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0]),1),pon.bind(0,1,(l,r)=>{
     let p=0;if(l<0)l=Math.abs(l,p=1)
     let n=[];for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((acc,v)=>f.call(acc,v),r.d[i]));return narr(n)
-  },[0,1])))
+  },[0,1]))),
+  "@":op(0,(a,b)=>mod(
+    l=>err(2),
+    (l,r)=>l==null||r==null?err(0):!a.incomp?err(2):!b.incomp?a.call(b,b):a.call(b.call(l),b.call(r))
+  ))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
@@ -325,7 +329,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,run=d=>{if(argv.debug)
   (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))))
-  else{try{exec(strand(grp(lex(d))))}catch(e){console.error(e)}}}
+  else{try{exec(strand(grp(lex(d))))}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}}
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
     ayr <file> - run a file

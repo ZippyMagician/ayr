@@ -101,13 +101,14 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |
 
 ## Binders
-|  Binder |   Usage   | Monadic | Dyadic |        Notes       |
-|:-------:|:---------:|:-------:|:------:|:------------------:|
-| ```"``` |  ```u"``` |   Each  |  Each  |                    |
-| ```&``` | ```u&v``` |  Beside |  Atop  | Binds if immediate |
-| ``` ` ``` | ```u` ``` | Commute | Flip |                    |
-| ```/``` |  ```u/``` |  Reduce | N-wise Reduce |             |
-| ```\``` |  ```u\``` |   Scan  |  Table |      TODO          |
+|  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
+|:-------:|:---------:|:-------:|:----:|:------:|:----:|:------------------:|
+| ```"``` |  ```u"``` |   Each  |   0  | Each  |   0 0 |                    |
+| ```&``` | ```u&v``` |  Compose | N/A  | Atop  |  N/A | Binds if immediate |
+| ``` ` ``` | ```u` ``` | Commute | N/A | Flip | N/A   |                    |
+| ```/``` |  ```u/``` |  Reduce |   1  | N-wise Reduce | 0 1 |              |
+| ```\``` |  ```u\``` |   Scan  |   1  | Table | 0 1 |       TODO           |
+| ```@``` | ```u@v``` |  TBD    |  TBD |  Over |  N/A  | Binds to both sides if immediate |
 
 ## Library Functions
     put A   ->    print A
