@@ -323,9 +323,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}
   }
 }
-,run=d=>exec(strand(grp(lex(d))))/*{if(argv.debug)
+,run=d=>{if(argv.debug)
   (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))))
-  else{try{exec(strand(grp(lex(d))))}catch(e){console.error(e)}}}*/
+  else{try{exec(strand(grp(lex(d))))}catch(e){console.error(e)}}}
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
     ayr <file> - run a file
