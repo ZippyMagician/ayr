@@ -13,7 +13,7 @@ What follows is an in-depth look at the specs of the `ayr` array language, so an
 * [Library functions](#library-functions)
 
 ## Array Model
-`ayr` uses the boxed array model, similar to [APL](https://dyalog.com) and [J](https://jsoftware.com). Values can be scalars, vectors, or matrices. These correspond to rank 0, 1, and 2 data respectively. 
+`ayr` uses the based array model, similar to [BQN](https://github.com/mlochbaum/BQN/blob/master/doc/based.md). Values can be scalars, vectors, or matrices. These correspond to rank 0, 1, and 2 data respectively. 
 <br>*Note: higher rank data will be supported in the future*
 
 ### Examples
@@ -99,6 +99,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 |  ```~``` |  One-Range |   0  |     Index    | 0 99  |
 | ```<.``` | Sort Ascending | 1 |     TBD     |  TBD  |
 | ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |
+|  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
