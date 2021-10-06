@@ -1,16 +1,10 @@
 #!/usr/bin/env node
-// t:
-//  0 -> int
-//  1 -> char[]
-//  2 -> symbol
-//  3 -> binder
-//  4 -> arr
-//  5 -> ;
-//  6 -> :
-//  7 -> var
-//  8 -> group
-//  9 -> whitespace
-//TODO: Higher rank data should be supported
+//TODO:
+//  - Higher rank data
+//  - '<.' and '>.' monadic, decide dyadic
+//  - '\' monadic and dyadic
+//  - '@' monadic
+//  - Variable assignment
 let f=require('fs'),
     argv=require('minimist')(process.argv.slice(2)),
     rl=require('readline-sync');
@@ -31,7 +25,7 @@ MoD.prototype.clone=function(){let mod=new MoD(this.f1,this.f2);mod.bd=this.bd;r
 A.prototype.clone=function(){return new A(this.d,this.r,this.b,this.str)}
 A.prototype.rank=function(r){
   switch(Math.min(r,this.ds)){
-    case 0:return new A(this.d,this.r,this.b);
+    case 0:return new A(this.d,this.fr,this.b);
     case 1:return chnk(this.d,this.r[0]);
     case 2:return chnk(chnk(this.d,this.r[0]),this.r[1]);
     default:err(1);
@@ -91,6 +85,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     }
   }
 }
+,ravel=a=>narr(a.d.map(n=>n instanceof A?ravel(n).d:n).flat())
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -128,7 +123,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     let m=carr(b).rank(b.ds-1),i
     if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
     else{let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
-  },[0,99]))
+  },[0,99])),
+  ",":mod(pon.bind(0,0,ravel,99),pon.bind(0,1,(a,b)=>narr(a.d.concat(b.d)),1))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(
@@ -169,7 +165,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,fix=a=>{
   let f=a.d.reduce((acc,x)=>acc||x instanceof A,false)
-  if(f)f=a.d.length>1&&a.d.slice(1).reduce((acc,b)=>acc||JSON.stringify(a.d[0].r)!=JSON.stringify(b.r),false)
+  if(f)f=a.d.length>1&&a.ds==1
   if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1))
 }
 ,str=s=>s.toString()
@@ -294,7 +290,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       fq=[]
     }
     if(o.t==7){
-      if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);err(5)}//TODO: declarations
+      if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);err(5)}
       else if(env[o.v]&&env[o.v].incomp)fq.push(env[o.v])
       else if(env[o.v]!=null)q.push(env[o.v])
       else err(3)
@@ -328,7 +324,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   }
 }
 ,run=d=>{if(argv.debug)
-  (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))))
+  (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),exec(strand(grp(lex(d)))))
   else{try{exec(strand(grp(lex(d))))}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}}
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
