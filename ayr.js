@@ -76,7 +76,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   if(!d){
     a=carr(a)
     if(a.ds-1>r[1])err(1);
-    else if(r[1]>a.ds-1||r[1]==0&&sb(a))return f(sb(a)?a.d[0]:a);
+    else if(r[1]>a.ds-1||r[1]==0&&sb(a))return f(r[1]==0&&sb(a)?a.d[0]:a);
     else return new A(a.rank(r[1]).d.map(f),a.r,a.b,a.str)
   }else{
     a=carr(a),b=carr(b);
