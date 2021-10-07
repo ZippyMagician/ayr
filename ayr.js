@@ -165,7 +165,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,fix=a=>{
   let f=a.d.reduce((acc,x)=>acc||x instanceof A,false)
-  if(f)f=a.d.length>1&&a.ds==1
+  if(f)f=a.d.length>1&&a.ds==1||a.d.reduce((acc,x)=>acc||x instanceof A&&x.b,false)
   if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1))
 }
 ,str=s=>s.toString()
