@@ -146,6 +146,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     let p=0;if(l<0)l=Math.abs(l,p=1)
     let n=[];for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((acc,v)=>f.call(acc,v),r.d[i]));return narr(n)
   },[0,1]))),
+  "\\":op(1,f=>mod(pon.bind(0,0,x=>(p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b,0)),1),pon.bind(0,1,(x,y)=>{
+    let n=[];for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
+  },1))),
   "@":op(0,(a,b)=>mod(
     l=>err(2),
     (l,r)=>l==null||r==null?err(0):!a.incomp?err(2):!b.incomp?a.call(b,b):a.call(b.call(l),b.call(r))
