@@ -86,6 +86,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   }
 }
 ,ravel=a=>narr(a.d.map(n=>n instanceof A?ravel(n).d:n).flat())
+,sort=(a,b)=>(a instanceof A?a.r.reduce((a,b)=>a*b,1):a)-(b instanceof A?b.r.reduce((a,b)=>a*b,1):b)
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -110,6 +111,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   ">":mod(pon.bind(0,0,a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,99),pon.bind(0,1,(a,b)=>+(a>b),0)),
   "<:":mod(pon.bind(0,0,a=>Math.floor(+a),0),pon.bind(0,1,(a,b)=>+(a<=b))),
   ">:":mod(pon.bind(0,0,a=>Math.ceil(+a),0),pon.bind(0,1,(a,b)=>+(a>=b),0)),
+  "<.":mod(pon.bind(0,0,a=>{a.d=a.d.sort(sort);return a},1),pon.bind(0,1,(a,b)=>err(2))),
+  ">.":mod(pon.bind(0,0,a=>{a.d=a.d.sort((a,b)=>-sort(a,b));return a},1),pon.bind(0,1,(a,b)=>err(2))),
   "^":mod(pon.bind(0,0,a=>2.7184*+a,0),pon.bind(0,1,(a,b)=>(+a)**+b,0)),
   "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),99),pon.bind(0,1,(a,b)=>{
     let nr=a instanceof A?a.d:[a]
