@@ -28,7 +28,7 @@ What follows is an in-depth look at the specs of the `ayr` array language, so an
 ```
 
 ## Basic syntax
-General types come in the form of signed floats and strings, which may or may not be scalar values. A vector, similar to **APL**, is denoted with a series of these general values separated by spaces. To create a matrix, you can currently use `;` to separate vectors or grouping (`()`) similar to how APL generally does it.
+General types come in the form of signed floats and strings, which may or may not be scalar values. A vector, similar to **APL**, is denoted with a series of these general values separated by spaces. To create a matrix, you can currently use `;` to separate vectors or grouping (`()`) similar to how APL generally does it. Note that `;` is not a symbol—rather, it is used solely for matrix denotion
 
 Incomplete operations within groups **or** assigned to a variable are called [Trains](#trains).
 
@@ -41,8 +41,8 @@ Binders are left-assosciative, while symbols are right-assosciative.
     'hello'
 hello
     _4 'hello' ; 1 2
-[ -4 ] [ 104 105 ] 
- [ 1 ]       [ 2 ]
+[ -4 ] [ hello ] 
+ [ 1 ]     [ 2 ]
 ```
 *The way output is stylized is implementation dependant*
 
