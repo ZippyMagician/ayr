@@ -304,7 +304,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       if(inst(b)||b.t==8){
         i=ni
         if(b.t==8){
-          if(b.v.incomp)fq.push((o.t==8?o.v:syms[o.v]).bind(0,q.pop()),ptrain(b.v,1))
+          if(b.v.incomp)fq.push((o.t==8?o.v:syms[o.v]),b.v)
           else fq.push(o.t==8?o.v:syms[o.v],b.v)
         }else fq.push(o.t==8?o.v:syms[o.v],b.v)
       }else fq.push(o.t==8?o.v:syms[o.v])
