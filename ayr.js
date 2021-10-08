@@ -69,9 +69,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   if(typeof r!='object')r=[r,r]
   if(!d){
     a=carr(a)
-    if(a.ds-1>r[1])err(1);
-    else if(r[1]>a.ds-1||r[1]==0&&sb(a))return f(r[1]==0&&sb(a)?a.d[0]:a);
-    else return new A(a.rank(r[1]).d.map(f),a.r,a.b,a.str)
+    if(r[1]>a.ds-1||r[1]==0&&sb(a))return f(r[1]==0&&sb(a)?a.d[0]:a);
+    return new A(a.rank(r[1]).d.map(f),a.r,a.b,a.str)
   }else{
     a=carr(a),b=carr(b);
     if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
@@ -81,7 +80,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       if((r[0]>a.ds-1||sb(a)&&r[0]==0)&&(r[1]>b.ds-1||sb(b)))return f(sb(a)&&r[0]==0?a.d[0]:a,sb(b)&&r[1]==0?b.d[0]:b)
       if(aln>bln)return new A(a.rank(r[0]).d.map(v=>pon(d,f,r,v,sb(b)?b.d[0]:b)),a.r,a.b,a.str)
       else if(bln>aln)return new A(b.rank(r[1]).d.map(v=>pon(d,f,r,sb(a)?a.d[0]:a,v)),b.r,b.b,b.str)
-      else return new A(a.rank(r[0]).d.map((v,i)=>pon(d,f,r,v,r[1]==0&&sb(b)?b.d[0]:b.rank(r[1]).d[i])),a.r,a.b,a.str)
+      return new A(a.rank(r[0]).d.map((v,i)=>pon(d,f,r,v,r[1]==0&&sb(b)?b.d[0]:b.rank(r[1]).d[i])),a.r,a.b,a.str)
     }
   }
 }
@@ -164,7 +163,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   let n=[],
       b=0;
   for(let x,i=0;i<a.length;i+=s){
-    if(i+s>a.length){b=1;n=n.map(e=>eval('e.b=1;e'))}
+    if(i+s>a.length){b=1;n=n.map(e=>(e.b=1,e))}
     x=a.slice(i,Math.min(a.length,i+s));n.push(new A(x,Math.min(a.length,i+s)-i))
   };
   return new A(n,n.length==1?1:[1,n.length],b);
@@ -313,8 +312,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       if(!fq.length)err(0)
       else if(!bdrs[o.v].m){
         [i,f]=nnw(t,i)
-        if(!inst(f)&&f.t!=2)err(0)
-        fq.push(bdrs[o.v].call(fq.pop(),inst(f)?f.v:syms[f.v]))
+        if(!inst(f)&&f.t!=2&&f.t!=8)err(0)
+        fq.push(bdrs[o.v].call(fq.pop(),inst(f)||f.t==8?f.v:syms[f.v]))
       }else fq.push(bdrs[o.v].call(fq.pop()))
     }else if(o.t<2||o.t==4||o.t==8){
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
