@@ -100,6 +100,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```<.``` | Sort Ascending | 1 |     TBD     |  TBD  |
 | ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |
 |  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |
+| ```;:``` |   Mold     |   1  |   Laminate   |  99 1 |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
