@@ -75,8 +75,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     a=carr(a),b=carr(b);
     if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
     else{
-      let aln=a.rank(r[0]).r.reduce((a,b)=>a*b,1)
-          ,bln=b.rank(r[1]).r.reduce((a,b)=>a*b,1)
+      let aln=pd(a.rank(r[0]).r)
+          ,bln=pd(b.rank(r[1]).r)
       if((r[0]>a.ds-1||sb(a)&&r[0]==0)&&(r[1]>b.ds-1||sb(b)))return f(sb(a)&&r[0]==0?a.d[0]:a,sb(b)&&r[1]==0?b.d[0]:b)
       if(aln>bln)return new A(a.rank(r[0]).d.map(v=>pon(d,f,r,v,sb(b)?b.d[0]:b)),a.r,a.b,a.str)
       else if(bln>aln)return new A(b.rank(r[1]).d.map(v=>pon(d,f,r,sb(a)?a.d[0]:a,v)),b.r,b.b,b.str)
@@ -84,8 +84,10 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     }
   }
 }
+,pd=a=>a.reduce((a,b)=>a*b,1)
 ,ravel=a=>narr(a.d.map(n=>n instanceof A?ravel(n).d:n).flat())
-,sort=(a,b)=>(a instanceof A?a.r.reduce((a,b)=>a*b,1):a)-(b instanceof A?b.r.reduce((a,b)=>a*b,1):b)
+,sort=(a,b)=>(a instanceof A?pd(a.r):a)-(b instanceof A?pd(b.r):b)
+,ext=(a,l)=>(a.d=a.d.concat([...Array(pd(l)-a.d.length).fill(0)]),a.r=l,a)
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -115,9 +117,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   "^":mod(pon.bind(0,0,a=>2.7184*+a,0),pon.bind(0,1,(a,b)=>(+a)**+b,0)),
   "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),99),pon.bind(0,1,(a,b)=>{
     let nr=a instanceof A?a.d:[a]
-    if(nr.indexOf(-1)>-1)nr[nr.indexOf(-1)]=b.r.reduce((a,b)=>a*b,1)/nr.reduce((a,b)=>a*(b>-1?b:1),1)
+    if(nr.indexOf(-1)>-1)nr[nr.indexOf(-1)]=pd(b.r)/nr.reduce((a,b)=>a*(b>-1?b:1),1)
     b=carr(b);
-    let [lo,ln]=[b.r.reduce((a,b)=>a*b,1),nr.reduce((a,b)=>a*b,1)]
+    let [lo,ln]=[pd(b.r),pd(nr)]
     if(lo==ln){b.r=nr;b.ds=nr.length;return b}
     else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);b.ds=nr.length;return b}
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
@@ -127,7 +129,13 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
     else{let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
   },[0,99])),
-  ",":mod(pon.bind(0,0,ravel,99),pon.bind(0,1,(a,b)=>narr(a.d.concat(b.d)),1))
+  ",":mod(pon.bind(0,0,ravel,99),pon.bind(0,1,(a,b)=>narr(a.d.concat(b.d)),1)),
+  ";:":mod(pon.bind(0,0,a=>{
+    let m=Math.max(...a.d.map(n=>n.d.length));return new A(a.d.flatMap(n=>ext(n,[m]).d),[...a.r,m],a.b,a.str)
+  },1),pon.bind(0,1,(a,b)=>{
+    if(b.r[0]==1&&b.ds==1)b=narr([...Array(a.r[0])].map(n=>b.r[0]));
+    return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,a.str)
+  },[99,1]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(
@@ -189,10 +197,10 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   while(s){
     if(test=/^(_?[0-9]*\.?[0-9]+)/.exec(s))toks.push({t:0,v:+test[1].replace(/_/g,'-')});
     else if(test=/^'((?:[^']|\\')*)'/.exec(s))toks.push({t:1,v:new A(test[1].split("").map(c=>c.charCodeAt(0)),test[1].length,0,1)});
-    else if(test=/^;/.exec(s))toks.push({t:5});
-    else if(test=/^:/.exec(s))toks.push({t:6});
     else if(test=RegExp(`^(${Object.keys(syms).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))toks.push({t:2,v:test[1]});
     else if(test=RegExp(`^(${Object.keys(bdrs).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))toks.push({t:3,v:test[1]});
+    else if(test=/^;/.exec(s))toks.push({t:5});
+    else if(test=/^:/.exec(s))toks.push({t:6});
     else if(test=/^(\s)/.exec(s))toks.push({t:9,v:test[1]});
     else if(test=/^([a-zA-Z]+)/.exec(s))toks.push({t:7,v:test[1]});
     else if(test=/^\(|\)/.exec(s))toks.push({t:2,v:test[0]})
