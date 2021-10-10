@@ -115,6 +115,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   "^":mod(pon.bind(0,0,a=>2.7184*+a,0),pon.bind(0,1,(a,b)=>(+a)**+b,0)),
   "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),99),pon.bind(0,1,(a,b)=>{
     let nr=a instanceof A?a.d:[a]
+    if(nr.indexOf(-1)>-1)nr[nr.indexOf(-1)]=b.r.reduce((a,b)=>a*b,1)/nr.reduce((a,b)=>a*(b>-1?b:1),1)
     b=carr(b);
     let [lo,ln]=[b.r.reduce((a,b)=>a*b,1),nr.reduce((a,b)=>a*b,1)]
     if(lo==ln){b.r=nr;b.ds=nr.length;return b}
