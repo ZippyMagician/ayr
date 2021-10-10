@@ -152,7 +152,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
         else err(1)
       }
   )),
-  "`":op(1,f=>mod(l=>f.call(l,l),(l,r)=>f.call(r,l))),
+  "`":op(1,f=>mod(l=>f.call(l.clone(),l),(l,r)=>f.call(r,l))),
   "/":op(1,f=>mod(pon.bind(0,0,x=>x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0]),1),pon.bind(0,1,(l,r)=>{
     let p=0;if(l<0)l=Math.abs(l,p=1)
     let n=[];for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((acc,v)=>f.call(acc,v),r.d[i]));return narr(n)
@@ -210,10 +210,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   return toks;
 }
 ,grp=t=>{
-  let tn=[]
-      ,b=[]
-      ,ig=0
-      ,oc=0;
+  let tn=[],b=[],ig=0,oc=0;
   for(let i=0;i<=t.length;i++){
     if(ig){
       if(t[i]==null)err(5)
@@ -230,9 +227,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,strand=t=>{
   if(t.length==1)return t
-  let tn=[]
-      ,b=[]
-      ,bn=[];
+  let tn=[],b=[],bn=[];
   for(let i=0;i<=t.length;i++)
     if(t[i]!=null&&t[i].t==5){bn.push(b);b=[]}
     else if(t[i]!=null&&inst(t[i]))b.push(t[i]);
@@ -269,8 +264,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     tn=t.map(n=>n.clone())
     for(let i=tn.length-1;i>=0;){
       if(i>=2&&t[i-1].incomp){i-=2;tn.splice(i,0,mod(
-        A=>t[i+1].call(t[i].call(A),t[i+2].call(A)),
-        (A,B)=>t[i+1].call(t[i].call(A,B),t[i+2].call(A,B)),
+        A=>t[i+1].call(t[i].call(A.clone()),t[i+2].call(A)),
+        (A,B)=>t[i+1].call(t[i].call(A.clone(),B.clone()),t[i+2].call(A,B)),
       ))}else if(i>=1){
         i-=1;tn.splice(i,0,mod(
           A=>t[i].call(t[i+1].call(A)),
@@ -284,13 +279,12 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     tn.push(t[t.length-1]);
     for(let i=t.length-2;i>=0;i--){
       if(t[i-1]!=null&&!(t[i-1]instanceof MoD)){
-        let x=tn.pop();
-        i--;
+        let x=tn.pop();i--
         tn.push(mod(A=>t[i+1].call(t[i].call(),x.call()),(A,B)=>t[i+1].call(t[i].call(),x.call())));
       }else {let x=tn.pop();tn.push(mod(A=>t[i].call(x.call()),(A,B)=>t[i].call(x.call())))}
     }
-    let x = tn.pop();
-    x.incomp=0;
+    let x=tn.pop()
+    x.incomp=0
     return x
   }
 }
@@ -358,7 +352,5 @@ else if(!argv._.length){
     Object.values(env).forEach(mod=>{if(mod.incomp)mod.bd=[]})
   }
 }else f.readFile(
-  __dirname+"/"+argv._[0],
-  'utf8',
-  (e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim())
+  __dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim())
 )
