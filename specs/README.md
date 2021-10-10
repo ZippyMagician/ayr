@@ -101,16 +101,23 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |
 |  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |
 | ```;:``` |   Mold     |   1  |   Laminate   |  99 1 |
+|  ```#``` |    Tally   |  99  |   Replicate  |  1 99 |
+|  ```=``` |   Depth    |  99  |   Equality   |  0 0  |
+| ```~.``` |   Enlist   |  99  |   Membership |  0 99 |
+| ```~:``` |   Unique   |   1  |   Unequality |  0 0  |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
 |:-------:|:---------:|:-------:|:----:|:------:|:----:|:------------------:|
 | ```"``` |  ```u"``` |   Each  |   0  | Each  |   0 0 |                    |
 | ```&``` | ```u&v``` |  Compose | N/A  | Atop  |  N/A | Binds if immediate |
+| ```&:``` | ```u&:v``` |  Compose | N/A | Hook |  N/A | Binds if immediate |
 | ``` ` ``` | ```u` ``` | Commute | N/A | Flip | N/A   |                    |
 | ```/``` |  ```u/``` |  Reduce |   1  | N-wise Reduce | 0 1 |              |
-| ```\``` |  ```u\``` |   Scan  |   1  | Table | 0 1 |       TODO           |
+| ```\``` |  ```u\``` |   Scan  |   1  | Table | 0 1 |                      |
 | ```@``` | ```u@v``` |  TBD    |  TBD |  Over |  N/A  | Binds to both sides if immediate |
+| ```/:``` | ```u/:``` | Diagonals | 2 | Each left | 0 99 |      TODO       |
+| ```\:``` | ```u\:``` | Antidiagonals | 2 | Each right | 99 0 | TODO       |
 
 ## Library Functions
     put A   ->    print A
