@@ -133,7 +133,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   ";:":mod(pon.bind(0,0,a=>{
     let m=Math.max(...a.d.map(n=>n.d.length));return new A(a.d.flatMap(n=>ext(n,[m]).d),[...a.r,m],a.b,a.str)
   },1),pon.bind(0,1,(a,b)=>{
-    if(b.r[0]==1&&b.ds==1)b=narr([...Array(a.r[0])].map(n=>b.r[0]));
+    if(b.r[0]==1&&b.ds==1)b=narr([...Array(a.r[0])].map(n=>b.d[0]));
     return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,a.str)
   },[99,1]))
 }
@@ -186,9 +186,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
 ,mex=f=>f.incomp?f:f.call()
 ,nnw=(t,i)=>{
-  let o=1;
-  while(t[i+o]&&t[i+o].t==9)o++;
-  return t[i+o]?[i+o,t[i+o]]:[i+o,t[i+o-1]];
+  let o=1;while(t[i+o]&&t[i+o].t==9)o++;
+  return t[i+o]?[i+o,t[i+o]]:[i+o,{t:10}];
 }
 ,inst=o=>o.t<2||o.t==4||o.t==7&&!env[o.v].incomp||o.t==8&&!o.v.incomp
 ,lex=s=>{
@@ -304,7 +303,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       else err(3)
     }else if(o.t==2||o.t==8&&o.v.incomp){
       let [ni,b]=nnw(t,i);
-      if(inst(b)||b.t==8){
+      if(inst(b)||ni!=i&&b.t==8){
         i=ni
         if(b.t==8){
           if(b.v.incomp)fq.push((o.t==8?o.v:syms[o.v]),b.v)
