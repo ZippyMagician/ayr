@@ -9,7 +9,7 @@ let f=require('fs'),
     argv=require('minimist')(process.argv.slice(2)),
     rl=require('readline-sync');
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
-if(this.d.length==1&&this.d[0].b)this.d[0].b=0}
+if(this.d.length==1&&this.d[0]&&this.d[0].b)this.d[0].b=0}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.incomp=1;}
 MoD.prototype.bind=function(...v){
   this.bd.push(...v);
