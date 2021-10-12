@@ -5,9 +5,7 @@
 //  - '@' monadic
 //  - Implement missing fns from specs
 //  - Variable assignment
-let f=require('fs'),
-    argv=require('minimist')(process.argv.slice(2)),
-    rl=require('readline-sync');
+if(require!=null){let f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
 if(this.d.length==1&&this.d[0]&&this.d[0].b)this.d[0].b=0}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.incomp=1;}
@@ -335,6 +333,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,run=d=>{if(argv.debug)
   (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),exec(strand(grp(lex(d)))))
   else{try{exec(strand(grp(lex(d))))}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}}
+if(module&&module.exports){
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
     ayr <file> - run a file
@@ -355,3 +354,4 @@ else if(!argv._.length){
 }else f.readFile(
   __dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim())
 )
+}else{(self||globalThis||window).runAyr=run}
