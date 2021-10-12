@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 //TODO:
 //  - Higher rank data
-//  - '<.' and '>.' monadic, decide dyadic
-//  - '\' monadic and dyadic
+//  - '<.' and '>.' decide dyadic
 //  - '@' monadic
+//  - Implement missing fns from specs
 //  - Variable assignment
 let f=require('fs'),
     argv=require('minimist')(process.argv.slice(2)),
