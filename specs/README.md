@@ -106,6 +106,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```~.``` |   Indices  |  99  | Interval Ind |  0 1  |       |
 | ```~:``` |   Unique   |   1  |   Unequality |  0 0  |       |
 | ```,:``` |   Enlist   |  99  |  Membership  | 99 99 |```1 = 'a' ,: 'hola'```|
+| ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |

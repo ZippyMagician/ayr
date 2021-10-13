@@ -137,7 +137,10 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...[Array(b.d.length-a.r[0]).fill(0)]);a.r[0]=b.d.length
     }
     return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,a.str)
-  },1,[99,1]))
+  },1,[99,1])),
+  "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0),pon.bind(0,1,(a,b)=>{
+    let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
+  },0,[1,0]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(
