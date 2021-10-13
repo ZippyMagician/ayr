@@ -264,17 +264,20 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   if(!t[t.length-1].incomp)G=0
   let tn=[];
   if(G){//train
-    for(let i=t.length-1;i>=0;i--)
-      if(i>=1&&t[i].incomp&&!t[i-1].incomp){t.splice(i-1,2,t[i].bind(t[i-1]));i--}
     tn=t.map(n=>n.clone())
     for(let i=tn.length-1;i>=0;){
-      if(i>=2&&t[i-1].incomp){i-=2;tn.splice(i,0,mod(
-        A=>t[i+1].call(t[i].call(A.clone()),t[i+2].call(A)),
-        (A,B)=>t[i+1].call(t[i].call(A.clone(),B.clone()),t[i+2].call(A,B)),
-      ))}else if(i>=1){
-        i-=1;tn.splice(i,0,mod(
-          A=>t[i].call(t[i+1].call(A)),
-          (A,B)=>t[i].call(A,t[i+1].call(B)),
+      if(i>=2&&t[i-1].incomp){i-=2;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(
+        A=>x[i+1].call(x[i].call(A.clone()),x[i+2].call(A)),
+        (A,B)=>x[i+1].call(x[i].call(A.clone(),B.clone()),x[i+2].call(A,B)),
+      ))}else if(i>=1&&!t[i-1].incomp){
+        i-=1;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(
+          A=>x[i+1].call(x[i],A),
+          (A,B)=>err(0),
+        ))
+      }else if(i>=1){
+        i-=1;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(
+          A=>x[i].call(x[i+1].call(A)),
+          (A,B)=>x[i].call(A,x[i+1].call(B))
         ))
       }else i--
     }
