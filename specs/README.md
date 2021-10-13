@@ -82,29 +82,30 @@ A (f g h) B      -> (A f B) g A h B
 Note that this is not an exhaustive list, there may be some edge cases not included.
 
 ## Symbols
-|  Symbol  |   Monadic  | Rank |    Dyadic    |  Rank |
-|:--------:|:----------:|:----:|:------------:|:-----:|
-|  ```+``` |     Abs    |   0  |      Add     |  0 0  |
-|  ```-``` |   Negate   |   0  |   Subtract   |  0 0  |
-|  ```*``` |   Signum   |   0  |   Multiply   |  0 0  |
-|  ```%``` | Reciprocal |   0  |    Divide    |  0 0  |
-|  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |
-|  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |
-| ```<:``` |    Floor   |   0  |    Less/Eq   |  0 0  |
-| ```>:``` |    Ceil    |   0  |  Greater/Eq  |  0 0  |
-|  ```^``` |     Exp    |   0  |      Pow     |  0 0  |
-|  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |
-|  ```[``` |  Identity  |  99  |     Left     | 99 99 |
-|  ```]``` |  Identity  |  99  |     Right    | 99 99 |
-|  ```~``` |  One-Range |   0  |     Index    | 0 99  |
-| ```<.``` | Sort Ascending | 1 |     TBD     |  TBD  |
-| ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |
-|  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |
-| ```;:``` |   Mold     |   1  |   Laminate   |  99 1 |
-|  ```#``` |    Tally   |  99  |   Replicate  |  1 99 |
-|  ```=``` |   Depth    |  99  |   Equality   |  0 0  |
-| ```~.``` |   Enlist   |  99  |   Membership |  0 99 |
-| ```~:``` |   Unique   |   1  |   Unequality |  0 0  |
+|  Symbol  |   Monadic  | Rank |    Dyadic    |  Rank | Notes |
+|:--------:|:----------:|:----:|:------------:|:-----:|:-----:|
+|  ```+``` |     Abs    |   0  |      Add     |  0 0  |       |
+|  ```-``` |   Negate   |   0  |   Subtract   |  0 0  |Str(m): swaps case|
+|  ```*``` |   Signum   |   0  |   Multiply   |  0 0  |Str(m): case sig (`1 _1 0 = *'Ab '`)|
+|  ```%``` | Reciprocal |   0  |    Divide    |  0 0  |       |
+|  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |       |
+|  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |       |
+| ```<:``` |    Floor   |   0  |    Less/Eq   |  0 0  |Str(m): lowercase|
+| ```>:``` |    Ceil    |   0  |  Greater/Eq  |  0 0  |Str(m): uppercase|
+|  ```^``` |     Exp    |   0  |      Pow     |  0 0  |       |
+|  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |       |
+|  ```[``` |  Identity  |  99  |     Left     | 99 99 |       |
+|  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
+|  ```~``` |  One-Range |   0  |     Index    | 0 99  |Str(m): alphabet upto arg|
+| ```<.``` | Sort Ascending | 1 |     TBD     |  TBD  |       |
+| ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |       |
+|  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |       |
+| ```;:``` |   Mold     |   1  |   Laminate   |  99 1 |       |
+|  ```#``` |    Tally   |  99  |   Replicate  |  1 99 |       |
+|  ```=``` |   Depth    |  99  |   Equality   |  0 0  |       |
+| ```~.``` |   Indices  |  99  | Interval Ind |  0 1  |       |
+| ```~:``` |   Unique   |   1  |   Unequality |  0 0  |       |
+| ```,:``` |   Enlist   |  99  |  Membership  | 99 99 |```1 = 'a' ,: 'hola'```|
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
