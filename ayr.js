@@ -126,8 +126,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),0,0,99),pon.bind(0,1,(a,b)=>{
     let nr=a instanceof A?a.d:[a]
     if(nr.indexOf(-1)>-1)nr[nr.indexOf(-1)]=pd(b.r)/nr.reduce((a,b)=>a*(b>-1?b:1),1)
-    b=carr(b);
-    let [lo,ln]=[pd(b.r),pd(nr)]
+    b=carr(b);let[lo,ln]=[pd(b.r),pd(nr)]
     if(lo==ln){b.r=nr;b.ds=nr.length;return b}
     else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);b.ds=nr.length;return b}
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
@@ -138,9 +137,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     let m=Math.max(...a.d.map(n=>n.ds==0?err(2):n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(n,[m],p).d)),[m,...a.r],a.b,p)
   },1,1,1),pon.bind(0,1,(a,b,p)=>{
     if(b.r[0]==1&&b.ds==1)b=narr([...Array(a.r[0])].map(n=>b.d[0]));
-    if(a.r[0]>b.d.length)b=ext(b,[a.r[0]],p);else if(b.d.length>a.r[0]){
+    if(a.r[0]>b.d.length)b=ext(b,[a.r[0]],p);else if(b.d.length>a.r[0])
       for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...[Array(b.d.length-a.r[0]).fill(p?32:0)]);a.r[0]=b.d.length
-    }
     return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,p)
   },1,1,[99,1])),
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0,0),pon.bind(0,1,(a,b)=>{
@@ -171,8 +169,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     let n=[];for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
   },0,0,1))),
   "@":op(0,(a,b)=>mod(
-    l=>err(2),
-    (l,r)=>l==null||r==null?err(0):!a.incomp?err(2):!b.incomp?a.call(b,b):a.call(b.call(l),b.call(r))
+    l=>err(2),(l,r)=>l==null||r==null?err(0):!a.incomp?err(2):!b.incomp?a.call(b,b):a.call(b.call(l),b.call(r))
   ))
 }
 ,env={
@@ -202,8 +199,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,inst=o=>o.t<2||o.t==4||o.t==7&&!env[o.v].incomp||o.t==8&&!o.v.incomp
 ,lex=s=>{
-  let test,
-      toks=[];
+  let test,toks=[];
   while(s){
     if(test=/^(_?[0-9]*\.?[0-9]+)/.exec(s))toks.push({t:0,v:+test[1].replace(/_/g,'-')});
     else if(test=/^'((?:[^']|\\')*)'/.exec(s))toks.push({t:1,v:new A(test[1].split("").map(c=>c.charCodeAt(0)),test[1].length,0,1)});
@@ -344,9 +340,12 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}
   }
 }
-,run=d=>{if(argv.debug)
+,run=d=>{
+  if(module!=null&&argv.debug)
   (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),exec(strand(grp(lex(d)))))
-  else{try{exec(strand(grp(lex(d))))}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}}
+  else if(module!=null){try{exec(strand(grp(lex(d))))}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}
+  else{try{return exec(strand(grp(d)),1)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
+}
 if(module&&module.exports){
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
@@ -365,7 +364,5 @@ else if(!argv._.length){
     Object.values(bdrs).forEach(mod=>{mod.bd=[]})
     Object.values(env).forEach(mod=>{if(mod.incomp)mod.bd=[]})
   }
-}else f.readFile(
-  __dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim())
-)
+}else f.readFile(__dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))
 }else{(self||globalThis||window).runAyr=run}
