@@ -68,7 +68,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   if(typeof r!='object')r=[r,r]
   if(!d){
     a=carr(a)
-    if(r[1]>a.ds-1||r[1]==0&&sb(a))return f(r[1]==0&&sb(a)?a.d[0]:a);
+    if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0]:a,p?a.str:0))
     let na=a.rank(r[1])
     return r[1]<a.ds&&S?new A(na.d.flatMap(n=>n instanceof A?ravel(f(n,a.str)).d:f(n,a.str)),a.r,a.b,p?a.str:0):new A(na.d.map(n=>f(n,a.str)),na.r,a.b,p?a.str:0)
   }else{
@@ -76,7 +76,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
     else{
       let aln=pd(a.rank(r[0]).r),bln=pd(b.rank(r[1]).r)
-      if((r[0]>a.ds-1||sb(a)&&r[0]==0)&&(r[1]>b.ds-1||sb(b)))return f(sb(a)&&r[0]==0?a.d[0]:a,sb(b)&&r[1]==0?b.d[0]:b,p?a.str|b.str:0)
+      if((r[0]>a.ds-1||sb(a)&&r[0]==0)&&(r[1]>b.ds-1||sb(b)))
+        return(n=>p&&a.str|b.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(sb(a)&&r[0]==0?a.d[0]:a,sb(b)&&r[1]==0?b.d[0]:b,p?a.str|b.str:0))
       if(aln>bln)return new A(a.rank(r[0]).d.map(v=>pon(d,f,S,p,r,v,sb(b)?b.d[0]:b)),a.r,a.b,p?a.str|b.str:0)
       else if(bln>aln)return new A(b.rank(r[1]).d.map(v=>pon(d,f,S,p,r,sb(a)?a.d[0]:a,v)),b.r,b.b,p?a.str|b.str:0)
       return new A(a.rank(r[0]).d.map((v,i)=>pon(d,f,S,p,r,v,r[1]==0&&sb(b)?b.d[0]:b.rank(r[1]).d[i])),a.r,a.b,p?a.str|b.str:0)
@@ -87,6 +88,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,ravel=(a,p=0)=>narr(a.d.flatMap(n=>n instanceof A?ravel(n).d:n),0,0,p)
 ,sort=(a,b)=>(a instanceof A?pd(a.r):a)-(b instanceof A?pd(b.r):b)
 ,ext=(a,l,str=0)=>(a.d=a.d.concat([...Array(pd(l)-a.d.length).fill(str?32:0)]),a.r=l,a)
+,lc=x=>x>=97&&x<=122
+,uc=x=>x>=65&&x<=90
+,rn=(l,u=0)=>u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()]
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -101,16 +105,16 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,mod=(f,f2)=>
   f2?new MoD(f.bind(0),f2.bind(0)):f instanceof MoD?(f.f1=f.f1.bind(0),f.f2=f.f2.bind(0),f):new MoD(A=>f.call(A),(A,B)=>f.call(A,B))
 ,syms={
-  "+":mod(pon.bind(0,0,a=>+a,1,1,0),pon.bind(0,1,(a,b)=>+a+ +b,1,1,0)),
-  "-":mod(pon.bind(0,0,a=>-a,1,1,0),pon.bind(0,1,(a,b)=>+a-+b,1,1,0)),
-  "*":mod(pon.bind(0,0,a=>a==0?0:a>0?1:-1,1,0,0),pon.bind(0,1,(a,b)=>+a*+b,1,0,0)),
+  "+":mod(pon.bind(0,0,a=>+a,1,0,0),pon.bind(0,1,(a,b)=>+a+ +b,1,1,0)),
+  "-":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a-32:uc(a)?a+32:a:-a,1,1,0),pon.bind(0,1,(a,b)=>+a-+b,1,1,0)),
+  "*":mod(pon.bind(0,0,(a,p)=>p?uc(a)?1:lc(a)?-1:0:a==0?0:a>0?1:-1,1,0,0),pon.bind(0,1,(a,b)=>+a*+b,1,0,0)),
   "%":mod(pon.bind(0,0,a=>1/+a,1,0,0),pon.bind(0,1,(a,b)=>+a/+b,1,0,0)),
   "]":mod(pon.bind(0,0,a=>a,1,1,99),pon.bind(0,1,(a,b)=>b,1,1,99)),
   "[":mod(pon.bind(0,0,a=>a,1,1,99),pon.bind(0,1,(a,b)=>a,1,1,99)),
   "<":mod(pon.bind(0,0,a=>a instanceof A?(a.b=1,a):new A([a],[1],1),0,1,99),pon.bind(0,1,(a,b)=>+(a<b),1,0,0)),
   ">":mod(pon.bind(0,0,a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,0,1,99),pon.bind(0,1,(a,b)=>+(a>b),0,0,0)),
-  "<:":mod(pon.bind(0,0,a=>Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>+(a<=b),1,0,0)),
-  ">:":mod(pon.bind(0,0,a=>Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>+(a>=b),1,0,0)),
+  "<:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>+(a<=b),1,0,0)),
+  ">:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a+32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>+(a>=b),1,0,0)),
   "<.":mod(pon.bind(0,0,a=>{a.d=a.d.sort(sort);return a},1,1,1),pon.bind(0,1,(a,b)=>err(2),0,0,99)),
   ">.":mod(pon.bind(0,0,a=>{a.d=a.d.sort((a,b)=>-sort(a,b));return a},1,1,1),pon.bind(0,1,(a,b)=>err(2),0,0,99)),
   "^":mod(pon.bind(0,0,a=>2.7184*+a,1,0,0),pon.bind(0,1,(a,b)=>(+a)**+b,1,0,0)),
@@ -123,7 +127,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);b.ds=nr.length;return b}
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
   },0,1,99)),
-  "~":mod(pon.bind(0,0,a=>narr([...Array(+a)].map((_,i)=>i+1)),0,0,0),pon.bind(0,1,(a,b)=>{
+  "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),0,1,0),pon.bind(0,1,(a,b)=>{
     let m=carr(b).rank(b.ds-1),i
     if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
     else{let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
