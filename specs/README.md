@@ -116,7 +116,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```&:``` | ```u&:v``` |  Compose | N/A | Hook |  N/A | Binds if immediate |
 | ``` ` ``` | ```u` ``` | Commute | N/A | Flip | N/A   |                    |
 | ```/``` |  ```u/``` |  Reduce |   1  | N-wise Reduce | 0 1 |              |
-| ```\``` |  ```u\``` |   Scan  |   1  | Table | 0 0 |                      |
+| ```\``` |  ```u\``` |   Scan  |   1  | Table | 1 1 |                      |
 | ```@``` | ```u@v``` |  TBD    |  TBD |  Over |  N/A  | Binds to both sides if immediate |
 | ```/:``` | ```u/:``` | Diagonals | 2 | Each left | 0 99 |      TODO       |
 | ```\:``` | ```u\:``` | Antidiagonals | 2 | Each right | 99 0 | TODO       |
