@@ -87,10 +87,10 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,pd=a=>a.reduce((a,b)=>a*b,1)
 ,ravel=(a,p=0)=>narr(a.d.flatMap(n=>n instanceof A?ravel(n).d:n),0,0,p)
 ,sort=(a,b)=>(a instanceof A?pd(a.r):a)-(b instanceof A?pd(b.r):b)
-,ext=(a,l,str=0)=>(a.d=a.d.concat([...Array(pd(l)-a.d.length).fill(str?32:0)]),a.r=l,a)
+,ext=(a,l,str=0)=>(a.d=a.d.concat(rn(0,pd(l)-a.d.length,str?32:0)),a.r=l,a)
 ,lc=x=>x>=97&&x<=122
 ,uc=x=>x>=65&&x<=90
-,rn=(l,u=0)=>u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()]
+,rn=(l,u=0,f)=>(x=u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()],f!=null?x.map(_=>f.clone()):x)
 ,get=(a,b)=>{
   let m=carr(b).rank(b.ds-1),i
   if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
@@ -136,11 +136,16 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   ";:":mod(pon.bind(0,0,(a,p)=>{
     let m=Math.max(...a.d.map(n=>n.ds==0?err(2):n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(n,[m],p).d)),[m,...a.r],a.b,p)
   },1,1,1),pon.bind(0,1,(a,b,p)=>{
-    if(b.r[0]==1&&b.ds==1)b=narr([...Array(a.r[0])].map(n=>b.d[0]));
+    if(b.r[0]==1&&b.ds==1)b=narr(rn(0,a.r[0],b.d[0]));
     if(a.r[0]>b.d.length)b=ext(b,[a.r[0]],p);else if(b.d.length>a.r[0])
-      for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...[Array(b.d.length-a.r[0]).fill(p?32:0)]);a.r[0]=b.d.length
+      for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...rn(0,b.d.length-a.r[0],p?32:0));a.r[0]=b.d.length
     return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,p)
   },1,1,[99,1])),
+  "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0,99),pon.bind(0,1,(a,b,p)=>{
+    let c=b.rank(b.ds-1);if(a.d.length!=c.d.length)err(2);let v=[];
+    c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)));
+    return new A(ravel(narr(v)).d,[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str)
+  },1,1,[1,99])),
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0,0),pon.bind(0,1,(a,b)=>{
     let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
   },0,0,[1,0]))
