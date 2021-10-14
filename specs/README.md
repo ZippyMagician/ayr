@@ -84,7 +84,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 ## Symbols
 |  Symbol  |   Monadic  | Rank |    Dyadic    |  Rank | Notes |
 |:--------:|:----------:|:----:|:------------:|:-----:|:-----:|
-|  ```+``` |     Abs    |   0  |      Add     |  0 0  |       |
+|  ```+``` |     Abs    |   0  |      Add     |  0 0  |Str(m): converts to nums|
 |  ```-``` |   Negate   |   0  |   Subtract   |  0 0  |Str(m): swaps case|
 |  ```*``` |   Signum   |   0  |   Multiply   |  0 0  |Str(m): case sig (`1 _1 0 = *'Ab '`)|
 |  ```%``` | Reciprocal |   0  |    Divide    |  0 0  |       |
