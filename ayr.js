@@ -5,7 +5,7 @@
 //  - '@' monadic
 //  - Implement missing fns from specs
 //  - Variable assignment
-if(require!=null){let f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
+if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
 if(this.d.length==1&&this.d[0]&&this.d[0].b)this.d[0].b=0}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.incomp=1;}
@@ -21,13 +21,13 @@ MoD.prototype.call=function(...a){
 }
 MoD.prototype.clone=function(){let mod=new MoD(this.f1,this.f2);mod.bd=this.bd;return mod}
 A.prototype.clone=function(){return new A(this.d,this.r,this.b,this.str)}
-A.prototype.rank=function(r){
+A.prototype.rank=function(r,s){
   switch(r){
     case -1:err(1)
     case 0:return new A(this.d,this.r,this.b)
     case 1:return chnk(this.d,this.r[0],this.str)
     case 2:return chnk(chnk(this.d,this.r[0],this.str),this.r[1],this.str)
-    default:return this
+    default:return s?new A([this],1,1,0):this
   }
 }
 A.prototype.toString=function(){
@@ -75,7 +75,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     a=carr(a),b=carr(b);
     if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1);
     else{
-      let aln=pd(a.rank(r[0]).r),bln=pd(b.rank(r[1]).r)
+      let aln=pd(a.rank(r[0],1).r),bln=pd(b.rank(r[1],1).r)
       if((r[0]>a.ds-1||sb(a)&&r[0]==0)&&(r[1]>b.ds-1||sb(b)))
         return(n=>p&&a.str|b.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(sb(a)&&r[0]==0?a.d[0]:a,sb(b)&&r[1]==0?b.d[0]:b,p?a.str|b.str:0))
       if(aln>bln)return new A(a.rank(r[0]).d.map(v=>pon(d,f,S,p,r,v,sb(b)?b.d[0]:b)),a.r,a.b,p?a.str|b.str:0)
@@ -91,6 +91,11 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,lc=x=>x>=97&&x<=122
 ,uc=x=>x>=65&&x<=90
 ,rn=(l,u=0)=>u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()]
+,get=(a,b)=>{
+  let m=carr(b).rank(b.ds-1),i
+  if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
+  else{a.d=a.d.reverse();let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
+}
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -127,11 +132,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);b.ds=nr.length;return b}
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
   },0,1,99)),
-  "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),0,1,0),pon.bind(0,1,(a,b)=>{
-    let m=carr(b).rank(b.ds-1),i
-    if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
-    else{let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
-  },0,1,[0,99])),
+  "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),0,1,0),pon.bind(0,1,get,0,1,[0,99])),
   ",":mod(pon.bind(0,0,ravel,1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.concat(b.d),0,0,p),1,1,1)),
   ";:":mod(pon.bind(0,0,(a,p)=>{
     let m=Math.max(...a.d.map(n=>n.ds==0?err(2):n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(n,[m],p).d)),[m,...a.r],a.b,p)
@@ -175,7 +176,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   ))
 }
 ,env={
-  put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
+  put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
+  i:mod(A=>err(2),(a,b)=>a.b==1?get(a,b):(a.d=a.d.map(n=>get(n,b)),a))
 }
 ,chnk=(a,s,str=0)=>{
   let n=[],b=0
