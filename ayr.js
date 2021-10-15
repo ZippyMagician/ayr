@@ -153,6 +153,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
     ,(l,r)=>l==null||r==null?err(0):!a.incomp||!b.incomp?err(0):a.call(b.call(l,r)))),
+  '&:':op(0,(f,g)=>mod(a=>a==null?err(0):f.call(a.clone(),g.call(a)),(a,b)=>a==null||b==null?err(0):f.call(a,g.call(b)))),
+  '&.':op(0,(f,g)=>mod(a=>a==null?err(0):g.call(f.call(a.clone()),a),(a,b)=>a==null||b==null?err(0):g.call(f.call(a),b))),
   '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
     if(l==null||r==null)err(0)
     let v;if(l.ds==0||sb(l))v=carr(r);else if(r.ds==0||sb(r))v=carr(l);if(v!=null)return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)))
