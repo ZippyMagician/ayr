@@ -107,6 +107,9 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```~:``` |   Unique   |   1  |   Unequality |  0 0  |       |
 | ```,:``` |   Enlist   |  99  |  Membership  | 99 99 |```1 = 'a' ,: 'hola'```|
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
+| ```{```  |  Increment |   0  |     Take     | 99 99 |       |
+| ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
+| ```|```  | Boolean Not|   0  |    Residue   |  0 0  |       |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
