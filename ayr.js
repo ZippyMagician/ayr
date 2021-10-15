@@ -155,16 +155,19 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
    ,(l,r)=>l==null||r==null?err(0):!a.incomp||!b.incomp?err(0):a.call(b.call(l,r)))
   ),
-  '"':op(1,f=>mod(l=>
-      l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>(sf=f.call(n),sf instanceof A)?(sf.b=1,sf):new A([sf],1,1)),l.r,l.b,l.str)
-      ,(l,r)=>{
-        if(l==null||r==null)err(0)
-        else if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)),0,1)}
-        else if(r.ds==0||sb(r)){let v=carr(l);return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)),0,1)}
-        else if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])),0,1)}
-        else err(1)
-      }
-  )),
+  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
+    if(l==null||r==null)err(0)
+    else if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)))}
+    else if(r.ds==0||sb(r)){let v=carr(l);return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)))}
+    else if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])))}
+    else err(1)
+  })),
+  '":':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):narr(l.d.map(n=>f.call(n))),(l,r)=>{
+    if(l==null||r==null)err(0);
+    let v;if(l.ds==0||sb(l))v=carr(r);else if(r.ds==0||sb(r))v=carr(l);if(v!=null)return narr(v.d.map(n=>f.call(l,n)))
+    if(JSON.stringify(l.r)==JSON.stringify(r.r))return narr(l.d.map((n,i)=>f.call(n,r.d[i])))
+    err(1)
+  })),
   "`":op(1,f=>mod(l=>f.call(l.clone(),l),(l,r)=>f.call(r,l))),
   "/":op(1,f=>mod(pon.bind(0,0,x=>x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0]),0,0,1),pon.bind(0,1,(l,r)=>{
     let p=0;if(l<0)l=Math.abs(l,p=1)
