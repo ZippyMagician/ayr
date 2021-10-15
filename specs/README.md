@@ -114,7 +114,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```"``` |  ```u"``` |   Each  |   0  |  Each  |  0 0 |                    |
 | ```":```| ```u":``` |    Tie  |  99  |   Tie  | 99 99|                    |
 | ```&``` | ```u&v``` | Compose |  N/A |  Atop  |  N/A | Binds if immediate |
-| ```&:``` | ```u&:v``` |Compose|  N/A |  Hook  |  N/A | Binds if immediate |
+| ```&:``` | ```u&:v``` | Hook  |  N/A |  Hook  |  N/A | Binds if immediate |
 | ``` ` ``` | ```u` ``` |Commute|  N/A |  Flip  |  N/A |                    |
 | ```/``` |  ```u/``` |  Reduce |   1  | N-wise Reduce | 0 1 |              |
 | ```\``` |  ```u\``` |   Scan  |   1  |  Table |  1 1 |                     |
