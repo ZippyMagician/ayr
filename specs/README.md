@@ -119,9 +119,11 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```/``` |  ```u/``` |  Reduce |   1  | N-wise Reduce | 0 1 |              |
 | ```\``` |  ```u\``` |   Scan  |   1  |  Table |  1 1 |                     |
 | ```@``` | ```u@v``` |  TBD    |  TBD |  Over  |  N/A | Binds to both sides if immediate |
-| ```/:``` | ```u/:``` | Diagonals | 2 | Each left | 0 99 |      TODO       |
-| ```\:``` | ```u\:``` | Antidiagonals | 2 | Each right | 99 0 | TODO       |
+| ```/:``` | ```u/:``` | Diagonals | 2 | Each left | 0 99 |                 |
+| ```\:``` | ```u\:``` | Antidiagonals | 2 | Each right | 99 0 |            |
 
 ## Library Functions
     put A   ->    print A
     A put B ->    print B A times
+    A  i  B ->    3 = 1 2 3;4 5 6 i` <0 2
+                  ~ of rank 99 99
