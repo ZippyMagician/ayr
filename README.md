@@ -30,5 +30,13 @@ Current todo list for myself
     * ``` (`: f) ``` ==> ```( (f)` )```
     * ```([: f g)``` ==> ```( (f) (g) )```
     * ```(]: f g)``` ==> ```( (f) & (g) )```
-- [ ] More combinators
+- [ ] More binders
     * Before
+    * Inner product
+- [ ] Good boolean logic support
+    * AND   ^.
+    * OR    v.
+    * NOT   |
+    * XOR   =.
+    * NOR   <.
+    * NAND  >.
