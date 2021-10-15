@@ -216,7 +216,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     else if(test=/^:/.exec(s))toks.push({t:6});
     else if(test=/^(\s)/.exec(s))toks.push({t:9,v:test[1]});
     else if(test=/^([a-zA-Z]+)/.exec(s))toks.push({t:7,v:test[1]});
-    else if(test=/^\(|\)/.exec(s))toks.push({t:2,v:test[0]})
+    else if(test=/^\(|^\)/.exec(s))toks.push({t:2,v:test[0]})
     else err(3)
     s=s.slice(test&&test[0].length||1);
   }
@@ -229,7 +229,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
       if(t[i]==null)err(5)
       else if(t[i].t==2&&t[i].v=='('){b.push(t[i]);oc++}
       else if(t[i].t==2&&t[i].v==')'){
-        if(oc==0){tn.push({t:8,v:exec(strand(grp(b)),1)});ig=0;oc=0;b=[]}
+        if(oc==0){tn.push({t:8,v:exec(strand(grp(b)),1)});ig=0;b=[]}
         else{b.push(t[i]);oc--}
       }else b.push(t[i])
     }else if(t[i]!=null&&t[i].t==2&&t[i].v=='(')ig=1
