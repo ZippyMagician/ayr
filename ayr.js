@@ -144,7 +144,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0,99),pon.bind(0,1,(a,b,p)=>{
     [a,b]=[b,a];let v=[];let c=b.rank(b.ds-1);if(a.d.length!=c.d.length)err(2)
     c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)));
-    return new A(ravel(narr(v)).d,[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str)
+    return new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str)
   },1,1,[99,1])),
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0,0),pon.bind(0,1,(a,b)=>{
     let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
