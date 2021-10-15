@@ -142,28 +142,25 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
     return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,p)
   },1,1,[99,1])),
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0,99),pon.bind(0,1,(a,b,p)=>{
-    let c=b.rank(b.ds-1);if(a.d.length!=c.d.length)err(2);let v=[];
+    [a,b]=[b,a];let v=[];let c=b.rank(b.ds-1);if(a.d.length!=c.d.length)err(2)
     c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)));
     return new A(ravel(narr(v)).d,[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str)
-  },1,1,[1,99])),
+  },1,1,[99,1])),
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0,0),pon.bind(0,1,(a,b)=>{
     let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
   },0,0,[1,0]))
 }
 ,bdrs={
-  '&':op(0,(a,b)=>mod(
-    l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
-   ,(l,r)=>l==null||r==null?err(0):!a.incomp||!b.incomp?err(0):a.call(b.call(l,r)))
-  ),
+  '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
+    ,(l,r)=>l==null||r==null?err(0):!a.incomp||!b.incomp?err(0):a.call(b.call(l,r)))),
   '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
     if(l==null||r==null)err(0)
-    else if(l.ds==0||sb(l)){let v=carr(r);return narr(v.rank(v.ds-1).d.map(n=>f.call(l,n)))}
-    else if(r.ds==0||sb(r)){let v=carr(l);return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)))}
-    else if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])))}
-    else err(1)
+    let v;if(l.ds==0||sb(l))v=carr(r);else if(r.ds==0||sb(r))v=carr(l);if(v!=null)return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)))
+    if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])))}
+    err(1)
   })),
   '":':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):narr(l.d.map(n=>f.call(n))),(l,r)=>{
-    if(l==null||r==null)err(0);
+    if(l==null||r==null)err(0)
     let v;if(l.ds==0||sb(l))v=carr(r);else if(r.ds==0||sb(r))v=carr(l);if(v!=null)return narr(v.d.map(n=>f.call(l,n)))
     if(JSON.stringify(l.r)==JSON.stringify(r.r))return narr(l.d.map((n,i)=>f.call(n,r.d[i])))
     err(1)
