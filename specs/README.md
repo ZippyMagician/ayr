@@ -101,7 +101,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |       |
 |  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |       |
 | ```;:``` |   Mold     |   1  |   Laminate   |  99 1 |       |
-|  ```#``` |    Tally   |  99  |   Replicate  |  1 99 |       |
+|  ```#``` |    Tally   |  99  |   Replicate  |  99 1 |       |
 |  ```=``` |   Depth    |  99  |   Equality   |  0 0  |       |
 | ```~.``` |   Indices  |  99  | Interval Ind |  0 1  |       |
 | ```~:``` |   Unique   |   1  |   Unequality |  0 0  |       |
