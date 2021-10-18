@@ -150,7 +150,9 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0,0),pon.bind(0,1,(a,b)=>{
     let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
   },0,0,[1,0])),
-  "=":mod(pon.bind(0,0,a=>(a.d=a.rank(1).d,a.d=a.d[0].d.flatMap((_,i)=>a.d.map(x=>x.d[i])),a),1,1,2),pon.bind(0,1,(a,b)=>+eq(a,b),0,1,0))
+  "=":mod(pon.bind(0,0,a=>{
+    a.d=a.rank(1).d,a.d=a.d[0].d.flatMap((_,i)=>a.d.map(x=>x.d[i]));a.r=a.r.length==1?[1,a.r[0]]:a.r.reverse();a.ds=2;return a
+  },1,1,2),pon.bind(0,1,(a,b)=>+eq(a,b),0,1,0))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
