@@ -59,8 +59,8 @@ Array.prototype.ds=1;
 Array.prototype.clone=function(){return this;}
 A.prototype.bind=function(...v){return this;}
 A.prototype.call=function(...v){return this;}
-const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
-,sb=arr=>arr instanceof A&&arr.ds==1&&arr.r[0]==1
+const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
+,us=a=>sb(a)?a.d[0]:a.ds==0?a:err(2)
 ,op=(m,f)=>{let x=new MoD(m?f:null,m?null:f);x.m=m;return x}
 ,carr=(v,b=0)=>v instanceof A?b?(v.b=1,v):v:new A([v],1,b)
 ,narr=(a,b=0,ba=0,s=0)=>new A(ba?a.map(n=>n instanceof A?(n.b=1,n):new A([n],1,1)):a,a.length,b,s)
@@ -92,11 +92,16 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,uc=x=>x>=65&&x<=90
 ,rn=(l,u=0,f)=>(x=u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()],f!=null?x.map(_=>f.clone()):x)
 ,eq=(a,b)=>a instanceof A?b instanceof A?JSON.stringify(a.r)==JSON.stringify(b.r)&&a.d.reduce((a,x,i)=>a&&eq(x,b.d[i]),1):err(2):+a==+b
+,eachN=(a,f,p=[])=>{
+  let x=a.map((n,i)=>n instanceof A?eachN(n.d,f,[i,...p]).d:f(n,[i,...p])).filter(n=>n!=null&&n.length!=0)
+  x=x.flatMap(n=>n instanceof A&&n.d[0].ds==1?n.d:n);return narr(x)
+}
 ,get=(a,b)=>{
   let m=carr(b).rank(b.ds-1),i
   if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
   else{a.d=a.d.reverse();let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
 }
+,geti=(a,b)=>a.b==1?get(a,b):(a.d=a.d.map(n=>geti(n,b)),a)
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -152,7 +157,10 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   },0,0,[1,0])),
   "=":mod(pon.bind(0,0,a=>{
     a.d=a.rank(1).d,a.d=a.d[0].d.flatMap((_,i)=>a.d.map(x=>x.d[i]));a.r=a.r.length==1?[1,a.r[0]]:a.r.reverse();a.ds=2;return a
-  },1,1,2),pon.bind(0,1,(a,b)=>+eq(a,b),0,1,0))
+  },1,1,2),pon.bind(0,1,(a,b)=>+eq(a,b),0,1,0)),
+  "~.":mod(pon.bind(0,0,a=>eachN(carr(a).rank(a.ds?a.ds-1:0).d,(n,i)=>+n==1?narr(i,1):null),0,0,99),pon.bind(0,1,(a,b)=>{
+    for(i=0;i<=b.d.length;i++)if(us(a)>us(i==0?-Infinity:b.d[i-1])&&us(a)<=us(i==b.d.length?Infinity:b.d[i]))return i
+  },0,0,[0,1]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
@@ -185,7 +193,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
-  i:mod(A=>err(2),(a,b)=>a.b==1?get(a,b):(a.d=a.d.map(n=>get(n,b)),a))
+  i:mod(A=>err(2),geti)
 }
 ,chnk=(a,s,str=0)=>{
   let n=[],b=0
@@ -210,21 +218,22 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 }
 ,inst=o=>o.t<2||o.t==4||o.t==7&&!env[o.v].incomp||o.t==8&&!o.v.incomp
 ,lex=s=>{
-  let test,toks=[];
+  let m,t=[];
   while(s){
-    if(test=/^(_?[0-9]*\.?[0-9]+)/.exec(s))toks.push({t:0,v:+test[1].replace(/_/g,'-')});
-    else if(test=/^'((?:[^']|\\')*)'/.exec(s))toks.push({t:1,v:new A(test[1].split("").map(c=>c.charCodeAt(0)),test[1].length,0,1)});
-    else if(test=RegExp(`^(${Object.keys(syms).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))toks.push({t:2,v:test[1]});
-    else if(test=RegExp(`^(${Object.keys(bdrs).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))toks.push({t:3,v:test[1]});
-    else if(test=/^;/.exec(s))toks.push({t:5});
-    else if(test=/^:/.exec(s))toks.push({t:6});
-    else if(test=/^(\s)/.exec(s))toks.push({t:9,v:test[1]});
-    else if(test=/^([a-zA-Z]+)/.exec(s))toks.push({t:7,v:test[1]});
-    else if(test=/^\(|^\)/.exec(s))toks.push({t:2,v:test[0]})
+    if(m=/^(_?[0-9]*\.?[0-9]+)/.exec(s))t.push({t:0,v:+m[1].replace(/_/g,'-')})
+    else if(m=/^__|^_/.exec(s))t.push({t:0,v:+(m[0]=="__"?-Infinity:Infinity)})
+    else if(m=/^'((?:[^']|\\')*)'/.exec(s))t.push({t:1,v:new A(m[1].split("").map(c=>c.charCodeAt(0)),m[1].length,0,1)})
+    else if(m=RegExp(`^(${Object.keys(syms).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:2,v:m[1]})
+    else if(m=RegExp(`^(${Object.keys(bdrs).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:3,v:m[1]})
+    else if(m=/^;/.exec(s))t.push({t:5})
+    else if(m=/^:/.exec(s))t.push({t:6})
+    else if(m=/^(\s)/.exec(s))t.push({t:9,v:m[1]})
+    else if(m=/^([a-zA-Z]+)/.exec(s))t.push({t:7,v:m[1]})
+    else if(m=/^\(|^\)/.exec(s))t.push({t:2,v:m[0]})
     else err(3)
-    s=s.slice(test&&test[0].length||1);
+    s=s.slice(m&&m[0].length||1);
   }
-  return toks;
+  return t;
 }
 ,grp=t=>{
   let tn=[],b=[],ig=0,oc=0;
