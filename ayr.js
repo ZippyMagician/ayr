@@ -169,13 +169,14 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   '&.':op(0,(f,g)=>mod(a=>a==null?err(0):g.call(f.call(a.clone()),a),(a,b)=>a==null||b==null?err(0):g.call(f.call(a),b))),
   '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
     if(l==null||r==null)err(0)
-    let v;if(l.ds==0||sb(l))v=carr(r);else if(r.ds==0||sb(r))v=carr(l);if(v!=null)return narr(v.rank(v.ds-1).d.map(n=>f.call(n,r)))
+    let j;if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;
+    if(j!=null)return narr(j?r.rank(r.ds-1).d.map(n=>f.call(l.clone(),n)):l.rank(l.ds-1).d.map(n=>f.call(n,r.clone())))
     if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])))}
     err(1)
   })),
   '":':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):narr(l.d.map(n=>f.call(n))),(l,r)=>{
     if(l==null||r==null)err(0)
-    let v;if(l.ds==0||sb(l))v=carr(r);else if(r.ds==0||sb(r))v=carr(l);if(v!=null)return narr(v.d.map(n=>f.call(l,n)))
+    let j;if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;if(j!=null)return narr(j?r.d.map(n=>f.call(l.clone(),n)):l.d.map(n=>f.call(n,r.clone())))
     if(JSON.stringify(l.r)==JSON.stringify(r.r))return narr(l.d.map((n,i)=>f.call(n,r.d[i])))
     err(1)
   })),
