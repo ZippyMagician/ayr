@@ -91,6 +91,7 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
 ,lc=x=>x>=97&&x<=122
 ,uc=x=>x>=65&&x<=90
 ,rn=(l,u=0,f)=>(x=u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()],f!=null?x.map(_=>f.clone()):x)
+,eq=(a,b)=>a instanceof A?b instanceof A?JSON.stringify(a.r)==JSON.stringify(b.r)&&a.d.reduce((a,x,i)=>a&&eq(x,b.d[i]),1):err(2):+a==+b
 ,get=(a,b)=>{
   let m=carr(b).rank(b.ds-1),i
   if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
@@ -148,7 +149,8 @@ const bc=arr=>arr instanceof A&&arr.d[0]&&arr.d[0].b
   },1,1,[99,1])),
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0,0),pon.bind(0,1,(a,b)=>{
     let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
-  },0,0,[1,0]))
+  },0,0,[1,0])),
+  "=":mod(pon.bind(0,0,a=>(a.d=a.rank(1).d,a.d=a.d[0].d.flatMap((_,i)=>a.d.map(x=>x.d[i])),a),1,1,2),pon.bind(0,1,(a,b)=>+eq(a,b),0,1,0))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))

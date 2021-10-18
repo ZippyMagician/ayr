@@ -1,5 +1,6 @@
 # Test files
 *.u
+*.swp
 
 # Node.js files
 node_modules/
