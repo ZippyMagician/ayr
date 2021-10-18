@@ -219,11 +219,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,inst=o=>o.t<2||o.t==4||o.t==7&&!env[o.v].incomp||o.t==8&&!o.v.incomp
 ,lex=s=>{
-  let m,t=[];
+  let m,l,t=[];
   while(s){
     if(m=/^(_?[0-9]*\.?[0-9]+)/.exec(s))t.push({t:0,v:+m[1].replace(/_/g,'-')})
     else if(m=/^__|^_/.exec(s))t.push({t:0,v:+(m[0]=="__"?-Infinity:Infinity)})
-    else if(m=/^'((?:[^']|\\')*)'/.exec(s))t.push({t:1,v:new A(m[1].split("").map(c=>c.charCodeAt(0)),m[1].length,0,1)})
+    else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1]}"`),new A(l.split("").map(c=>c.charCodeAt(0)),l.length,0,1))})
     else if(m=RegExp(`^(${Object.keys(syms).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:2,v:m[1]})
     else if(m=RegExp(`^(${Object.keys(bdrs).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:3,v:m[1]})
     else if(m=/^;/.exec(s))t.push({t:5})
