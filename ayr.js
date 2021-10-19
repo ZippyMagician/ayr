@@ -86,7 +86,12 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,pd=a=>a.reduce((a,b)=>a*b,1)
 ,ravel=(a,p=0)=>narr(a.d.flatMap(n=>n instanceof A?ravel(n).d:n),0,0,p)
-,sort=(a,b)=>(a instanceof A?pd(a.r):a)-(b instanceof A?pd(b.r):b)
+,sort=(a,b)=>{
+  if(a instanceof A&&b instanceof A){
+    if(pd(a.r)==pd(b.r))for(i=0;1;i++)if(!eq(a.d[i],b.d[i]))return sort(a.d[i],b.d[i])
+    else return pd(a.r)-pd(b.r)
+  }else return(a instanceof A?pd(a.r):+a)-(b instanceof A?pd(b.r):+b)
+}
 ,ext=(a,l,str=0)=>(a.d=a.d.concat(rn(0,pd(l)-a.d.length,str?32:0)),a.r=l,a)
 ,lc=x=>x>=97&&x<=122
 ,uc=x=>x>=65&&x<=90
@@ -157,10 +162,13 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,0,[1,0])),
   "=":mod(pon.bind(0,0,a=>{
     a.d=a.rank(1).d,a.d=a.d[0].d.flatMap((_,i)=>a.d.map(x=>x.d[i]));a.r=a.r.length==1?[1,a.r[0]]:a.r.reverse();a.ds=2;return a
-  },1,1,2),pon.bind(0,1,(a,b)=>+eq(a,b),0,1,0)),
+  },1,1,2),pon.bind(0,1,(a,b)=>+eq(a,b),1,0,0)),
   "~.":mod(pon.bind(0,0,a=>eachN(carr(a).rank(a.ds?a.ds-1:0).d,(n,i)=>+n==1?narr(i,1):null),0,0,99),pon.bind(0,1,(a,b)=>{
     for(i=0;i<=b.d.length;i++)if(us(a)>us(i==0?-Infinity:b.d[i-1])&&us(a)<=us(i==b.d.length?Infinity:b.d[i]))return i
-  },0,0,[0,1]))
+  },0,0,[0,1])),
+  "~:":mod(pon.bind(0,0,(a,p)=>{
+    let s=new Set(a.d),d=[];for(n of s.keys())d.push(n);return narr(d,0,0,p?a.str:0)
+  },0,1,1),pon.bind(0,0,(a,b)=>+!eq(a,b),0,0,0))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
