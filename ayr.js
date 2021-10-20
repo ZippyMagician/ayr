@@ -229,9 +229,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,lex=s=>{
   let m,l,t=[];
   while(s){
-    if(m=/^(_?[0-9]*\.?[0-9]+)/.exec(s))t.push({t:0,v:+m[1].replace(/_/g,'-')})
-    else if(m=/^__|^_/.exec(s))t.push({t:0,v:+(m[0]=="__"?-Infinity:Infinity)})
-    else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1]}"`),new A(l.split("").map(c=>c.charCodeAt(0)),l.length,0,1))})
+    if(m=/^((?:_?\d*)?r_?\d+)|^(__|(?:_?\d*\.?\d*)?e?_?\d*\.?\d+|_)/.exec(s)){
+      if(m[2]!=null)m[1]=m[2];let x=m[1].replace(/_/g,'-').replace(/(?<=-?)(?<!\d)(e|r)/,'1$1'),l,r;if(x=="--"||x=="-")t.push({t:0,v:x=="--"?-Infinity:Infinity})
+      else if(x.indexOf("r")>-1)t.push({t:0,v:([l,r]=x.split("r"),+l/+r)})
+      else if(x.lastIndexOf(".")>x.indexOf("e")&&x.indexOf("e")>-1)t.push({t:0,v:([l,r]=x.split("e"),(+l)**+r)});else t.push({t:0,v:+x})
+    }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1]}"`),new A(l.split("").map(c=>c.charCodeAt(0)),l.length,0,1))})
     else if(m=RegExp(`^(${Object.keys(syms).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:2,v:m[1]})
     else if(m=RegExp(`^(${Object.keys(bdrs).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:3,v:m[1]})
     else if(m=/^;/.exec(s))t.push({t:5})

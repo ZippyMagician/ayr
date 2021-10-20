@@ -34,6 +34,22 @@ Incomplete operations within groups **or** assigned to a variable are called [Tr
 
 Binders are left-assosciative, while symbols are right-assosciative.
 
+### Data Types
+#### Numbers
+Numbers are the basis of an array language. `ayr` supports an array of numeric literals, and will support more in the future.
+<br>In short, the rules can be summarized by this regex:
+```re
+((?:_?\d*)?r_?\d+)|^(__|(?:_?\d*\.?\d*)?e?_?\d*\.?\d+|_)
+```
+`_` represents a negative sign. Literal floats and scientific notation are supported. For example,
+```
+    e2
+100
+    _3.76
+-3.76
+```
+`ayr` also supports rational literals, such as `5r4` (`5/4`) and `r3` (`1/3`)
+
 ### Examples
 ```
     13
