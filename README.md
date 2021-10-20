@@ -21,9 +21,9 @@ Current todo list for myself
     * Tail
     * etc
 - [ ] Higher rank data supported
-    * Change rank of `/` and `\` to be major rank - 1, similar to `#`
-- [ ] Support more literal num types
-- [ ] Make sure strings are supported properly
+- [x] Change rank of `/` and `\` to be major rank - 1, similar to `#`
+- [x] Support more literal num types
+- [x] Make sure strings are supported properly
 - [ ] Implement variable assignment
 - [ ] (Maybe) implement block syntax `{{ x + y }}`
 - [ ] Syntactic elements to trains
