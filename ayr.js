@@ -30,6 +30,10 @@ A.prototype.rank=function(r,s){
     default:return s?new A([this],1,1,0):this
   }
 }
+A.prototype.has=function(o){
+  for(n of this.d)if(eq(o,n))return 1
+  return 0
+}
 A.prototype.toString=function(){
   let S="";
   let r=this.r.reverse();
@@ -168,7 +172,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,0,[0,1])),
   "~:":mod(pon.bind(0,0,(a,p)=>{
     let s=new Set(a.d),d=[];for(n of s.keys())d.push(n);return narr(d,0,0,p?a.str:0)
-  },0,1,1),pon.bind(0,0,(a,b)=>+!eq(a,b),0,0,0))
+  },0,1,1),pon.bind(0,0,(a,b)=>+!eq(a,b),0,0,0)),
+  ",:":mod(pon.bind(0,0,(a,p)=>narr(a.d,a.b,0,p?a.str:0),0,1,99),pon.bind(0,1,(a,b)=>narr(a.d.map(n=>b.has(n))),0,0,99))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
