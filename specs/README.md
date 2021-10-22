@@ -125,7 +125,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
-| ```|```  | Boolean Not|   0  |    Residue   |  0 0  |       |
+| `\|`     | Boolean Not|   0  |    Residue   |  0 0  |       |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
@@ -146,4 +146,4 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
     put A   ->    print A
     A put B ->    print B A times
     A  i  B ->    3 = 1 2 3;4 5 6 i` <0 2
-                  ~ of rank 99 99
+                  ~@99\: if @ was rank
