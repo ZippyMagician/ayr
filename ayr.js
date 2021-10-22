@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 //TODO:
-//  - Higher rank data
-//  - '<.' and '>.' decide dyadic
 //  - '@' monadic
 //  - Implement missing fns from specs
 //  - Variable assignment
+//  - Syntactic trains
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
 if(this.d.length==1&&this.d[0]&&this.d[0].b)this.d[0].b=0}
@@ -135,8 +134,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   ">":mod(pon.bind(0,0,a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,0,1,99),pon.bind(0,1,(a,b)=>+(a>b),0,0,0)),
   "<:":mod(pon.bind(0,0,a=>narr([...Array(a.d.length).keys()].sort((i,j)=>sort(a.d[i],a.d[j]))),0,0,1),pon.bind(0,1,(a,b)=>+(a<=b),1,0,0)),
   ">:":mod(pon.bind(0,0,a=>narr([...Array(a.d.length).keys()].sort((i,j)=>-sort(a.d[i],a.d[j]))),0,0,1),pon.bind(0,1,(a,b)=>+(a>=b),1,0,0)),
-  "<.":mod(pon.bind(0,0,a=>{a.d=a.d.sort(sort);return a},1,1,1),pon.bind(0,1,(a,b)=>!a&&!b,1,0,0)),
-  ">.":mod(pon.bind(0,0,a=>{a.d=a.d.sort((a,b)=>-sort(a,b));return a},1,1,1),pon.bind(0,1,(a,b)=>!(a&&b),1,0,0)),
+  "<.":mod(pon.bind(0,0,a=>{a.d=a.d.sort(sort);return a},1,1,1),pon.bind(0,1,(a,b)=>+(!a&&!b),1,0,0)),
+  ">.":mod(pon.bind(0,0,a=>{a.d=a.d.sort((a,b)=>-sort(a,b));return a},1,1,1),pon.bind(0,1,(a,b)=>+!(a&&b),1,0,0)),
   "^":mod(pon.bind(0,0,a=>2.7184*+a,1,0,0),pon.bind(0,1,(a,b)=>(+a)**+b,1,0,0)),
   "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),0,0,99),pon.bind(0,1,(a,b)=>{
     let nr=a instanceof A?a.d:[a]
