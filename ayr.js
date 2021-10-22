@@ -286,75 +286,46 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   let tn=[],b=[],bn=[];
   for(let i=0;i<=t.length;i++)
     if(t[i]!=null&&t[i].t==5){bn.push(b);b=[]}
-    else if(t[i]!=null&&inst(t[i]))b.push(t[i]);
+    else if(t[i]!=null&&inst(t[i]))b.push(t[i])
     else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7||t[i].t==8)&&b.length==1&&bn.length==0)
       tn.push(...(t[i]!=null?[b.pop(),t[i]]:[b.pop()]));
     else if((t[i]==null||!(t[i].t==9&&t[i].v==' '))&&b.length){
       if(bn.length){
-        let s,bx=0;
-        bn=bn.concat([b]);
-        if(!bn.reduce((acc,x)=>acc&&x.length==bn[0].length)
-          ||bn.reduce((acc,x)=>acc||(x[0] instanceof A&&x[0].d.length!=bn[0].length),false)){
-          s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v),n.length,1));
-          bx=1;
-        }else s=bn.flat().map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v);
-        let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,bn.length],0)};
-        tn.push(...(t[i]!=null?[t4,t[i]]:[t4]))
-        bn=[]
-      }else{
-        let a=narr(b.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v))
-        tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))
-      }
-      b=[]
-    }
-    else tn.push(t[i]);
-  return tn.filter(n=>n!=null);//sometimes happens
+        let s,bx=0;bn=bn.concat([b]);
+        if(!bn.reduce((acc,x)=>acc&&x.length==bn[0].length)||bn.reduce((acc,x)=>acc||(x[0] instanceof A&&x[0].d.length!=bn[0].length),false)){
+          s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v),n.length,1));bx=1
+        }else s=bn.flat().map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v)
+        let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,bn.length],0)};tn.push(...(t[i]!=null?[t4,t[i]]:[t4]));bn=[]
+      }else{let a=narr(b.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v));tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))}b=[]
+    }else tn.push(t[i]);return tn.filter(n=>n!=null);//sometimes happens
 }
 ,ptrain=(t,G=0)=>{
-  if(t.length==1)return t[0];
-  if(!t[t.length-1].incomp)G=0
-  let tn=[];
+  if(t.length==1)return t[0];if(!t[t.length-1].incomp)G=0;let tn=[];
   if(G){//train
     tn=t.map(n=>n.clone())
     for(let i=tn.length-1;i>=0;){
       if(i>=2&&t[i-1].incomp){i-=2;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(
-        A=>x[i+1].call(x[i].call(A.clone()),x[i+2].call(A)),
-        (A,B)=>x[i+1].call(x[i].call(A.clone(),B.clone()),x[i+2].call(A,B)),
+        A=>x[i+1].call(x[i].call(A.clone()),x[i+2].call(A)),(A,B)=>x[i+1].call(x[i].call(A.clone(),B.clone()),x[i+2].call(A,B)),
       ))}else if(i>=1&&!t[i-1].incomp){
-        i-=1;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(
-          A=>x[i+1].call(x[i],A),
-          (A,B)=>err(0),
-        ))
+        i-=1;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(A=>x[i+1].call(x[i],A),(A,B)=>err(0)))
       }else if(i>=1){
-        i-=1;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(
-          A=>x[i].call(x[i+1].call(A)),
-          (A,B)=>x[i].call(A,x[i+1].call(B))
-        ))
+        i-=1;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(A=>x[i].call(x[i+1].call(A)),(A,B)=>x[i].call(A,x[i+1].call(B))))
       }else i--
-    }
-    return tn[0]
+    }return tn[0]
   }else{//normal
     if(t[t.length-1].incomp)return ptrain(t,1);
     tn.push(t[t.length-1]);
     for(let i=t.length-2;i>=0;i--){
       if(t[i-1]!=null&&!(t[i-1]instanceof MoD)){
-        let x=tn.pop();i--
-        tn.push(mod(A=>t[i+1].call(t[i].call(),x.call()),(A,B)=>t[i+1].call(t[i].call(),x.call())));
-      }else {let x=tn.pop();tn.push(mod(A=>t[i].call(x.call()),(A,B)=>t[i].call(x.call())))}
-    }
-    let x=tn.pop()
-    x.incomp=0
-    return x
+        let x=tn.pop();i--;tn.push(mod(A=>t[i+1].call(t[i].call(),x.call()),(A,B)=>t[i+1].call(t[i].call(),x.call())))
+      }else{let x=tn.pop();tn.push(mod(A=>t[i].call(x.call()),(A,B)=>t[i].call(x.call())))}
+    }let x=tn.pop();x.incomp=0;return x
   }
 }
 ,exec=(t,G=0)=>{
-  let fq=[]
-  for(let i=0;i<t.length;i++){
-    let o=t[i];
-    if(o.t==9&&o.v=='\n'&&fq.length){
-      let x=ptrain(fq,G).call();
-      if(!G&&x!=null)console.log(x.toString())
-      fq=[]
+  let fq=[];for(let i=0;i<t.length;i++){
+    let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
+      let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(x.toString());fq=[]
     }
     if(o.t==7){
       if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);err(5)}
@@ -364,8 +335,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }else if(o.t==2||o.t==8&&o.v.incomp){
       let [ni,b]=nnw(t,i);
       if(inst(b)||ni!=i&&b.t==8){
-        i=ni
-        if(b.t==8){
+        i=ni;if(b.t==8){
           if(b.v.incomp)fq.push((o.t==8?o.v:syms[o.v]),b.v)
           else fq.push(o.t==8?o.v:syms[o.v],b.v)
         }else fq.push(o.t==8?o.v:syms[o.v],b.v)
@@ -373,9 +343,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }else if(o.t==3){
       if(!fq.length)err(0)
       else if(!bdrs[o.v].m){
-        [i,f]=nnw(t,i)
-        if(!inst(f)&&f.t!=2&&f.t!=8)err(0)
-        fq.push(bdrs[o.v].call(fq.pop(),inst(f)||f.t==8?f.v:syms[f.v]))
+        [i,f]=nnw(t,i);if(!inst(f)&&f.t!=2&&f.t!=8)err(0);fq.push(bdrs[o.v].call(fq.pop(),inst(f)||f.t==8?f.v:syms[f.v]))
       }else fq.push(bdrs[o.v].call(fq.pop()))
     }else if(o.t<2||o.t==4||o.t==8){
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
