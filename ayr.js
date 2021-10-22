@@ -133,8 +133,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "[":mod(pon.bind(0,0,a=>a,1,1,99),pon.bind(0,1,(a,b)=>a,1,1,99)),
   "<":mod(pon.bind(0,0,a=>a instanceof A?(a.b=1,a):new A([a],[1],1),0,1,99),pon.bind(0,1,(a,b)=>+(a<b),1,0,0)),
   ">":mod(pon.bind(0,0,a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,0,1,99),pon.bind(0,1,(a,b)=>+(a>b),0,0,0)),
-  "<:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>+(a<=b),1,0,0)),
-  ">:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a+32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>+(a>=b),1,0,0)),
+  "<:":mod(pon.bind(0,0,a=>narr([...Array(a.d.length).keys()].sort((i,j)=>sort(a.d[i],a.d[j]))),0,0,1),pon.bind(0,1,(a,b)=>+(a<=b),1,0,0)),
+  ">:":mod(pon.bind(0,0,a=>narr([...Array(a.d.length).keys()].sort((i,j)=>-sort(a.d[i],a.d[j]))),0,0,1),pon.bind(0,1,(a,b)=>+(a>=b),1,0,0)),
   "<.":mod(pon.bind(0,0,a=>{a.d=a.d.sort(sort);return a},1,1,1),pon.bind(0,1,(a,b)=>err(2),0,0,99)),
   ">.":mod(pon.bind(0,0,a=>{a.d=a.d.sort((a,b)=>-sort(a,b));return a},1,1,1),pon.bind(0,1,(a,b)=>err(2),0,0,99)),
   "^":mod(pon.bind(0,0,a=>2.7184*+a,1,0,0),pon.bind(0,1,(a,b)=>(+a)**+b,1,0,0)),
@@ -183,7 +183,10 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(a.d.length>b.ds)err(2);let c=new A([0],1,0,b.str);c=ext(c,a.d.map((n,i)=>b.r[i]-n),b.str)
     for(let i=0;i<b.ds&&i<a.d.length;i++)
       for(let k=a.d[i+1]||0;k>=0;k--)for(let j=a.d[i];j<b.r[i];j++)c.d[j-a.d[i]+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0;return c
-  },0,1,99))
+  },0,1,99)),
+  "|":mod(pon.bind(0,0,a=>+!a,1,0,0),pon.bind(0,1,(a,b)=>b % a,0,0,0)),
+  "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a+32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1,0)),
+  "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1,0)),
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))

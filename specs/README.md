@@ -106,8 +106,8 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 |  ```%``` | Reciprocal |   0  |    Divide    |  0 0  |       |
 |  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |       |
 |  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |       |
-| ```<:``` |    Floor   |   0  |    Less/Eq   |  0 0  |Str(m): lowercase|
-| ```>:``` |    Ceil    |   0  |  Greater/Eq  |  0 0  |Str(m): uppercase|
+| ```<:``` |  Grade Up  |   0  |    Less/Eq   |  0 0  |       |
+| ```>:``` | Grade Down |   0  |  Greater/Eq  |  0 0  |       |
 |  ```^``` |     Exp    |   0  |      Pow     |  0 0  |       |
 |  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |       |
 |  ```[``` |  Identity  |  99  |     Left     | 99 99 |       |
@@ -125,7 +125,9 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
-| `\|`     | Boolean Not|   0  |    Residue   |  0 0  |       |
+|   `\|`   | Boolean Not|   0  |    Residue   |  0 0  |       |
+| ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
+| ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
@@ -146,4 +148,4 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
     put A   ->    print A
     A put B ->    print B A times
     A  i  B ->    3 = 1 2 3;4 5 6 i` <0 2
-                  ~@99\: if @ was rank
+                  ~ of rank 99 99
