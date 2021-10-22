@@ -216,7 +216,9 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,0,1))),
   "@":op(0,(a,b)=>mod(
     l=>err(2),(l,r)=>l==null||r==null?err(0):!a.incomp?err(2):!b.incomp?a.call(b,b):a.call(b.call(l),b.call(r))
-  ))
+  )),
+  "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a);a.d=a.d.map(n=>f.call(n,b));fix(a);return a})),
+  "\\:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{b=carr(b);b.d=b.d.map(n=>f.call(a,n));fix(b);return b}))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
