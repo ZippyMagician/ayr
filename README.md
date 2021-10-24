@@ -3,7 +3,7 @@ A toy array language. For the specs see [here](specs/README.md)
 
 ## TODO
 Current todo list for myself
-- [ ] Implement missing symbols + binders
+- [x] Implement missing symbols + binders
     * ```=```
     * ```~.```
     * ```~:```
@@ -14,11 +14,8 @@ Current todo list for myself
     * monadic `@`
     * dyadic `>.` and `<.`
 - [ ] Design and implement more symbols
-    * Residue
-    * Grade
     * Stencil/cut
-    * Head
-    * Tail
+    * Mix (inverse of Mold)
     * etc
 - [ ] Higher rank data supported
 - [x] Change rank of `/` and `\` to be major rank - 1, similar to `#`
