@@ -112,7 +112,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 |  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |       |
 |  ```[``` |  Identity  |  99  |     Left     | 99 99 |       |
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
-|  ```~``` |  One-Range |   0  |     Index    | 0 99  |Str(m): alphabet upto arg|
+|  ```~``` |  One-Range |   0  |     Index    | 99 99 |Str(m): alphabet upto arg|
 | ```<.``` | Sort Ascending | 1 |     TBD     |  TBD  |       |
 | ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |       |
 |  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |       |
@@ -140,12 +140,10 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ``` ` ``` | ```u` ``` |Commute|  N/A |  Flip  |  N/A |                    |
 | ```/``` |  ```u/``` |  Reduce |   1  | N-wise Reduce | 0 1 |              |
 | ```\``` |  ```u\``` |   Scan  |   1  |  Table |  1 1 |                     |
-| ```@``` | ```u@v``` |  TBD    |  TBD |  Over  |  N/A | Binds to both sides if immediate |
+| ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |
 | ```/:``` | ```u/:``` | Diagonals | 2 | Each left | 0 99 |                 |
 | ```\:``` | ```u\:``` | Antidiagonals | 2 | Each right | 99 0 |            |
 
 ## Library Functions
     put A   ->    print A
     A put B ->    print B A times
-    A  i  B ->    3 = 1 2 3;4 5 6 i` <0 2
-                  ~ of rank 99 99
