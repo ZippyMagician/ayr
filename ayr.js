@@ -7,7 +7,7 @@
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
 if(this.d.length==1&&this.d[0]&&this.d[0].b)this.d[0].b=0}
-function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.incomp=1;}
+function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.uf=1;}
 MoD.prototype.bind=function(...v){
   this.bd.push(...v);
   return this;
@@ -189,8 +189,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1,0)),
 }
 ,bdrs={
-  '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.incomp?b.call(a,l):!b.incomp?a.call(l,b):a.call(b.call(l))
-    ,(l,r)=>l==null||r==null?err(0):!a.incomp||!b.incomp?err(0):a.call(b.call(l,r)))),
+  '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
+    ,(l,r)=>l==null||r==null?err(0):!a.uf||!b.uf?err(0):a.call(b.call(l,r)))),
   '&:':op(0,(f,g)=>mod(a=>a==null?err(0):f.call(a.clone(),g.call(a)),(a,b)=>a==null||b==null?err(0):f.call(a,g.call(b)))),
   '&.':op(0,(f,g)=>mod(a=>a==null?err(0):g.call(f.call(a.clone()),a),(a,b)=>a==null||b==null?err(0):g.call(f.call(a),b))),
   '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
@@ -215,10 +215,10 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     let n=[];for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
   },0,0,1))),
   "@":op(0,(a,b)=>mod(l=>{
-    if(b.incomp)return a.call(b.call(l))
+    if(b.uf)return a.call(b.call(l))
     else{if(b<0){b=-b;err(2)}else return mapd(l,n=>a.call(n),b)}
   },(l,r)=>{
-    if(b.ds==0)b=narr([b,b]);if(b.incomp)return a.call(b.call(l),b.call(r))
+    if(b.ds==0)b=narr([b,b]);if(b.uf)return a.call(b.call(l),b.call(r))
     else{if(b.d[0]<0||b.d[1]<0){err(2)}else return mapd(l,L=>mapd(r,R=>a.call(L,R),b.d[1]),b.d[0])}
   })),
   "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a);a.d=a.d.map(n=>f.call(n,b));fix(a);return a})),
@@ -243,12 +243,12 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,str=s=>s.toString()
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
-,mex=f=>f.incomp?f:f.call()
+,mex=f=>f.uf?f:f.call()
 ,nnw=(t,i)=>{
   let o=1;while(t[i+o]&&t[i+o].t==9)o++;
   return t[i+o]?[i+o,t[i+o]]:[i+o,{t:10}];
 }
-,inst=o=>o.t<2||o.t==4||o.t==7&&!env[o.v].incomp||o.t==8&&!o.v.incomp
+,inst=o=>o.t<2||o.t==4||o.t==7&&(env[o.v]==null?0:!env[o.v].uf)||o.t==8&&!o.v.uf
 ,lex=s=>{
   let m,l,t=[];
   while(s){
@@ -297,43 +297,44 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }else tn.push(t[i]);return tn.filter(n=>n!=null);//sometimes happens
 }
 ,ptrain=(t,G=0)=>{
-  if(t.length==1)return t[0];if(!t[t.length-1].incomp)G=0;let tn=[];
+  if(t.length==1)return t[0];if(!t[t.length-1].uf)G=0;let tn=[];
   if(G){//train
     tn=t.map(n=>n.clone())
     for(let i=tn.length-1;i>=0;){
-      if(i>=2&&t[i-1].incomp){i-=2;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(
+      if(i>=2&&t[i-1].uf){i-=2;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(
         A=>x[i+1].call(x[i].call(A.clone()),x[i+2].call(A)),(A,B)=>x[i+1].call(x[i].call(A.clone(),B.clone()),x[i+2].call(A,B)),
-      ))}else if(i>=1&&!t[i-1].incomp){
+      ))}else if(i>=1&&!t[i-1].uf){
         i-=1;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(A=>x[i+1].call(x[i],A),(A,B)=>err(0)))
       }else if(i>=1){
         i-=1;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(A=>x[i].call(x[i+1].call(A)),(A,B)=>x[i].call(A,x[i+1].call(B))))
       }else i--
     }return tn[0]
   }else{//normal
-    if(t[t.length-1].incomp)return ptrain(t,1);
+    if(t[t.length-1].uf)return ptrain(t,1);
     tn.push(t[t.length-1]);
     for(let i=t.length-2;i>=0;i--){
       if(t[i-1]!=null&&!(t[i-1]instanceof MoD)){
         let x=tn.pop();i--;tn.push(mod(A=>t[i+1].call(t[i].call(),x.call()),(A,B)=>t[i+1].call(t[i].call(),x.call())))
       }else{let x=tn.pop();tn.push(mod(A=>t[i].call(x.call()),(A,B)=>t[i].call(x.call())))}
-    }let x=tn.pop();x.incomp=0;return x
+    }let x=tn.pop();x.uf=0;return x
   }
 }
 ,exec=(t,G=0)=>{
-  let fq=[];for(let i=0;i<t.length;i++){
+  let fq=[],V,h;for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
-      let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(x.toString());fq=[]
+      if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}
+      else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(x.toString());fq=[]}
     }
     if(o.t==7){
-      if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);err(5)}
-      else if(env[o.v]&&env[o.v].incomp)fq.push(env[o.v])
-      else if(env[o.v]!=null)q.push(env[o.v])
+      if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push(mod(a=>(env[o.v]=a),(a,b)=>err(2)));else V=o.v}
+      else if(env[o.v]&&env[o.v].uf)fq.push(env[o.v])
+      else if(env[o.v]!=null)fq.push(env[o.v])
       else err(3)
-    }else if(o.t==2||o.t==8&&o.v.incomp){
+    }else if(o.t==2||o.t==8&&o.v.uf){
       let [ni,b]=nnw(t,i);
       if(inst(b)||ni!=i&&b.t==8){
         i=ni;if(b.t==8){
-          if(b.v.incomp)fq.push((o.t==8?o.v:syms[o.v]),b.v)
+          if(b.v.uf)fq.push((o.t==8?o.v:syms[o.v]),b.v)
           else fq.push(o.t==8?o.v:syms[o.v],b.v)
         }else fq.push(o.t==8?o.v:syms[o.v],b.v)
       }else fq.push(o.t==8?o.v:syms[o.v])
@@ -350,9 +351,10 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }
   }
   if(fq.length){
-    if(!G&&fq[fq.length-1].incomp)err(0)
+    if(V)env[V]=(h=ptrain(fq,1),h.uf?h:h.call())
+    else if(!G&&fq[fq.length-1].uf)err(0)
     else var x=ptrain(fq,G)
-    if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}
+    if(!V){if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}}
   }
 }
 ,run=d=>{
@@ -377,7 +379,7 @@ else if(!argv._.length){
     //what the fuck javascript
     Object.values(syms).forEach(mod=>{mod.bd=[]})
     Object.values(bdrs).forEach(mod=>{mod.bd=[]})
-    Object.values(env).forEach(mod=>{if(mod.incomp)mod.bd=[]})
+    Object.values(env).forEach(mod=>{if(mod.uf)mod.bd=[]})
   }
 }else f.readFile(__dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))
 }else{(self||globalThis||window).runAyr=run}
