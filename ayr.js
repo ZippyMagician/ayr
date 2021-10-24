@@ -147,7 +147,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,1,99)),
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),0,1,0),pon.bind(0,1,get,0,1,[0,99])),
   ",":mod(pon.bind(0,0,ravel,1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.concat(b.d),0,0,p),1,1,1)),
-  ";:":mod(pon.bind(0,0,(a,p)=>{
+  ";":mod(pon.bind(0,0,(a,p)=>{
     let m=Math.max(...a.d.map(n=>n.ds==0?err(2):n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(n,[m],p).d)),[m,...a.r],a.b,p)
   },1,1,1),pon.bind(0,1,(a,b,p)=>{
     if(b.r[0]==1&&b.ds==1)b=narr(rn(0,a.r[0],b.d[0]));
@@ -255,7 +255,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1]}"`),new A(l.split("").map(c=>c.charCodeAt(0)),l.length,0,1))})
     else if(m=RegExp(`^(${Object.keys(syms).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:2,v:m[1]})
     else if(m=RegExp(`^(${Object.keys(bdrs).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:3,v:m[1]})
-    else if(m=/^;/.exec(s))t.push({t:5})
+    //FREE: t=5
     else if(m=/^:/.exec(s))t.push({t:6})
     else if(m=/^(\s)/.exec(s))t.push({t:9,v:m[1]})
     else if(m=/^([a-zA-Z]+)/.exec(s))t.push({t:7,v:m[1]})
@@ -283,21 +283,14 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,strand=t=>{
   if(t.length==1)return t
-  let tn=[],b=[],bn=[];
+  let tn=[],b=[];
   for(let i=0;i<=t.length;i++)
-    if(t[i]!=null&&t[i].t==5){bn.push(b);b=[]}
-    else if(t[i]!=null&&inst(t[i]))b.push(t[i])
-    else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7||t[i].t==8)&&b.length==1&&bn.length==0)
+    if(t[i]!=null&&inst(t[i]))b.push(t[i])
+    else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7||t[i].t==8)&&b.length==1)
       tn.push(...(t[i]!=null?[b.pop(),t[i]]:[b.pop()]));
     else if((t[i]==null||!(t[i].t==9&&t[i].v==' '))&&b.length){
-      if(bn.length){
-        let s,bx=0;bn=bn.concat([b]);
-        if(!bn.reduce((acc,x)=>acc&&x.length==bn[0].length)||bn.reduce((acc,x)=>acc||(x[0] instanceof A&&x[0].d.length!=bn[0].length),false)){
-          s=bn.map(n=>new A(n.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v),n.length,1));bx=1
-        }else s=bn.flat().map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v)
-        let t4={t:4,v:new A(s,bx?s.length:[s[0].b?1:bn[0].length,bn.length],0)};tn.push(...(t[i]!=null?[t4,t[i]]:[t4]));bn=[]
-      }else{let a=narr(b.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v));tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]))}b=[]
-    }else tn.push(t[i]);return tn.filter(n=>n!=null);//sometimes happens
+      let a=narr(b.map(n=>n.t==1||n.t==4?(n.v.b=1,n.v):n.v));tn.push(...(t[i]!=null?[{t:4,v:a},t[i]]:[{t:4,v:a}]));b=[]
+    }return tn.filter(n=>n!=null);//sometimes happens
 }
 ,ptrain=(t,G=0)=>{
   if(t.length==1)return t[0];if(!t[t.length-1].incomp)G=0;let tn=[];

@@ -28,7 +28,7 @@ What follows is an in-depth look at the specs of the `ayr` array language, so an
 ```
 
 ## Basic syntax
-General types come in the form of signed floats and strings, which may or may not be scalar values. A vector, similar to **APL**, is denoted with a series of these general values separated by spaces. To create a matrix, you can currently use `;` to separate vectors or grouping (`()`) similar to how APL generally does it. Note that `;` is not a symbol—rather, it is used solely for matrix denotion
+General types come in the form of signed floats and strings, which may or may not be scalar values. A vector, similar to **APL**, is denoted with a series of these general values separated by spaces. To create a matrix, you can currently use `;` to separate vectors or grouping (`()`) similar to how APL generally does it.
 
 Incomplete operations within groups **or** assigned to a variable are called [Trains](#trains).
 
@@ -116,7 +116,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```<.``` | Sort Ascending | 1 |     TBD     |  TBD  |       |
 | ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |       |
 |  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |       |
-| ```;:``` |   Mold     |   1  |   Laminate   |  99 1 |       |
+|  ```;``` |   Mold     |   1  |   Laminate   |  99 1 |       |
 |  ```#``` |    Tally   |  99  |   Replicate  |  99 1 |       |
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
 | ```~.``` |   Indices  |  99  | Interval Ind |  0 1  |       |
