@@ -128,6 +128,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 |   `\|`   | Boolean Not|   0  |    Residue   |  0 0  |       |
 | ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
+|  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
