@@ -57,6 +57,7 @@ Array.prototype.clone=function(){return this;}
 A.prototype.bind=function(...v){return this;}
 A.prototype.call=function(...v){return this;}
 const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
+,ft=a=>a<2?1:eval('for(let n=2,x=1;n<=a;n++)x*=n')
 ,us=a=>sb(a)?a.d[0]:a.ds==0?a:err(2)
 ,op=(m,f)=>{let x=new MoD(m?f:null,m?null:f);x.m=m;return x}
 ,carr=(v,b=0)=>v instanceof A?b?(v.b=1,v):v:new A([v],1,b)
@@ -174,6 +175,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "|":mod(pon.bind(0,0,a=>+!a,1,0,0),pon.bind(0,1,(a,b)=>b % a,0,0,0)),
   "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a+32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1,0)),
   "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1,0)),
+  "!":mod(pon.bind(0,0,ft,1,0,0),pon.bind(0,1,(a,b)=>ft(a)/(ft(b)*ft(a-b)),1,0,0))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
