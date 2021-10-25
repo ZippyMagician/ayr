@@ -5,11 +5,8 @@
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
 if(this.d.length==1&&this.d[0]&&this.d[0].b)this.d[0].b=0}
-function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.uf=1;}
-MoD.prototype.bind=function(...v){
-  this.bd.push(...v);
-  return this;
-}
+function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.uf=1}
+MoD.prototype.bind=function(...v){this.bd.push(...v);return this}
 MoD.prototype.call=function(...a){
   if(this.bd.length+a.length>2)err(0);else if(this.bd.length){return this.f2.call(0,...this.bd,a[0])}else if(a.length>1)return this.f2.call(0,...a)
   else return this.f1.call(0,a[0])
@@ -30,11 +27,10 @@ A.prototype.has=function(o){
   return 0
 }
 A.prototype.toString=function(){
-  let S="";
-  let r=this.r.reverse();
-  while(r.length>1)this.d=chnk(this.d,r.pop(),this.str).d;
+  let S="";let r=this.r.reverse()
+  while(r.length>1)this.d=chnk(this.d,r.pop(),this.str).d
   switch(this.ds){
-    case 1:S+=`${this.b?'[ ':''}${this.str?String.fromCharCode(...this.d):this.d.map(str).join(" ")}${this.b?' ]':''}`;break;
+    case 1:S+=`${this.b?'[ ':''}${this.str?String.fromCharCode(...this.d):this.d.map(str).join(" ")}${this.b?' ]':''}`;break
     case 2:
       let l=Math.max(...this.d.map(n=>Math.max(...n.d.map(r=>str(r).length)))),f=1,ind=0
       if(this.b){S+='[ ';ind=2}
@@ -42,20 +38,20 @@ A.prototype.toString=function(){
         if(!f)S+=' '.repeat(ind);else f=0;if(x.b)S+='[ '
         if(x.str)S+=str(x);else for(y of x.d)S+=(x.b?" ":" ".repeat(l-str(y).length))+str(y)+" ";if(x.b&&!x.str)S=S.trimEnd()+']';S+='\n'
       }
-      if(this.b)S=S.trimEnd()+' ]';break;
-    default:err(1);
+      if(this.b)S=S.trimEnd()+' ]';break
+    default:err(1)
   }
-  return S.trimEnd();
+  return S.trimEnd()
 }
 A.prototype.clone=function(){return new A(this.d.map(n=>n.clone()),this.r,this.b,this.str)}
-Number.prototype.call=function(...v){return +this;}
-Number.prototype.bind=function(...v){return +this;}
-Number.prototype.clone=function(){return +this;}
+Number.prototype.call=function(...v){return +this}
+Number.prototype.bind=function(...v){return +this}
+Number.prototype.clone=function(){return +this}
 Number.prototype.ds=0;
 Array.prototype.ds=1;
-Array.prototype.clone=function(){return this;}
-A.prototype.bind=function(...v){return this;}
-A.prototype.call=function(...v){return this;}
+Array.prototype.clone=function(){return this}
+A.prototype.bind=function(...v){return this.clone()}
+A.prototype.call=function(...v){return this.clone()}
 const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,ft=a=>a<2?1:eval('for(let n=2,x=1;n<=a;n++)x*=n')
 ,us=a=>sb(a)?a.d[0]:a.ds==0?a:err(2)
@@ -138,13 +134,21 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),0,1,0),pon.bind(0,1,geti,0,1,99)),
   ",":mod(pon.bind(0,0,ravel,1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.concat(b.d),0,0,p),1,1,1)),
   ";":mod(pon.bind(0,0,(a,p)=>{
+    console.log("CALLED:",a)
     let m=Math.max(...a.d.map(n=>n.ds==0?err(2):n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(n,[m],p).d)),[m,...a.r],a.b,p)
   },1,1,1),pon.bind(0,1,(a,b,p)=>{
-    if(b.r[0]==1&&b.ds==1)b=narr(rn(0,a.r[0],b.d[0]))
-    if(a.r[0]>b.d.length)b=ext(b,[a.r[0]],p);else if(b.d.length>a.r[0])
-      for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...rn(0,b.d.length-a.r[0],p?32:0));a.r[0]=b.d.length
-    return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,p)
-  },1,1,[99,1])),
+    if(b.ds<=a.ds){
+      if(b.r[0]==1&&b.ds==1)b=narr(rn(0,a.r[0],b.d[0]))
+      if(a.r[0]>b.d.length)b=ext(b,[a.r[0]],p);else if(b.d.length>a.r[0])
+        for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...rn(0,b.d.length-a.r[0],p?32:0));a.r[0]=b.d.length
+      return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,p)
+    }else{
+      if(a.r[0]==1&&a.ds==1)b=narr(rn(0,b.r[0],a.d[0]))
+      if(b.r[0]>a.d.length)b=ext(a,[b.r[0]],p);else if(a.d.length>b.r[0])
+        for(i=0;i<(b.r[1]||1);i++)b.d.splice(i*pd(b.r.slice(1))+b.r[0],0,...rn(0,a.d.length-b.r[0],p?32:0));b.r[0]=a.d.length
+      return new A(a.d.concat(b.d),b.ds>1?[...b.r.slice(0,b.ds-1),b.r.pop()+1]:[b.r[0],2],b.b,p)
+    }
+  },1,1,[99,99])),
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0,99),pon.bind(0,1,(a,b,p)=>{
     [a,b]=[b,a];let v=[];let c=b.rank(b.ds-1);if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
     return new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str)
@@ -175,7 +179,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "|":mod(pon.bind(0,0,a=>+!a,1,0,0),pon.bind(0,1,(a,b)=>b % a,0,0,0)),
   "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a+32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1,0)),
   "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1,0)),
-  "!":mod(pon.bind(0,0,ft,1,0,0),pon.bind(0,1,(a,b)=>ft(a)/(ft(b)*ft(a-b)),1,0,0))
+  "!":mod(pon.bind(0,0,ft,1,0,0),pon.bind(0,1,(a,b)=>ft(a)/(ft(b)*ft(a-b)),1,0,0)),
+  ";:":mod(pon.bind(0,0,a=>carr(a,a.b||0).rank(a.ds?a.ds-1:0),0,1,99),pon.bind(0,1,(a,b)=>{},0,1,[1,99]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
@@ -267,7 +272,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }else tn.push(t[i]);return tn.filter(n=>n!=null);//sometimes happens
 }
 ,ptrain=(t,G=0)=>{
-  if(t.length==1)return t[0];if(!t[t.length-1].uf)G=0;let tn=[];
+  if(t.length==1)return t[0];if(!t[t.length-1].uf)G=0;let tn=[]
   if(G){//train
     tn=t.map(n=>n.clone());for(let i=tn.length-1;i>=0;){
       if(i>=2&&t[i-1].uf){i-=2;let x=tn.map(n=>n.clone());tn.splice(i,0,mod(
@@ -280,7 +285,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }return tn[0]
   }else{//normal
     if(t[t.length-1].uf)return ptrain(t,1);tn.push(t[t.length-1]);for(let i=t.length-2;i>=0;i--){
-      if(t[i-1]!=null&&!(t[i-1]instanceof MoD)){
+      if(t[i-1]!=null&&!t[i-1].uf){
         let x=tn.pop();i--;tn.push(mod(A=>t[i+1].call(t[i].call(),x.call()),(A,B)=>t[i+1].call(t[i].call(),x.call())))
       }else{let x=tn.pop();tn.push(mod(A=>t[i].call(x.call()),(A,B)=>t[i].call(x.call())))}
     }let x=tn.pop();x.uf=0;return x
@@ -293,18 +298,18 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }
     if(o.t==7){
       if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push(mod(a=>(env[o.v]=a),(a,b)=>err(2)));else V=o.v}
-      else if(env[o.v]&&env[o.v].uf)fq.push(env[o.v])
       else if(env[o.v]!=null)fq.push(env[o.v])
       else err(3)
     }else if(o.t==2||o.t==8&&o.v.uf){
       let [ni,b]=nnw(t,i);
       if(inst(b)||ni!=i&&b.t==8){
-        i=ni;if(b.t==8){if(b.v.uf)fq.push((o.t==8?o.v:syms[o.v]),b.v);else fq.push(o.t==8?o.v:syms[o.v],b.v)}else fq.push(o.t==8?o.v:syms[o.v],b.v)
+        i=ni;if(b.t==8){if(b.v.uf||b.t==7&&env[b.v]!=null&&env[b.v].uf)fq.push((o.t==8?o.v:syms[o.v]),b.t==7?env[b.v]:b.v);else fq.push(o.t==8?o.v:syms[o.v],b.v)}
+        else fq.push(o.t==8?o.v:syms[o.v],b.t==7?env[b.v]:b.v)
       }else fq.push(o.t==8?o.v:syms[o.v])
     }else if(o.t==3){
       if(!fq.length)err(0)
       else if(!bdrs[o.v].m){
-        [i,f]=nnw(t,i);if(!inst(f)&&f.t!=2&&f.t!=8)err(0);fq.push(bdrs[o.v].call(fq.pop(),inst(f)||f.t==8?f.v:syms[f.v]))
+        [i,f]=nnw(t,i);if(!inst(f)&&f.t!=2&&f.t!=8)err(0);fq.push(bdrs[o.v].call(fq.pop(),inst(f)||f.t==8?f.t==7?env[f.v]:f.v:syms[f.v]))
       }else fq.push(bdrs[o.v].call(fq.pop()))
     }else if(o.t<2||o.t==4||o.t==8){
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
@@ -313,8 +318,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }
   }
   if(fq.length){
-    if(V)env[V]=(h=ptrain(fq,1),h.uf?h:h.call())
-    else if(!G&&fq[fq.length-1].uf)err(0);
+    if(V)env[V]=ptrain(fq,1)
+    else if(!G&&fq[fq.length-1].uf)err(0)
     else var x=ptrain(fq,G);if(!V){if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}}
   }
 }
