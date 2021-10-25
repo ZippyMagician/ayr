@@ -116,7 +116,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```<.``` | Sort Ascending | 1 |     TBD     |  TBD  |       |
 | ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |       |
 |  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |       |
-|  ```;``` |   Mold     |   1  |   Laminate   |  99 1 |       |
+|  ```;``` |   Mold     |   1  |   Laminate   | 99 99 |       |
 |  ```#``` |    Tally   |  99  |   Replicate  |  99 1 |       |
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
 | ```~.``` |   Indices  |  99  | Interval Ind |  0 1  |       |
@@ -129,6 +129,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 |  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
+| ```;:``` |   Squish   |  99  |    Group     |  1 99 |0s denote new group|
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
