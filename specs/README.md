@@ -129,7 +129,7 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 | ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 |  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
-| ```;:``` |   Squish   |  99  |    Group     |  1 99 |0s denote new group|
+| ```;:``` |   Squish   |  99  |    Group     | 99 1 |0s denote new group|
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |

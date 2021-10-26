@@ -112,7 +112,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,mod=(f,f2)=>
   f2?new MoD(f.bind(0),f2.bind(0)):f instanceof MoD?(f.f1=f.f1.bind(0),f.f2=f.f2.bind(0),f):new MoD(A=>f.call(A),(A,B)=>f.call(A,B))
 ,syms={
-  "+":mod(pon.bind(0,0,a=>+a,1,0,0),pon.bind(0,1,(a,b)=>+a+ +b,1,1,0)),
+  "+":mod(pon.bind(0,0,a=>a<0?-a:+a,1,0,0),pon.bind(0,1,(a,b)=>+a+ +b,1,1,0)),
   "-":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a-32:uc(a)?a+32:a:-a,1,1,0),pon.bind(0,1,(a,b)=>+a-+b,1,1,0)),
   "*":mod(pon.bind(0,0,(a,p)=>p?uc(a)?1:lc(a)?-1:0:a==0?0:a>0?1:-1,1,0,0),pon.bind(0,1,(a,b)=>+a*+b,1,0,0)),
   "%":mod(pon.bind(0,0,a=>1/+a,1,0,0),pon.bind(0,1,(a,b)=>+a/+b,1,0,0)),
@@ -180,7 +180,13 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a+32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1,0)),
   "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1,0)),
   "!":mod(pon.bind(0,0,ft,1,0,0),pon.bind(0,1,(a,b)=>ft(a)/(ft(b)*ft(a-b)),1,0,0)),
-  ";:":mod(pon.bind(0,0,a=>carr(a,a.b||0).rank(a.ds?a.ds-1:0),0,1,99),pon.bind(0,1,(a,b)=>{},0,1,[1,99]))
+  ";:":mod(pon.bind(0,0,a=>new A(carr(a).rank(a.ds?a.ds-1:0).d,a.r,a.b,a.str),0,1,99),pon.bind(0,1,(b,a,p)=>{
+    let n=[];for(i=0;i<a.d.length;i++){
+      if(i==0&&a.d[i]!=0)n.push(b.d[i].clone())
+      else if(a.d[i]!=0){if(typeof n[n.length-1]!='object')n[n.length-1]=[n[n.length-1]];n[n.length-1].push(b.d[i].clone())}
+      else n.push([b.d[i].clone()])
+    }if(n.length==1)return narr(n[0]);return narr(n.map(n=>narr(n,1)),0,1,p)
+  },0,1,[99,1]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
@@ -224,7 +230,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,fix=a=>{
   let f=a.d.reduce((acc,x)=>acc||x instanceof A,false);if(f)f=a.d.length>1&&a.ds==1||a.d.reduce((acc,x)=>acc||x instanceof A&&x.b,false)
-  if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1));while(a.r[a.ds-1]==1&&a.ds>1){a.r.pop();a.ds-=1}
+  if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1));while(a.r[a.ds-1]==1&&a.ds>1){a.r.pop();a.ds-=1}return a
 }
 ,str=s=>s.toString()
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
