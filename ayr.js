@@ -49,7 +49,8 @@ Number.prototype.bind=function(...v){return +this}
 Number.prototype.cl=function(){return +this}
 Number.prototype.ds=0;
 Array.prototype.ds=1;
-Array.prototype.cl=function(){return [...this.map(n=>n.cl())]}
+Array.prototype.cl=function(){return[...this.map(n=>n.cl())]}
+Object.prototype.cl=function(){return{...this}}
 A.prototype.bind=function(...v){return this.cl()}
 A.prototype.call=function(...v){return this.cl()}
 const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
@@ -278,7 +279,13 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,ptrain=(t,G=0)=>{
   if(t.length==1)return t[0];if(!t[t.length-1].uf)G=0;let tn=[]
-  if(G){//train
+  if(t[0].t==6){
+    tn=t.map(n=>n.cl());let x=tn.map(n=>n.cl());tn.push(mod(A=>x[x.length-1].call(A),(A,B)=>x[x.length-1].call(B,A)))//why do I need to swap the args here???
+    for(let i=tn.length-2;i>0;i--){
+      if(!tn[i-1].uf&&i>1){let x=tn.map(n=>n.cl());i--;tn.push(mod(A=>x[i+1].call(x[i],x[x.length-1].call(A)),(A,B)=>x[i+1].call(x[i],x[x.length-1].call(A,B))))}
+      else{let x=tn.map(n=>n.cl());tn.push(mod(A=>x[i].call(x[x.length-1].call(A)),(A,B)=>x[i].call(x[x.length-1].call(A,B))))}
+    }return tn[tn.length-1]
+  }if(G){//train
     tn=t.map(n=>n.cl());for(let i=tn.length-1;i>=0;){
       if(i>=2&&t[i-1].uf){i-=2;let x=tn.map(n=>n.cl());tn.splice(i,0,mod(
         A=>x[i+1].call(x[i].call(A.cl()),x[i+2].call(A)),(A,B)=>x[i+1].call(x[i].call(A.cl(),B.cl()),x[i+2].call(A,B)),
@@ -320,7 +327,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
         if(G&&nnw(t,i)[0]+1>=t.length)return o.v;else if(!G)console.log(o.v.toString())
       }else fq.push(o.v);
-    }
+    }else if(o.t==6)fq.push(o)
   }
   if(fq.length){
     if(V)env[V]=ptrain(fq,1)
