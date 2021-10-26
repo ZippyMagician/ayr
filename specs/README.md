@@ -84,6 +84,7 @@ User functions refer to, as the name implies, functions defined by the user. For
 They are defined with the syntax `<name> : <expression>`
 
 ## Trains
+There are two types of trains: partial trains and J-style trains. First the default, J-style:<br>
 *Key: lowercase letters represent symbols and uppercase represent immediates*
 
 ```
@@ -96,6 +97,13 @@ A (f g h) B      -> (A f B) g A h B
 ..etc
 ```
 Note that this is not an exhaustive list, there may be some edge cases not included.
+
+Partial trains are also present in `ayr`, and are usable by prefixing a train with `:`. For example:
+```
+(: f g h) A      -> f g h A
+A (: f g h) B    -> f g A h B
+```
+Partial trains, of course, support constants within them too.
 
 ## Symbols
 |  Symbol  |   Monadic  | Rank |    Dyadic    |  Rank | Notes |
@@ -113,8 +121,8 @@ Note that this is not an exhaustive list, there may be some edge cases not inclu
 |  ```[``` |  Identity  |  99  |     Left     | 99 99 |       |
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
 |  ```~``` |  One-Range |   0  |     Index    | 99 99 |Str(m): alphabet upto arg|
-| ```<.``` | Sort Ascending | 1 |     TBD     |  TBD  |       |
-| ```>.``` | Sort Descending | 1 |    TBD     |  TBD  |       |
+| ```<.``` | Sort Ascending | 1 |     NOR     |  0 0  |       |
+| ```>.``` | Sort Descending | 1 |    NAND    |  0 0  |       |
 |  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |       |
 |  ```;``` |   Mold     |   1  |   Laminate   | 99 99 |       |
 |  ```#``` |    Tally   |  99  |   Replicate  |  99 1 |       |
