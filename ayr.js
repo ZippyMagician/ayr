@@ -12,7 +12,7 @@ MoD.prototype.call=function(...a){
   else return this.f1.call(0,a[0])
 }
 MoD.prototype.clone=function(){let mod=new MoD(this.f1,this.f2);mod.bd=this.bd;return mod}
-A.prototype.clone=function(){return new A(this.d,this.r,this.b,this.str)}
+A.prototype.clone=function(){return new A(this.d.map(n=>n.clone()),this.r.clone(),this.b,this.str)}
 A.prototype.rank=function(r,s){
   switch(r){
     case -1:err(1)
@@ -27,14 +27,14 @@ A.prototype.has=function(o){
   return 0
 }
 A.prototype.toString=function(){
-  let S="";let r=this.r.reverse()
-  while(r.length>1)this.d=chnk(this.d,r.pop(),this.str).d
+  let S="",r=this.r.clone().reverse(),d=this.d.clone()
+  while(r.length>1)d=chnk(d,r.pop(),this.str).d
   switch(this.ds){
-    case 1:S+=`${this.b?'[ ':''}${this.str?String.fromCharCode(...this.d):this.d.map(str).join(" ")}${this.b?' ]':''}`;break
+    case 1:S+=`${this.b?'[ ':''}${this.str?String.fromCharCode(...d):d.map(str).join(" ")}${this.b?' ]':''}`;break
     case 2:
-      let l=Math.max(...this.d.map(n=>Math.max(...n.d.map(r=>str(r).length)))),f=1,ind=0
+      let l=Math.max(...d.map(n=>Math.max(...n.d.map(r=>str(r).length)))),f=1,ind=0
       if(this.b){S+='[ ';ind=2}
-      for(x of this.d){
+      for(x of d){
         if(!f)S+=' '.repeat(ind);else f=0;if(x.b)S+='[ '
         if(x.str)S+=str(x);else for(y of x.d)S+=(x.b?" ":" ".repeat(l-str(y).length))+str(y)+" ";if(x.b&&!x.str)S=S.trimEnd()+']';S+='\n'
       }
@@ -43,13 +43,13 @@ A.prototype.toString=function(){
   }
   return S.trimEnd()
 }
-A.prototype.clone=function(){return new A(this.d.map(n=>n.clone()),this.r,this.b,this.str)}
+A.prototype.clone=function(){return new A(this.d.map(n=>n.clone()),this.r.clone(),this.b,this.str)}
 Number.prototype.call=function(...v){return +this}
 Number.prototype.bind=function(...v){return +this}
 Number.prototype.clone=function(){return +this}
 Number.prototype.ds=0;
 Array.prototype.ds=1;
-Array.prototype.clone=function(){return this}
+Array.prototype.clone=function(){return [...this.map(n=>n.clone())]}
 A.prototype.bind=function(...v){return this.clone()}
 A.prototype.call=function(...v){return this.clone()}
 const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
@@ -134,7 +134,6 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),0,1,0),pon.bind(0,1,geti,0,1,99)),
   ",":mod(pon.bind(0,0,ravel,1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.concat(b.d),0,0,p),1,1,1)),
   ";":mod(pon.bind(0,0,(a,p)=>{
-    console.log("CALLED:",a)
     let m=Math.max(...a.d.map(n=>n.ds==0?err(2):n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(n,[m],p).d)),[m,...a.r],a.b,p)
   },1,1,1),pon.bind(0,1,(a,b,p)=>{
     if(b.ds<=a.ds){
@@ -217,8 +216,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(b.ds==0)b=narr([b,b]);if(b.uf)return a.call(b.call(l),b.call(r))
     else{if(b.d[0]<0||b.d[1]<0){err(2)}else return mapd(l,L=>mapd(r,R=>a.call(L,R),b.d[1]),b.d[0])}
   })),
-  "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a);a.d=a.d.map(n=>f.call(n,b));fix(a);return a})),
-  "\\:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{b=carr(b);b.d=b.d.map(n=>f.call(a,n));fix(b);return b}))
+  "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a);a.d=a.d.map(n=>f.call(n,b.clone()));fix(a);return a})),
+  "\\:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{b=carr(b);b.d=b.d.map(n=>f.call(a.clone(),n));fix(b);return b}))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
