@@ -46,7 +46,7 @@ A.prototype.toString=function(){
 A.prototype.cl=function(){return new A(this.d.map(n=>n.cl()),this.r.cl(),this.b,this.str)}
 Number.prototype.call=function(...v){return +this}
 Number.prototype.bind=function(...v){return +this}
-Number.prototype.cl=function(){return +this}
+Number.prototype.cl=function(){return +JSON.parse(JSON.stringify(this))}
 Number.prototype.ds=0;
 Array.prototype.ds=1;
 Array.prototype.cl=function(){return[...this.map(n=>n.cl())]}
@@ -60,11 +60,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,carr=(v,b=0)=>v instanceof A?b?(v.b=1,v):v:new A([v],1,b)
 ,narr=(a,b=0,ba=0,s=0)=>new A(ba?a.map(n=>n instanceof A?(n.b=1,n):new A([n],1,1)):a,a.length,b,s)
 ,pon=(d,f,S,p,r,a,b)=>{
-  if(typeof r!='object')r=[r,r]
+  let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}
   if(!d){
     a=carr(a);if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0]:a,p?a.str:0))
     let na=a.rank(r[1])
-    return r[1]<a.ds&&S?new A(na.d.flatMap(n=>n instanceof A?ravel(f(n,a.str)).d:f(n,a.str)),a.r,a.b,p?a.str:0):new A(na.d.map(n=>f(n,a.str)),na.r,a.b,p?a.str:0)
+    return r[1]<a.ds&&S?new A(na.d.flatMap(n=>n instanceof A?ravel(f(n,a.str)).d:f(n,a.str)),a.r,a.b,p?a.str:0):new A(na.d.map(n=>f(n,a.str)),l&&na.ds>1?na.r.slice(1):na.r,a.b,p?a.str:0)
   }else{
     a=carr(a),b=carr(b);if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1)
     else{
@@ -204,7 +204,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(JSON.stringify(l.r)==JSON.stringify(r.r))return narr(l.d.map((n,i)=>f.call(n,r.d[i])));err(1)
   })),
   "`":op(1,f=>mod(l=>f.call(l.cl(),l),(l,r)=>f.call(r,l))),
-  "/":op(1,f=>mod(pon.bind(0,0,x=>x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0]),0,0,1),pon.bind(0,1,(l,r)=>{
+  "/":op(1,f=>mod(pon.bind(0,0,x=>x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0]),2,0,1),pon.bind(0,1,(l,r)=>{
     let p=0,n=[];if(l<0)l=Math.abs(l,p=1)
     for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((acc,v)=>f.call(acc,v),r.d[i]));return narr(n)
   },0,0,[0,1]))),
@@ -217,8 +217,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(b.ds==0)b=narr([b,b]);if(b.uf)return a.call(b.call(l),b.call(r))
     else{if(b.d[0]<0||b.d[1]<0){err(2)}else return mapd(l,L=>mapd(r,R=>a.call(L,R),b.d[1]),b.d[0])}
   })),
-  "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a);a.d=a.d.map(n=>f.call(n,b.cl()));fix(a);return a})),
-  "\\:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{b=carr(b);b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);return b}))
+  "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a);a.d=a.d.map(n=>f.call(n,b.cl()));fix(a);a.str=0;return a})),
+  "\\:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{b=carr(b);b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b}))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
@@ -280,19 +280,21 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,ptrain=(t,G=0)=>{
   if(t.length==1)return t[0];if(!t[t.length-1].uf)G=0;let tn=[]
   if(t[0].t==6){
-    tn=t.map(n=>n.cl());let x=tn.map(n=>n.cl());tn.push(mod(A=>x[x.length-1].call(A),(A,B)=>x[x.length-1].call(B,A)))//why do I need to swap the args here???
-    for(let i=tn.length-2;i>0;i--){
-      if(!tn[i-1].uf&&i>1){let x=tn.map(n=>n.cl());i--;tn.push(mod(A=>x[i+1].call(x[i],x[x.length-1].call(A)),(A,B)=>x[i+1].call(x[i],x[x.length-1].call(A,B))))}
-      else{let x=tn.map(n=>n.cl());tn.push(mod(A=>x[i].call(x[x.length-1].call(A)),(A,B)=>x[i].call(x[x.length-1].call(A,B))))}
+    tn=t.cl();let i=tn.length-2
+    if(!tn[tn.length-2].uf){let x=tn.cl();i--;tn.push(mod(A=>x[x.length-1].call(x[x.length-2],A),(A,B)=>err(0)))}
+    else{let x=tn.cl();tn.push(mod(A=>x[x.length-1].call(A),(A,B)=>x[x.length-1].call(B,A)))}//why do I need to swap the args here???
+    for(;i>0;i--){
+      if(!tn[i-1].uf&&i>1){let x=tn.cl();i--;let I=i.cl();tn.push(mod(A=>x[I+1].call(x[I],x[x.length-1].call(A)),(A,B)=>x[I+1].call(x[I],x[x.length-1].call(A,B))))}
+      else{let x=tn.cl();let I=i.cl();tn.push(mod(A=>x[I].call(x[x.length-1].call(A)),(A,B)=>x[I].call(x[x.length-1].call(A,B))))}
     }return tn[tn.length-1]
   }if(G){//train
-    tn=t.map(n=>n.cl());for(let i=tn.length-1;i>=0;){
-      if(i>=2&&t[i-1].uf){i-=2;let x=tn.map(n=>n.cl());tn.splice(i,0,mod(
+    tn=t.cl();for(let i=tn.length-1;i>=0;){
+      if(i>=2&&t[i-1].uf){i-=2;let x=tn.cl();tn.splice(i,0,mod(
         A=>x[i+1].call(x[i].call(A.cl()),x[i+2].call(A)),(A,B)=>x[i+1].call(x[i].call(A.cl(),B.cl()),x[i+2].call(A,B)),
       ))}else if(i>=1&&!t[i-1].uf){
-        i-=1;let x=tn.map(n=>n.cl());tn.splice(i,0,mod(A=>x[i+1].call(x[i],A),(A,B)=>err(0)))
+        i-=1;let x=tn.cl();tn.splice(i,0,mod(A=>x[i+1].call(x[i],A),(A,B)=>err(0)))
       }else if(i>=1){
-        i-=1;let x=tn.map(n=>n.cl());tn.splice(i,0,mod(A=>x[i].call(x[i+1].call(A)),(A,B)=>x[i].call(A,x[i+1].call(B))))
+        i-=1;let x=tn.cl();tn.splice(i,0,mod(A=>x[i].call(x[i+1].call(A)),(A,B)=>x[i].call(A,x[i+1].call(B))))
       }else i--
     }return tn[0]
   }else{//normal
