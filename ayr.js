@@ -86,7 +86,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,ext=(a,l,str=0)=>(a.d=a.d.concat(rn(0,pd(l)-a.d.length,str?32:0)),a.r=l,a.ds=l.length,a)
 ,lc=x=>x>=97&&x<=122
 ,uc=x=>x>=65&&x<=90
-,rn=(l,u=0,f)=>(x=u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()],f!=null?x.map(_=>f.cl()):x)
+,rn=(l,u=0,f)=>(module!=null&&argv['0']?(l--,u--):0,x=u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()],f!=null?x.map(_=>f.cl()):x)
 ,eq=(a,b)=>a instanceof A?b instanceof A?JSON.stringify(a.r)==JSON.stringify(b.r)&&a.d.reduce((a,x,i)=>a&&eq(x,b.d[i]),1):err(2):+a==+b
 ,eachN=(a,f,p=[])=>{
   let x=a.map((n,i)=>n instanceof A?eachN(n.d,f,[i,...p]).d:f(n,[i,...p])).filter(n=>n!=null&&n.length!=0)
@@ -179,7 +179,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "|":mod(pon.bind(0,0,a=>+!a,1,0,0),pon.bind(0,1,(a,b)=>b % a,0,0,0)),
   "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a+32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1,0)),
   "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1,0)),
-  "!":mod(pon.bind(0,0,ft,1,0,0),pon.bind(0,1,(a,b)=>ft(a)/(ft(b)*ft(a-b)),1,0,0)),
+  "!":mod(pon.bind(0,0,ft,1,0,0),pon.bind(0,1,(a,b)=>a<b?0:ft(a)/(ft(b)*ft(a-b)),1,0,0)),
   ";:":mod(pon.bind(0,0,a=>new A(carr(a).rank(a.ds?a.ds-1:0).d,a.r,a.b,a.str),0,1,99),pon.bind(0,1,(b,a,p)=>{
     let n=[];for(i=0;i<a.d.length;i++){
       if(i==0&&a.d[i]!=0)n.push(b.d[i].cl())
@@ -350,7 +350,8 @@ Usage:
     ayr -u <code> - run the code
 
 Args:
-    --debug - Debug code (for internal use)`),process.exit(0);
+    --debug - Debug code (for internal use)
+    -0      - The one-range symbol '~' creates a range from [0, N) instead`),process.exit(0);
 if(argv.u)run(argv.u)
 else if(!argv._.length){
   console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`)
