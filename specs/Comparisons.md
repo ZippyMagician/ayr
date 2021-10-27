@@ -16,3 +16,9 @@ Comparisons between `ayr` and a few other languages
 |    APL     | ```×/+/``` | |
 |     J      | ```*/+/"1``` | J's reduce operates on the data as a whole, instead of rank 1 by default |
 |   Haskell  | ```foldr (*) 1 . map (foldr (+) 0)``` | |
+
+## Check if parens are balanced
+| Language | Programs | Notes |
+|:--------:|:--------:|:-----:|
+|    ayr   | ```((=/+/)^.(</>&~."))'()'=\``` | |
+|    ayr   | ```:((|+/)^.1=>)(+/1 _1*)"'()'=\:``` | |
