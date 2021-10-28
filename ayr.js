@@ -4,7 +4,7 @@
 //  - Design and implement more binders + symbols
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
-if(this.d.length==1&&this.d[0]&&this.d[0].b)this.d[0].b=0}
+if(this.d.length==1&&this.d[0]&&this.d[0].b&&!this.b)this.d[0].b=0}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.uf=1}
 MoD.prototype.bind=function(...v){this.bd.push(...v);return this}
 MoD.prototype.call=function(...a){
@@ -150,8 +150,9 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }
   },1,1,[99,99])),
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0,99),pon.bind(0,1,(a,b,p)=>{
-    [a,b]=[b,a];let v=[];let c=b.rank(b.ds-1);if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
-    return new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str)
+    [a,b]=[b,a];let v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0)a=narr([...Array(c.d.length)].map(_=>a))
+    if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
+    return(n=>ba?(n.r=[n.d.length],n.ds=1,n):n)(new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str))
   },1,1,[99,1])),
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0,0),pon.bind(0,1,(a,b)=>{
     let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
@@ -214,8 +215,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "@":op(0,(a,b)=>mod(l=>{
     if(b.uf)return a.call(b.call(l));else{if(b<0){b=-b;err(2)}else return mapd(l,n=>a.call(n),b)}
   },(l,r)=>{
-    if(b.ds==0)b=narr([b,b]);if(b.uf)return a.call(b.call(l),b.call(r))
-    else{if(b.d[0]<0||b.d[1]<0){err(2)}else return mapd(l,L=>mapd(r,R=>a.call(L,R),b.d[1]),b.d[0])}
+    if(b.ds==0)b=narr([b.cl(),b]);if(b.uf)return a.call(b.call(l),b.call(r))
+    else{let w=0;if(b.d[0]<0||b.d[1]<0){if(b.d[0]<0){b.d[0]=0;l=narr([l],1,1);w=1}if(b.d[1]<0){b.d[1]=0;r=narr([r],1,1)}}return mapd(l,L=>mapd(r,R=>a.call(L,R),b.d[1]),b.d[0])}
   })),
   "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a);a.d=a.d.map(n=>f.call(n,b.cl()));fix(a);a.str=0;return a})),
   "\\:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{b=carr(b);b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b}))
