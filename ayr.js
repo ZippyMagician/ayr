@@ -135,6 +135,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),0,1,0),pon.bind(0,1,(a,b)=>geti(b,a),0,1,99)),
   ",":mod(pon.bind(0,0,ravel,1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.concat(b.d),0,0,p),1,1,1)),
   ";":mod(pon.bind(0,0,(a,p)=>{
+    if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
     let m=Math.max(...a.d.map(n=>n.ds==0?err(2):n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(n,[m],p).d)),[m,...a.r],a.b,p)
   },1,1,1),pon.bind(0,1,(a,b,p)=>{
     if(b.ds<=a.ds){
@@ -152,7 +153,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0,99),pon.bind(0,1,(a,b,p)=>{
     [a,b]=[b,a];let v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0)a=narr([...Array(c.d.length)].map(_=>a))
     if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
-    return(n=>ba?(n.r=[n.d.length],n.ds=1,n):n)(new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str))
+    return(n=>ba?(n.r=[n.d.length],n.ds=1,n):n)(b.ds<2?narr(v,a.b|b.b,0,p):new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str))
   },1,1,[99,1])),
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0,0),pon.bind(0,1,(a,b)=>{
     let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
