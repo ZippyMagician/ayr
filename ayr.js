@@ -182,7 +182,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a+32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1,0)),
   "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1,0)),
   "!":mod(pon.bind(0,0,ft,1,0,0),pon.bind(0,1,(a,b)=>a<b?0:ft(a)/(ft(b)*ft(a-b)),1,0,0)),
-  ";:":mod(pon.bind(0,0,a=>new A(carr(a).rank(a.ds?a.ds-1:0).d,a.r,a.b,a.str),0,1,99),pon.bind(0,1,(b,a,p)=>{
+  ";:":mod(pon.bind(0,0,a=>new A(carr(a).rank(a.ds?a.ds-1:0).d,a.r.slice(a.ds-1),a.b,a.str),0,1,99),pon.bind(0,1,(b,a,p)=>{
     let n=[];for(i=0;i<a.d.length;i++){
       if(i==0&&a.d[i]!=0)n.push(b.d[i].cl())
       else if(a.d[i]!=0){if(typeof n[n.length-1]!='object')n[n.length-1]=[n[n.length-1]];n[n.length-1].push(b.d[i].cl())}
