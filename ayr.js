@@ -64,7 +64,9 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(!d){
     a=carr(a);if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0]:a,p?a.str:0))
     let na=a.rank(r[1])
-    return r[1]<a.ds&&S?new A(na.d.flatMap(n=>n instanceof A?ravel(f(n,a.str)).d:f(n,a.str)),a.r,a.b,p?a.str:0):new A(na.d.map(n=>f(n,a.str)),l&&na.ds>1?na.r.slice(1):na.r,a.b,p?a.str:0)
+    return r[1]>0&&r[1]<a.ds&&S?
+      new A(na.d.flatMap(n=>n instanceof A?ravel(pon(d,f,S,p&&a.str,r,n)).d:pon(d,f,S,p&&a.str,r,n)),a.r,a.b,p?a.str:0)
+     :new A(na.d.map(n=>pon(d,f,S,p&&a.str,r,n)),l&&na.ds>1?na.r.slice(1):na.r,a.b,p?a.str:0)
   }else{
     a=carr(a),b=carr(b);if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1)
     else{
@@ -132,7 +134,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);b.ds=nr.length;return b}
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
   },0,1,99)),
-  "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),0,1,0),pon.bind(0,1,(a,b)=>geti(b,a),0,1,99)),
+  "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),1,1,0),pon.bind(0,1,(a,b)=>geti(b,a),0,1,99)),
   ",":mod(pon.bind(0,0,ravel,1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.concat(b.d),0,0,p),1,1,1)),
   ";":mod(pon.bind(0,0,(a,p)=>{
     if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
