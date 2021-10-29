@@ -273,7 +273,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,strand=t=>{
   if(t.length==1)return t;let tn=[],b=[];for(let i=0;i<=t.length;i++)
-    if(t[i]!=null&&inst(t[i]))b.push(t[i])
+    if(t[i]!=null&&inst(t[i]))b.push(t[i].t==7?{v:env[t[i].v]}:t[i])
     else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7||t[i].t==8)&&b.length==1)
       tn.push(...(t[i]!=null?[b.pop(),t[i]]:[b.pop()]));
     else if((t[i]==null||!(t[i].t==9&&t[i].v==' '))&&b.length){
