@@ -1,7 +1,7 @@
 {
-  "name": "ayr",
+  "name": "ayr-lang",
   "version": "0.1.0",
-  "description": "Toy array language",
+  "description": "A toy array language",
   "main": "ayr.js",
   "scripts": {
     "test": "node ayr.js -u \"1 2 3+4 5 6\""
@@ -15,7 +15,9 @@
     "array",
     "apl",
     "parser",
-    "language"
+    "language",
+    "j",
+    "k"
   ],
   "author": "Joshua Barnett",
   "license": "MIT",

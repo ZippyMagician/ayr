@@ -1,6 +1,11 @@
 # ayr
 A toy array language. For the specs see [here](specs/README.md)
 
+## Installation
+```
+npm i -g ayr-lang
+```
+
 ## TODO
 Current todo list for myself
 - [x] Implement missing symbols + binders
