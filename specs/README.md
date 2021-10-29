@@ -138,7 +138,8 @@ Partial trains, of course, support constants within them too.
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 |  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
 | ```;:``` |   Squish   |  99  |    Group     |  99 1 |0s denote new group|
-| ```.:``` | Determinant|   2  |  Dot Product |  1 1  |       |
+| ```,:``` | Determinant|   2  |  Dot Product |  1 1  |       |
+| ```=.``` |  All Equal |  99  |     XOR      |  0 0  |       |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |

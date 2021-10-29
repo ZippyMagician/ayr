@@ -188,7 +188,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       else if(a.d[i]!=0){if(typeof n[n.length-1]!='object')n[n.length-1]=[n[n.length-1]];n[n.length-1].push(b.d[i].cl())}
       else n.push([b.d[i].cl()])
     }if(n.length==1)return narr(n[0]);return narr(n.map(n=>narr(n,1)),0,1,p)
-  },0,1,[99,1]))
+  },0,1,[99,1])),
+  "=.":mod(pon.bind(0,0,a=>a.d.length?+a.d.map(n=>eq(a.d[0],n)).reduce((a,b)=>a&&b,1):1,0,0,99),pon.bind(0,1,(a,b)=>a^b,1,0,0))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
