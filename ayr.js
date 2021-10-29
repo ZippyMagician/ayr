@@ -206,21 +206,21 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(JSON.stringify(l.r)==JSON.stringify(r.r))return narr(l.d.map((n,i)=>f.call(n,r.d[i])));err(1)
   })),
   "`":op(1,f=>mod(l=>f.call(l.cl(),l),(l,r)=>f.call(r,l))),
-  "/":op(1,f=>mod(pon.bind(0,0,x=>x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0]),2,0,1),pon.bind(0,1,(l,r)=>{
-    let p=0,n=[];if(l<0)l=Math.abs(l,p=1)
+  "/":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0])):x,2,0,99),pon.bind(0,1,(l,r)=>{
+    if(r.ds==0)return r;let p=0,n=[];r=r.rank(r.ds-1);if(l<0)l=Math.abs(l,p=1)
     for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((acc,v)=>f.call(acc,v),r.d[i]));return narr(n)
-  },0,0,[0,1]))),
-  "\\":op(1,f=>mod(pon.bind(0,0,x=>(p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b,0)),0,0,1),pon.bind(0,1,(x,y)=>{
-    let n=[];for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
-  },0,0,1))),
+  },0,0,[0,99]))),
+  "\\":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b,0)):x,0,0,99),pon.bind(0,1,(x,y)=>{
+    let n=[];x=carr(x,0).rank(x.ds-1);y=carr(y,0).rank(y.ds-1);for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
+  },0,0,99))),
   "@":op(0,(a,b)=>mod(l=>{
     if(b.uf)return a.call(b.call(l));else{if(b<0){b=-b;err(2)}else return mapd(l,n=>a.call(n),b)}
   },(l,r)=>{
     if(b.ds==0)b=narr([b.cl(),b]);if(b.uf)return a.call(b.call(l),b.call(r))
     else{let w=0;if(b.d[0]<0||b.d[1]<0){if(b.d[0]<0){b.d[0]=0;l=narr([l],1,1);w=1}if(b.d[1]<0){b.d[1]=0;r=narr([r],1,1)}}return mapd(l,L=>mapd(r,R=>a.call(L,R),b.d[1]),b.d[0])}
   })),
-  "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a);a.d=a.d.map(n=>f.call(n,b.cl()));fix(a);a.str=0;return a})),
-  "\\:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{b=carr(b);b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b}))
+  "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a,0).rank(Math.max(0,a.ds-1));a.d=a.d.map(n=>f.call(n,b.cl()));fix(a);a.str=0;return a})),
+  "\\:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{b=carr(b,0).rank(Math.max(0,b.ds-1));b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b}))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))

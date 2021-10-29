@@ -137,7 +137,8 @@ Partial trains, of course, support constants within them too.
 | ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 |  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
-| ```;:``` |   Squish   |  99  |    Group     | 99 1 |0s denote new group|
+| ```;:``` |   Squish   |  99  |    Group     |  99 1 |0s denote new group|
+| ```.:``` | Determinant|   2  |  Dot Product |  1 1  |       |
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
@@ -148,11 +149,11 @@ Partial trains, of course, support constants within them too.
 | ```&:``` | ```u&:v``` | Hook  |  N/A |  Hook  |  N/A | Binds if immediate |
 | ```&.``` | ```u&.v``` | Before|  N/A | Before |  N/A | Binds if immediate |
 | ``` ` ``` | ```u` ``` |Commute|  N/A |  Flip  |  N/A |                    |
-| ```/``` |  ```u/``` |  Reduce |   1  | N-wise Reduce | 0 1 |              |
-| ```\``` |  ```u\``` |   Scan  |   1  |  Table |  1 1 |                     |
+| ```/``` |  ```u/``` |  Reduce |  99  | N-wise Reduce | 0 1 |              |
+| ```\``` |  ```u\``` |   Scan  |  99  |  Table |  1 1 |                    |
 | ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |
-| ```/:``` | ```u/:``` | Diagonals | 2 | Each left | 0 99 |                 |
-| ```\:``` | ```u\:``` | Antidiagonals | 2 | Each right | 99 0 |            |
+| ```/:``` | ```u/:``` | Diagonals | 2 | Each left | 99 99 |                |
+| ```\:``` | ```u\:``` | Antidiagonals | 2 | Each right | 99 99 |           |
 
 ## Library Functions
     put A   ->    print A
