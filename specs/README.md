@@ -112,35 +112,35 @@ Partial trains, of course, support constants within them too.
 |  ```-``` |   Negate   |   0  |   Subtract   |  0 0  |Str(m): swaps case|
 |  ```*``` |   Signum   |   0  |   Multiply   |  0 0  |Str(m): case sig (`1 _1 0 = *'Ab '`)|
 |  ```%``` | Reciprocal |   0  |    Divide    |  0 0  |       |
+|   `\|`   | Boolean Not|   0  |    Residue   |  0 0  |       |
+|  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
 |  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |       |
 |  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |       |
+| ```<.``` | Sort Ascending | 1 |     NOR     |  0 0  |       |
+| ```>.``` | Sort Descending | 1 |    NAND    |  0 0  |       |
 | ```<:``` |  Grade Up  |   0  |    Less/Eq   |  0 0  |       |
 | ```>:``` | Grade Down |   0  |  Greater/Eq  |  0 0  |       |
 |  ```^``` |     Exp    |   0  |      Pow     |  0 0  |       |
+| ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
 |  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |       |
 |  ```[``` |  Identity  |  99  |     Left     | 99 99 |       |
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
-|  ```~``` |  One-Range |   0  |     Index    | 99 99 |Str(m): alphabet upto arg|
-| ```<.``` | Sort Ascending | 1 |     NOR     |  0 0  |       |
-| ```>.``` | Sort Descending | 1 |    NAND    |  0 0  |       |
-|  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |       |
-|  ```;``` |   Mold     |   1  |   Laminate   | 99 99 |       |
-|  ```#``` |    Tally   |  99  |   Replicate  |  99 1 |       |
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
+| ```=.``` |  All Equal |  99  |     XOR      |  0 0  |       |
+|  ```~``` |  One-Range |   0  |     Index    | 99 99 |Str(m): alphabet upto arg|
 | ```~.``` |   Indices  |  99  | Interval Ind |  0 1  |       |
 | ```~:``` |   Unique   |   1  |   Unequality |  0 0  |       |
+|  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |       |
+| ```,.``` | Determinant|   2  |  Dot Product |  1 1  |       |
 | ```,:``` |   Enlist   |  99  |  Membership  | 99 99 |```1 = 'a' ,: 'hola'```|
+|  ```;``` |   Mold     |   1  |   Laminate   | 99 99 |       |
+| ```;:``` |   Squish   |  99  |    Group     |  99 1 |0s denote new group|
+|  ```#``` |    Tally   |  99  |   Replicate  |  99 1 |       |
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
-|   `\|`   | Boolean Not|   0  |    Residue   |  0 0  |       |
-| ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
+| ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
-|  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
-| ```;:``` |   Squish   |  99  |    Group     |  99 1 |0s denote new group|
-| ```,:``` | Determinant|   2  |  Dot Product |  1 1  |       |
-| ```=.``` |  All Equal |  99  |     XOR      |  0 0  |       |
-| ```i.``` |  Unindices |  1   | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
