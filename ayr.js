@@ -197,7 +197,15 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       else n.push([b.d[i].cl()])
     }if(n.length==1)return narr(n[0]);return narr(n.map(n=>narr(n,1)),0,1,p)
   },0,1,[99,1])),
-  "=.":mod(pon.bind(0,0,a=>a.d.length?+a.d.map(n=>eq(a.d[0],n)).reduce((a,b)=>a&&b,1):1,0,0,99),pon.bind(0,1,(a,b)=>a^b,1,0,0))
+  "=.":mod(pon.bind(0,0,a=>a.d.length?+a.d.map(n=>eq(a.d[0],n)).reduce((a,b)=>a&&b,1):1,0,0,99),pon.bind(0,1,(a,b)=>a^b,1,0,0)),
+  "i.":mod(pon.bind(0,0,a=>{
+    if(a.d.length==0)err(2);let r=[],i;for(i=0;i<=a.d[0].ds;i++)r.push(Math.max(...a.d.map(n=>n instanceof A?n.d[i]:i?err(2):n))+1)
+    a.d=a.d.map(carr);let x=new A(rn(pd(r),0,0),r);for(let l of a.d)x.d[l.d.map((n,i)=>n*pd(r.slice(r.length-i))).reduce((a,b)=>a+b,0)]=1;return x
+  },0,0,1),pon.bind(0,1,(a,b)=>{
+    let r=a.d;b.d=b.d.map(carr);let x=new A(rn(pd(r),0,0),r);for(let l of b.d){
+      let n=l.d.map((n,i)=>n*pd(r.slice(0,i))).reduce((a,b)=>a+b,0);if(n>=x.d.length)continue;x.d[n]=1
+    }return x
+  },0,0,[99,1]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
