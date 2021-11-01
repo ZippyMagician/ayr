@@ -94,6 +94,12 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   let x=a.map((n,i)=>n instanceof A?eachN(n.d,f,[i,...p]).d:f(n,[i,...p])).filter(n=>n!=null&&n.length!=0)
   x=x.flatMap(n=>n instanceof A&&n.d[0].ds==1?n.d:n);return narr(x)
 }
+,dgs=(f,a,r=0)=>{
+  if(!r)a=a.rank(1);let d=[],x=0,y=0;while(1){
+    d.push([a.d[y].d[x]]);let o=[x,y];let nx=x,ny=y;while(JSON.stringify(o)!=JSON.stringify([ny,nx]))d[d.length-1].push(a.d[++ny].d[--nx])
+    if(x==a.d[0].d.length-1){if(y==a.d.length-1)break;y++}else x++
+  }return narr(d.map(a=>f.call(narr(a,1))))
+}
 ,mapd=(a,f,d)=>a instanceof A?d>0?new A(a.d.map(n=>mapd(n,f,d-1)),a.r,a.b,a.str):f(a):f(a)
 ,get=(a,b)=>{
   let m=carr(b).rank(b.ds-1),i
@@ -222,8 +228,10 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(b.ds==0)b=narr([b.cl(),b]);if(b.uf)return a.call(b.call(l),b.call(r))
     else{let w=0;if(b.d[0]<0||b.d[1]<0){if(b.d[0]<0){b.d[0]=0;l=narr([l],1,1);w=1}if(b.d[1]<0){b.d[1]=0;r=narr([r],1,1)}}return mapd(l,L=>mapd(r,R=>a.call(L,R),b.d[1]),b.d[0])}
   })),
-  "/:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{a=carr(a,0).rank(Math.max(0,a.ds-1));a.d=a.d.map(n=>f.call(n,b.cl()));fix(a);a.str=0;return a})),
-  "\\:":op(1,f=>mod(pon.bind(0,0,a=>err(2),0,0,99),(a,b)=>{b=carr(b,0).rank(Math.max(0,b.ds-1));b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b}))
+  "/:":op(1,f=>mod(pon.bind(0,0,dgs.bind(0,f),0,0,2),(a,b)=>{a=carr(a,0).rank(Math.max(0,a.ds-1));a.d=a.d.map(n=>f.call(n,b.cl()));fix(a);a.str=0;return a})),
+  "\\:":op(1,f=>mod(pon.bind(0,0,a=>{a=a.rank(1);a.d=a.d.map(n=>(n.d=n.d.reverse(),n));return dgs(f,a,1)},0,0,2),(a,b)=>{
+    b=carr(b,0).rank(Math.max(0,b.ds-1));b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b
+  }))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
