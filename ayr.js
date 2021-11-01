@@ -47,8 +47,10 @@ A.prototype.cl=function(){return new A(this.d.map(n=>n.cl()),this.r.cl(),this.b,
 Number.prototype.call=function(...v){return +this}
 Number.prototype.bind=function(...v){return +this}
 Number.prototype.cl=function(){return +JSON.parse(JSON.stringify(this))}
-Number.prototype.ds=0;
-Array.prototype.ds=1;
+Number.prototype.ds=0
+Number.prototype.uf=0
+Array.prototype.ds=1
+Array.prototype.uf=0
 Array.prototype.cl=function(){return[...this.map(n=>n.cl())]}
 Object.prototype.cl=function(){return{...this}}
 A.prototype.bind=function(...v){return this.cl()}
@@ -106,6 +108,9 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
   else{a.d=a.d.reverse();let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
 }
+,det=m=>m.d.length==1?m.d[0].d[0]:m.d[0].d.length==2&&m.d.length==2?m.d[0].d[0]*m.d[1].d[1]-m.d[0].d[1]*m.d[1].d[0]:m.d[0].d.reduce((r,e,i)=>
+  r+(-1)**(i+2)*e*det(narr(m.d.slice(1).map(c=>narr(c.d.filter((_,j)=>i!=j))))),0
+)
 ,geti=(a,b)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b)),a):get(a,b)
 ,err=id=>{
   switch(id){
@@ -205,7 +210,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     let r=a.d;b.d=b.d.map(carr);let x=new A(rn(pd(r),0,0),r);for(let l of b.d){
       let n=l.d.map((n,i)=>n*pd(r.slice(0,i))).reduce((a,b)=>a+b,0);if(n>=x.d.length)continue;x.d[n]=1
     }return x
-  },0,0,[99,1]))
+  },0,0,[99,1])),
+  ",.":mod(pon.bind(0,0,a=>det(carr(a,0).rank(1)),0,1,2),pon.bind(0,1,(a,b)=>a.d.map((n,i)=>n*b.d[i]).reduce((a,b)=>a+b,0),0,0,1))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
@@ -291,7 +297,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,strand=t=>{
   if(t.length==1)return t;let tn=[],b=[];for(let i=0;i<=t.length;i++)
-    if(t[i]!=null&&inst(t[i]))b.push(t[i].t==7?{v:env[t[i].v]}:t[i])
+    if(t[i]!=null&&inst(t[i]))b.push(t[i].t==7?{t:env[t[i].v].call()instanceof A?4:0,v:env[t[i].v].call()}:t[i])
     else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7||t[i].t==8)&&b.length==1)
       tn.push(...(t[i]!=null?[b.pop(),t[i]]:[b.pop()]));
     else if((t[i]==null||!(t[i].t==9&&t[i].v==' '))&&b.length){
@@ -333,11 +339,9 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }
     if(o.t==7){
       if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push(mod(a=>(env[o.v]=a),(a,b)=>err(2)));else V=o.v}
-      else if(env[o.v]!=null)fq.push(env[o.v])
-      else err(3)
+      else if(env[o.v]!=null)fq.push(env[o.v]);else err(3)
     }else if(o.t==2||o.t==8&&o.v.uf){
-      let [ni,b]=nnw(t,i);
-      if(inst(b)||ni!=i&&b.t==8){
+      let[ni,b]=nnw(t,i);if(inst(b)||ni!=i&&b.t==8){
         i=ni;if(b.t==8){if(b.v.uf||b.t==7&&env[b.v]!=null&&env[b.v].uf)fq.push((o.t==8?o.v:syms[o.v]),b.t==7?env[b.v]:b.v);else fq.push(o.t==8?o.v:syms[o.v],b.v)}
         else fq.push(o.t==8?o.v:syms[o.v],b.t==7?env[b.v]:b.v)
       }else fq.push(o.t==8?o.v:syms[o.v])
@@ -353,8 +357,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }else if(o.t==6)fq.push(o)
   }
   if(fq.length){
-    if(V)env[V]=ptrain(fq,1)
-    else if(!G&&fq[fq.length-1].uf)err(0)
+    if(V)env[V]=ptrain(fq,1);else if(!G&&fq[fq.length-1].uf)err(0)
     else var x=ptrain(fq,G);if(!V){if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}}
   }
 }
