@@ -140,6 +140,7 @@ Partial trains, of course, support constants within them too.
 | ```;:``` |   Squish   |  99  |    Group     |  99 1 |0s denote new group|
 | ```,:``` | Determinant|   2  |  Dot Product |  1 1  |       |
 | ```=.``` |  All Equal |  99  |     XOR      |  0 0  |       |
+| ```i.``` |  Unindices |  1   | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
