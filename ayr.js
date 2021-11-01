@@ -4,7 +4,7 @@
 //  - Design and implement more binders + symbols
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
-if(this.d.length==1&&this.d[0]&&this.d[0].b&&!this.b)this.d[0].b=0}
+if(this.d.length==1&&this.d[0]&&this.d[0].b&&!this.b)this.d[0].b=0;this.uf=0}
 function MoD(f1,f2){this.f1=f1;this.f2=f2;this.bd=[];this.uf=1}
 MoD.prototype.bind=function(...v){this.bd.push(...v);return this}
 MoD.prototype.call=function(...a){
@@ -268,7 +268,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,inst=o=>o.t<2||o.t==4||o.t==7&&(env[o.v]==null?0:!env[o.v].uf)||o.t==8&&!o.v.uf
 ,lex=s=>{
   let m,l,t=[];while(s){
-    if(m=/^((?:_?\d*)?r_?\d+)|^(__|(?:_?\d*\.?\d*)?e?_?\d*\.?\d+|_)/.exec(s)){
+    if(m=/^((?:_?\d*)?r_?\d+)|^(__|(?:_?\d*\.?\d*)?(?:e_?)?\d*\.?\d+|_)/.exec(s)){
       if(m[2]!=null)m[1]=m[2];let x=m[1].replace(/_/g,'-').replace(/(?<=-?)(?<!\d)(e|r)/,'1$1'),l,r;if(x=="--"||x=="-")t.push({t:0,v:x=="--"?-Infinity:Infinity})
       else if(x.indexOf("r")>-1)t.push({t:0,v:([l,r]=x.split("r"),+l/+r)})
       else if(x.lastIndexOf(".")>x.indexOf("e")&&x.indexOf("e")>-1)t.push({t:0,v:([l,r]=x.split("e"),(+l)**+r)});else t.push({t:0,v:+x})
@@ -338,8 +338,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(x.toString());fq=[]}
     }
     if(o.t==7){
-      if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push(mod(a=>(env[o.v]=a),(a,b)=>err(2)));else V=o.v}
-      else if(env[o.v]!=null)fq.push(env[o.v]);else err(3)
+      if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
+      else fq.push(env[o.v])
     }else if(o.t==2||o.t==8&&o.v.uf){
       let[ni,b]=nnw(t,i);if(inst(b)||ni!=i&&b.t==8){
         i=ni;if(b.t==8){if(b.v.uf||b.t==7&&env[b.v]!=null&&env[b.v].uf)fq.push((o.t==8?o.v:syms[o.v]),b.t==7?env[b.v]:b.v);else fq.push(o.t==8?o.v:syms[o.v],b.v)}
