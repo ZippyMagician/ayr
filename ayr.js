@@ -111,6 +111,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,det=m=>m.d.length==1?m.d[0].d[0]:m.d[0].d.length==2&&m.d.length==2?m.d[0].d[0]*m.d[1].d[1]-m.d[0].d[1]*m.d[1].d[0]:m.d[0].d.reduce((r,e,i)=>
   r+(-1)**(i+2)*e*det(narr(m.d.slice(1).map(c=>narr(c.d.filter((_,j)=>i!=j))))),0
 )
+,zp=(...a)=>a[0].d.map((n,i)=>narr([n,...a.slice(1).map(n=>n.d[i])]))
 ,geti=(a,b)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b)),a):get(a,b)
 ,err=id=>{
   switch(id){
@@ -211,7 +212,10 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       let n=l.d.map((n,i)=>n*pd(r.slice(0,i))).reduce((a,b)=>a+b,0);if(n>=x.d.length)continue;x.d[n]=1
     }return x
   },0,0,[99,1])),
-  ",.":mod(pon.bind(0,0,a=>det(carr(a,0).rank(1)),0,1,2),pon.bind(0,1,(a,b)=>a.d.map((n,i)=>n*b.d[i]).reduce((a,b)=>a+b,0),0,0,1))
+  ",.":mod(pon.bind(0,0,a=>det(carr(a,0).rank(1)),0,1,2),pon.bind(0,1,(a,b)=>a.d.map((n,i)=>n*b.d[i]).reduce((a,b)=>a+b,0),0,0,1)),
+  "i:":mod(pon.bind(0,0,a=>{let r=new A(rn(a*a,0,0),[a,a]);for(let i=0;i<a;i++)r.d[i*a+i]=1;return r},0,0,0),pon.bind(0,1,(a,b)=>err(2),0,0,99)),
+  "^.":mod(pon.bind(0,0,a=>new A(a.rank(a.ds-1).d.reverse().flatMap(n=>n instanceof A?n.d:n),a.r,a.b,a.str),1,1,99),pon.bind(0,1,(a,b)=>a&b,1,0,0)),
+  "v.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>a|b,1,0,0))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
