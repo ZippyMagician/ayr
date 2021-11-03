@@ -22,7 +22,7 @@ Current todo list for myself
     * Stencil/cut
     * Mix (inverse of Mold)
     * etc
-- [ ] Higher rank data supported
+- [x] Higher rank data supported
 - [x] Change rank of `/` and `\` to be major rank - 1, similar to `#`
 - [x] Support more literal num types
 - [x] Make sure strings are supported properly
@@ -32,10 +32,10 @@ Current todo list for myself
     * ``` (`: f) ``` ==> ```( (f)` )```
     * ```([: f g)``` ==> ```( (f) (g) )```
     * ```(]: f g)``` ==> ```( (f) & (g) )```
-- [ ] More binders
+- [x] More binders
     * Before
     * Inner product
-- [ ] Good boolean logic support
+- [x] Good boolean logic support
     * AND   ^.
     * OR    v.
     * NOT   |
