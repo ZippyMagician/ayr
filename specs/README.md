@@ -109,9 +109,13 @@ Partial trains, of course, support constants within them too.
 |  Symbol  |   Monadic  | Rank |    Dyadic    |  Rank | Notes |
 |:--------:|:----------:|:----:|:------------:|:-----:|:-----:|
 |  ```+``` |     Abs    |   0  |      Add     |  0 0  |Str(m): converts to nums|
+| ```+:``` |   Double   |   0  |   Abs Add    |  0 0  |       |
 |  ```-``` |   Negate   |   0  |   Subtract   |  0 0  |Str(m): swaps case|
+| ```-:``` |   Halve    |   0  |  Abs Diff    |  0 0  |       |
 |  ```*``` |   Signum   |   0  |   Multiply   |  0 0  |Str(m): case sig (`1 _1 0 = *'Ab '`)|
+| ```*:``` |   Square   |   0  |   N * \|N\|  |  0 0  |       |   
 |  ```%``` | Reciprocal |   0  |    Divide    |  0 0  |       |
+| ```%:``` |  Square Rt |   0  |   Nth Root   |  0 0  |       |
 |   `\|`   | Boolean Not|   0  |    Residue   |  0 0  |       |
 |  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
 |  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |       |
