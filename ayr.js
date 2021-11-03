@@ -128,9 +128,13 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   f2?new MoD(f.bind(0),f2.bind(0)):f instanceof MoD?(f.f1=f.f1.bind(0),f.f2=f.f2.bind(0),f):new MoD(A=>f.call(A),(A,B)=>f.call(A,B))
 ,syms={
   "+":mod(pon.bind(0,0,a=>a<0?-a:+a,1,0,0),pon.bind(0,1,(a,b)=>+a+ +b,1,1,0)),
+  "+:":mod(pon.bind(0,0,a=>a*2,1,1,0),pon.bind(0,1,(a,b)=>Math.abs(a+b),1,0,0)),
   "-":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a-32:uc(a)?a+32:a:-a,1,1,0),pon.bind(0,1,(a,b)=>+a-+b,1,1,0)),
+  "-:":mod(pon.bind(0,0,a=>a/2,1,1,0),pon.bind(0,1,(a,b)=>Math.abs(a-b),1,0,0)),
   "*":mod(pon.bind(0,0,(a,p)=>p?uc(a)?1:lc(a)?-1:0:a==0?0:a>0?1:-1,1,0,0),pon.bind(0,1,(a,b)=>+a*+b,1,0,0)),
+  "*:":mod(pon.bind(0,0,a=>a**2,1,0,0),pon.bind(0,1,(a,b)=>a*Math.abs(b),1,0,0)),
   "%":mod(pon.bind(0,0,a=>1/+a,1,0,0),pon.bind(0,1,(a,b)=>+a/+b,1,0,0)),
+  "%:":mod(pon.bind(0,0,a=>a**.5,1,1,0),pon.bind(0,1,(a,b)=>b**(1/a),1,0,0)),
   "]":mod(pon.bind(0,0,a=>a,1,1,99),pon.bind(0,1,(a,b)=>b,1,1,99)),
   "[":mod(pon.bind(0,0,a=>a,1,1,99),pon.bind(0,1,(a,b)=>a,1,1,99)),
   "<":mod(pon.bind(0,0,a=>a instanceof A?(a.b=1,a):new A([a],[1],1),0,1,99),pon.bind(0,1,(a,b)=>+(a<b),1,0,0)),
@@ -213,7 +217,10 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }return x
   },0,0,[99,1])),
   ",.":mod(pon.bind(0,0,a=>det(carr(a,0).rank(1)),0,1,2),pon.bind(0,1,(a,b)=>a.d.map((n,i)=>n*b.d[i]).reduce((a,b)=>a+b,0),0,0,1)),
-  "i:":mod(pon.bind(0,0,a=>{let r=new A(rn(a*a,0,0),[a,a]);for(let i=0;i<a;i++)r.d[i*a+i]=1;return r},0,0,0),pon.bind(0,1,(a,b)=>err(2),0,0,99)),
+  "i:":mod(pon.bind(0,0,a=>{let r=new A(rn(a*a,0,0),[a,a]);for(let i=0;i<a;i++)r.d[i*a+i]=1;return r},0,0,0),pon.bind(0,1,(a,b)=>{
+    if(b.ds>=a.ds){a=a.rank(a.ds-1);b=b.rank(b.ds-1);return narr(b.d.map(b=>{for(i=0;i<a.d.length;i++)if(eq(a.d[i],b))return i;return a.d.length}))}
+    else{a=a.rank(b.ds);for(i=0;i<a.d.length;i++)if(eq(a.d[i],b))return i;return a.d.length}
+  },0,0,99)),
   "^.":mod(pon.bind(0,0,a=>new A(a.rank(a.ds-1).d.reverse().flatMap(n=>n instanceof A?n.d:n),a.r,a.b,a.str),1,1,99),pon.bind(0,1,(a,b)=>a&b,1,0,0)),
   "v.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>a|b,1,0,0))
 }
