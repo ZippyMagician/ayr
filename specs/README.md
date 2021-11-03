@@ -116,17 +116,18 @@ Partial trains, of course, support constants within them too.
 |  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
 |  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |       |
 |  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |       |
-| ```<.``` | Sort Ascending | 1 |     NOR     |  0 0  |       |
-| ```>.``` | Sort Descending | 1 |    NAND    |  0 0  |       |
+| ```<.``` | Sort Ascending | 1 |     Nor     |  0 0  |       |
+| ```>.``` | Sort Descending | 1 |    Nand    |  0 0  |       |
 | ```<:``` |  Grade Up  |   0  |    Less/Eq   |  0 0  |       |
 | ```>:``` | Grade Down |   0  |  Greater/Eq  |  0 0  |       |
 |  ```^``` |     Exp    |   0  |      Pow     |  0 0  |       |
+| ```^.``` | Up Reverse |  99  |      And     |  0 0  |       |
 | ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
 |  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |       |
 |  ```[``` |  Identity  |  99  |     Left     | 99 99 |       |
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
-| ```=.``` |  All Equal |  99  |     XOR      |  0 0  |       |
+| ```=.``` |  All Equal |  99  |     Xor      |  0 0  |       |
 |  ```~``` |  One-Range |   0  |     Index    | 99 99 |Str(m): alphabet upto arg|
 | ```~.``` |   Indices  |  99  | Interval Ind |  0 1  |       |
 | ```~:``` |   Unique   |   1  |   Unequality |  0 0  |       |
@@ -140,6 +141,8 @@ Partial trains, of course, support constants within them too.
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
 | ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
+| ```i:``` |  Identity  |   0  |   Index Of   | 99 99 |By items|
+| ```v.``` |   Reverse  |   1  |      Or      |  0 0  |       |
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 
 ## Binders
