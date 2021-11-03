@@ -18,8 +18,9 @@ A.prototype.rank=function(r,s){
     case -1:err(1)
     case 0:return this.cl()
     case 1:return chnk(this.d,this.r[0],this.str,this.b)
-    case 2:return chnk(chnk(this.d,this.r[0],this.str),this.r[1],this.str,this.b)
-    default:return s?new A([this.cl()],1,1,0):this.cl()
+    case 3:case 4:case 5:case 6:case 7:case 8:case 9:
+    case 2:return(f=>(f.d=f.d.map(n=>(n.r=this.r.slice(0,this.ds-1),n.ds=this.ds-1,n)),f))(chnk(this.d,pd(this.r.slice(0,this.ds-1)),this.str,this.b))
+    default:return s?new A([this.cl()],1,1,0):this.cl()//cant remember what this is for but too afraid to change it
   }
 }
 A.prototype.has=function(o){
@@ -39,7 +40,7 @@ A.prototype.toString=function(){
         if(x.str)S+=str(x);else for(y of x.d)S+=(x.b?" ":" ".repeat(l-str(y).length))+str(y)+" ";if(x.b&&!x.str)S=S.trimEnd()+']';S+='\n'
       }
       if(this.b)S=S.trimEnd()+' ]';break
-    default:err(1)
+    default:let m=this.rank(this.ds-1);for(let n of m.d)S+=str(n)+"\n"+"\n".repeat(this.ds-2);break
   }
   return S.trimEnd()
 }
@@ -229,15 +230,15 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     ,(l,r)=>l==null||r==null?err(0):!a.uf||!b.uf?err(0):a.call(b.call(l,r)))),
   '&:':op(0,(f,g)=>mod(a=>a==null?err(0):f.call(a.cl(),g.call(a)),(a,b)=>a==null||b==null?err(0):f.call(a,g.call(b)))),
   '&.':op(0,(f,g)=>mod(a=>a==null?err(0):g.call(f.call(a.cl()),a),(a,b)=>a==null||b==null?err(0):g.call(f.call(a),b))),
-  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
+  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>f.call(n)),l.rank(l.ds-1).r,l.b,l.str),(l,r)=>{
     if(l==null||r==null)err(0);let j;if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;
     if(j!=null)return narr(j?r.rank(r.ds-1).d.map(n=>f.call(l.cl(),n)):l.rank(l.ds-1).d.map(n=>f.call(n,r.cl())))
     if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])))}err(1)
   })),
-  '":':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):narr(l.d.map(n=>f.call(n))),(l,r)=>{
+  '":':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
     if(l==null||r==null)err(0);let j
-    if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;if(j!=null)return narr(j?r.d.map(n=>f.call(l.cl(),n)):l.d.map(n=>f.call(n,r.cl())))
-    if(JSON.stringify(l.r)==JSON.stringify(r.r))return narr(l.d.map((n,i)=>f.call(n,r.d[i])));err(1)
+    if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;if(j!=null)return new A(j?r.d.map(n=>f.call(l.cl(),n)):l.d.map(n=>f.call(n,r.cl())),j?r.r:l.r,l.b|r.b,l.str|r.str)
+    if(JSON.stringify(l.r)==JSON.stringify(r.r))return new A(l.d.map((n,i)=>f.call(n,r.d[i])),r.r,l.b|r.b,l.str|r.str);err(1)
   })),
   "`":op(1,f=>mod(l=>f.call(l.cl(),l),(l,r)=>f.call(r,l))),
   "/":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0])):x,2,0,99),pon.bind(0,1,(l,r)=>{
