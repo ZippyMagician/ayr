@@ -82,7 +82,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }
 }
 ,pd=a=>a.reduce((a,b)=>a*b,1)
-,ravel=(a,p=0)=>narr(a.d.flatMap(n=>n instanceof A?ravel(n).d:n),0,0,p)
+,ravel=(a,p=null)=>narr(a.d.flatMap(n=>n instanceof A?(p!=null&&n.str&&(p=1),ravel(n).d):n),0,0,p==null?0:p)
 ,sort=(a,b)=>{
   if(a instanceof A&&b instanceof A){if(pd(a.r)==pd(b.r))for(i=0;1;i++)if(!eq(a.d[i],b.d[i]))return sort(a.d[i],b.d[i]);else return pd(a.r)-pd(b.r)}
   else return(a instanceof A?pd(a.r):+a)-(b instanceof A?pd(b.r):+b)
@@ -151,7 +151,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
   },0,1,99)),
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),1,1,0),pon.bind(0,1,(a,b)=>geti(b,a),0,1,99)),
-  ",":mod(pon.bind(0,0,ravel,1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.concat(b.d),0,0,p),1,1,1)),
+  ",":mod(pon.bind(0,0,a=>ravel(a,0),1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.concat(b.d),0,0,p),1,1,1)),
   ";":mod(pon.bind(0,0,(a,p)=>{
     if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
     let m=Math.max(...a.d.map(n=>n.ds==0?err(2):n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(n,[m],p).d)),[m,...a.r],a.b,p)
@@ -256,6 +256,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "/:":op(1,f=>mod(pon.bind(0,0,dgs.bind(0,f),0,0,2),(a,b)=>{a=carr(a,0).rank(Math.max(0,a.ds-1));a.d=a.d.map(n=>f.call(n,b.cl()));fix(a);a.str=0;return a})),
   "\\:":op(1,f=>mod(pon.bind(0,0,a=>{a=a.rank(1);a.d=a.d.map(n=>(n.d=n.d.reverse(),n));return dgs(f,a,1)},0,0,2),(a,b)=>{
     b=carr(b,0).rank(Math.max(0,b.ds-1));b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b
+  })),
+  "@:":op(1,f=>mod(a=>err(2),(a,b)=>{
+    let i=Math.min(a.d.length,b.d.length),n=[];for(let x=0;x<i;x++)n.push(f.call(narr([a.d[x]],0,0,a.str),narr([b.d[x]],0,0,a.str)))
+    if(i<a.d.length)n=[...n,...a.d.slice(i).map(n=>narr([n],0,0,a.str))];else if(i<b.d.length)n=[...n,...b.d.slice(i).map(n=>narr([n],0,0,b.str))]
+    return new A(n,i<a.d.length?a.r.cl():b.r.cl())
   }))
 }
 ,env={
