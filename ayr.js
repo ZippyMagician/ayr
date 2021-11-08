@@ -179,6 +179,9 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
     return(n=>ba?(n.r=[n.d.length],n.ds=1,n):n)(b.ds<2?narr(v,a.b|b.b,0,p):new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str))
   },1,1,[99,1])),
+  "#.":mod(pon.bind(0,0,a=>parseInt(a.d.join(""),2),0,0,1),pon.bind(0,1,(a,b)=>{
+    let n=0;for(let i=0;i<b.d.length;i++)n+=b.d[i]*a**i;return n
+  },0,0,[0,1])),
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0,0),pon.bind(0,1,(a,b)=>{
     let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
   },0,0,[1,0])),
@@ -232,7 +235,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(n<2)return 2;if(n==2)return 3;let l=n*(Math.log(n)+Math.log(Math.log(n)))|0,r=Math.sqrt(l)+1|0,c=1,i=0,s,p,j;l=(l-1)/2|0;r=r/2-1|0;s=Array(l)
     for(;i<r;++i)if(!s[i]){++c;for(j=2*i*(i+3)+3,p=2*i+3;j<l;j+=p)s[j]=1}for(p=r;c<n;++p)if(!s[p])++c;return 2*p+1
   },1,0,0),pon.bind(0,1,(a,b)=>a|b,1,0,0)),
-  "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1,[0,1]))
+  "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1,[0,1])),
+  "B:":mod(a=>a.ds>0?ayr(':;(-`"&:(^:/)#")&.((],`0#[)")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr('#:=').call(a,b):ayr('#:').call(a,b))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
@@ -354,12 +358,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }let x=tn.pop();x.uf=0;return x
   }
 }
-,exec=(t,G=0)=>{
+const exec=(t,G=0)=>{
   let fq=[],V,h;for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
       if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(x.toString());fq=[]}
-    }
-    if(o.t==7){
+    }if(o.t==7){
       if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
       else fq.push(env[o.v])
     }else if(o.t==2||o.t==8&&o.v.uf){
@@ -377,17 +380,17 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
         if(G&&nnw(t,i)[0]+1>=t.length)return o.v;else if(!G)console.log(o.v.toString())
       }else fq.push(o.v);
     }else if(o.t==6)fq.push(o)
-  }
-  if(fq.length){
+  }if(fq.length){
     if(V)env[V]=ptrain(fq,1);else if(!G&&fq[fq.length-1].uf)err(0)
     else var x=ptrain(fq,G);if(!V){if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}}
   }
 }
+,ayr=(d,g=1)=>exec(strand(grp(lex(d))),g)
 ,run=d=>{
   if(module!=null&&argv.debug)
-  (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),exec(strand(grp(lex(d)))))
-  else if(module!=null){try{exec(strand(grp(lex(d))))}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}
-  else{try{return exec(strand(grp(d)),1)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
+  (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),ayr(d,0))
+  else if(module!=null){try{ayr(d,0)}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}
+  else{try{return ayr(d)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
 }
 if(module&&module.exports){
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
