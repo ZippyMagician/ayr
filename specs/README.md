@@ -163,7 +163,7 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 | ```&``` | ```u&v``` | Compose |  N/A |  Atop  |  N/A | Binds if immediate |
 | ```&:```| ```u&:v```|   Hook  |  N/A |  Hook  |  N/A | Binds if immediate |
 | ```&.```| ```u&.v```|  Before |  N/A | Before |  N/A | Binds if immediate |
-| ``` ` ```| ```u` ```| Commute |  N/A |  Flip  |  N/A |                    |
+| ``` ` ```| ```u` ```| Commute |  N/A |  Flip  |  N/A | ```u&`v``` is ```v&u``` |
 | ```/``` |  ```u/``` |  Reduce |  99  | N-wise Reduce | 0 1 |              |
 | ```\``` |  ```u\``` |   Scan  |  99  |  Table |  1 1 |                    |
 | ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |

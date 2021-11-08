@@ -359,7 +359,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }
 }
 const exec=(t,G=0)=>{
-  let fq=[],V,h;for(let i=0;i<t.length;i++){
+  let fq=[],V,h,j;for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
       if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(str(x));fq=[]}
     }if(o.t==7){
@@ -373,7 +373,8 @@ const exec=(t,G=0)=>{
     }else if(o.t==3){
       if(!fq.length)err(0)
       else if(!bdrs[o.v].m){
-        [i,f]=nnw(t,i);if(!inst(f)&&f.t!=2&&f.t!=8)err(0);fq.push(bdrs[o.v].call(fq.pop(),inst(f)||f.t==8?f.t==7?env[f.v]:f.v:syms[f.v]))
+        [i,f]=nnw(t,i),j=0;if(f.t==3&&f.v=='`')[i,f]=nnw(t,i),j=1;if(!inst(f)&&f.t!=2&&f.t!=8)err(0)
+        fq.push(bdrs[o.v].call(...(f=>j?f.reverse():f)([fq.pop(),inst(f)||f.t==8?f.t==7?env[f.v]:f.v:syms[f.v]])))
       }else fq.push(bdrs[o.v].call(fq.pop()))
     }else if(o.t<2||o.t==4||o.t==8){
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
