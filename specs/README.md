@@ -142,13 +142,18 @@ Partial trains, of course, support constants within them too.
 |  ```;``` |   Mold     |   1  |   Laminate   | 99 99 |       |
 | ```;:``` |   Squish   |  99  |    Group     |  99 1 |0s denote new group|
 |  ```#``` |    Tally   |  99  |   Replicate  |  99 1 |       |
+| ```#.``` | Decode Binary | 0 |    Decode    |  0 0  |       |
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
+| ```B:``` | Encode Binary+| 0 |    Encode+   |  1 0  |       |
 | ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 | ```i:``` |  Identity  |   0  |   Index Of   | 99 99 |By items|
 | ```v.``` |  Nth Prime |   0  |      Or      |  0 0  |       |
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
+
+Monadic `B:` is equivalent to ```:;(-`"&:(^:/)#")&.((],`0#[)")#:``` when >r0 data is passed.<br>
+Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 
 ## Binders
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
