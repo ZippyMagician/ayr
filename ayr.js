@@ -232,7 +232,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,0,99)),
   "^.":mod(pon.bind(0,0,a=>new A(a.rank(a.ds-1).d.reverse().flatMap(n=>n instanceof A?n.d:n),a.r,a.b,a.str),1,1,99),pon.bind(0,1,(a,b)=>a&b,1,0,0)),
   "v.":mod(pon.bind(0,0,n=>{
-    if(n<2)return 2;if(n==2)return 3;let l=n*(Math.log(n)+Math.log(Math.log(n)))|0,r=Math.sqrt(l)+1|0,c=1,i=0,s,p,j;l=(l-1)/2|0;r=r/2-1|0;s=Array(l)
+    if(argv!=null&&argv['0'])n++;if(n<2)return 2;if(n==2)return 3;let l=n*(Math.log(n)+Math.log(Math.log(n)))|0,r=Math.sqrt(l)+1|0,c=1,i=0,s,p,j;l=(l-1)/2|0;r=r/2-1|0;s=Array(l)
     for(;i<r;++i)if(!s[i]){++c;for(j=2*i*(i+3)+3,p=2*i+3;j<l;j+=p)s[j]=1}for(p=r;c<n;++p)if(!s[p])++c;return 2*p+1
   },1,0,0),pon.bind(0,1,(a,b)=>a|b,1,0,0)),
   "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1,[0,1])),
