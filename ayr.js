@@ -47,7 +47,7 @@ A.prototype.toString=function(){
 A.prototype.cl=function(){return new A(this.d.map(n=>n.cl()),this.r.cl(),this.b,this.str)}
 Number.prototype.call=function(...v){return +this}
 Number.prototype.bind=function(...v){return +this}
-Number.prototype.cl=function(){return +JSON.parse(JSON.stringify(this))}
+Number.prototype.cl=function(){return this==Infinity?+this:+JSON.parse(JSON.stringify(this))}
 Number.prototype.ds=0
 Number.prototype.uf=0
 Array.prototype.ds=1
@@ -285,7 +285,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   let f=a.d.reduce((acc,x)=>acc||x instanceof A,false);if(f)f=a.d.length>1&&a.ds==1||a.d.reduce((acc,x)=>acc||x instanceof A&&x.b,false)
   if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1));while(a.r[a.ds-1]==1&&a.ds>1){a.r.pop();a.ds-=1}return a
 }
-,str=s=>s.toString()
+,str=s=>argv!=null&&!argv.n&&typeof s=='number'?s.toString().replace('-','_').replace('Infinity','_'):s.toString()
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
 ,mex=f=>f.uf?f:f.call()
 ,nnw=(t,i)=>{
@@ -361,7 +361,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 const exec=(t,G=0)=>{
   let fq=[],V,h;for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
-      if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(x.toString());fq=[]}
+      if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(str(x));fq=[]}
     }if(o.t==7){
       if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
       else fq.push(env[o.v])
@@ -377,12 +377,12 @@ const exec=(t,G=0)=>{
       }else fq.push(bdrs[o.v].call(fq.pop()))
     }else if(o.t<2||o.t==4||o.t==8){
       if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
-        if(G&&nnw(t,i)[0]+1>=t.length)return o.v;else if(!G)console.log(o.v.toString())
+        if(G&&nnw(t,i)[0]+1>=t.length)return o.v;else if(!G)console.log(str(o.v))
       }else fq.push(o.v);
     }else if(o.t==6)fq.push(o)
   }if(fq.length){
     if(V)env[V]=ptrain(fq,1);else if(!G&&fq[fq.length-1].uf)err(0)
-    else var x=ptrain(fq,G);if(!V){if(G)return mex(x);else{x=x.call();if(x!=null)console.log(x.toString())}}
+    else var x=ptrain(fq,G);if(!V){if(G)return mex(x);else{x=x.call();if(x!=null)console.log(str(x))}}
   }
 }
 ,ayr=(d,g=1)=>exec(strand(grp(lex(d))),g)
@@ -400,16 +400,13 @@ Usage:
 
 Args:
     --debug - Debug code (for internal use)
-    -0      - The one-range symbol '~' creates a range from [0, N) instead`),process.exit(0);
-if(argv.u)run(argv.u)
-else if(!argv._.length){
-  console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`)
-  while((inp=rl.question('\t'))&&inp!="exit"){
-    run(inp)
-    //what the fuck javascript
-    Object.values(syms).forEach(mod=>{mod.bd=[]})
-    Object.values(bdrs).forEach(mod=>{mod.bd=[]})
-    Object.values(env).forEach(mod=>{if(mod.uf)mod.bd=[]})
-  }
-}else f.readFile(__dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))
-}else{(self||globalThis||window).runAyr=run}
+    -0      - The one-range symbol '~' creates a range from [0, N) instead
+    -n      - Numbers are outputted in classic JS style instead of ayr style`),process.exit(0);if(argv.u)run(argv.u);else if(!argv._.length){
+console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`)
+while((inp=rl.question('\t'))&&inp!="exit"){
+  run(inp)
+  //what the fuck javascript
+  Object.values(syms).forEach(mod=>{mod.bd=[]})
+  Object.values(bdrs).forEach(mod=>{mod.bd=[]})
+  Object.values(env).forEach(mod=>{if(mod.uf)mod.bd=[]})
+}}else f.readFile(__dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))}else{(self||globalThis||window).runAyr=run}
