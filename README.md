@@ -6,6 +6,13 @@ A toy array language. For the specs see [here](specs/README.md)
 npm i -g ayr-lang
 ```
 
+## Usage
+Once installed, run
+```
+ayr help
+```
+to get a list of commands.
+
 ## TODO
 Current todo list for myself
 - [x] Implement missing symbols + binders
