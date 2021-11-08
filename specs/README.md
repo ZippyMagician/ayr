@@ -98,6 +98,13 @@ A (f g h) B      -> (A f B) g A h B
 ```
 Note that this is not an exhaustive list, there may be some edge cases not included.
 
+Furthermore, there are currently 3 tokens used in J-style trains that have special meaning:
+```
+([: f g)         -> f & g
+(]: f g)         -> f &: g
+(`: f)           -> f`
+```
+
 Partial trains are also present in `ayr`, and are usable by prefixing a train with `:`. For example:
 ```
 (: f g h) A      -> f g h A
