@@ -35,7 +35,7 @@ Current todo list for myself
 - [x] Make sure strings are supported properly
 - [x] Implement variable assignment
 - [ ] (Maybe) implement block syntax `{{ x + y }}`
-- [ ] Syntactic elements to trains
+- [x] Syntactic elements to trains
     * ``` (`: f) ``` ==> ```( (f)` )```
     * ```([: f g)``` ==> ```( (f) (g) )```
     * ```(]: f g)``` ==> ```( (f) & (g) )```
