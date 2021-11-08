@@ -117,6 +117,7 @@ Partial trains, of course, support constants within them too.
 |  ```%``` | Reciprocal |   0  |    Divide    |  0 0  |       |
 | ```%:``` |  Square Rt |   0  |   Nth Root   |  0 0  |       |
 |   `\|`   | Boolean Not|   0  |    Residue   |  0 0  |       |
+|  `\|.`   |   Reverse  |   1  |    Rotate    |  0 1  |       |
 |  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
 |  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |       |
 |  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |       |
@@ -146,7 +147,7 @@ Partial trains, of course, support constants within them too.
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
 | ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 | ```i:``` |  Identity  |   0  |   Index Of   | 99 99 |By items|
-| ```v.``` |   Reverse  |   1  |      Or      |  0 0  |       |
+| ```v.``` |  Nth Prime |   0  |      Or      |  0 0  |       |
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 
 ## Binders

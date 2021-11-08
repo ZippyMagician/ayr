@@ -53,6 +53,7 @@ Number.prototype.uf=0
 Array.prototype.ds=1
 Array.prototype.uf=0
 Array.prototype.cl=function(){return[...this.map(n=>n.cl())]}
+Array.prototype.rot=function(n){this.unshift.apply(this,this.splice(n,this.length));return this}
 Object.prototype.cl=function(){return{...this}}
 A.prototype.bind=function(...v){return this.cl()}
 A.prototype.call=function(...v){return this.cl()}
@@ -223,7 +224,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     else{a=a.rank(b.ds);for(i=0;i<a.d.length;i++)if(eq(a.d[i],b))return i;return a.d.length}
   },0,0,99)),
   "^.":mod(pon.bind(0,0,a=>new A(a.rank(a.ds-1).d.reverse().flatMap(n=>n instanceof A?n.d:n),a.r,a.b,a.str),1,1,99),pon.bind(0,1,(a,b)=>a&b,1,0,0)),
-  "v.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>a|b,1,0,0))
+  "v.":mod(pon.bind(0,0,n=>{
+    if(n<2)return 2;if(n==2)return 3;let l=n*(Math.log(n)+Math.log(Math.log(n)))|0,r=Math.sqrt(l)+1|0,c=1,i=0,s,p,j;l=(l-1)/2|0;r=r/2-1|0;s=Array(l)
+    for(;i<r;++i)if(!s[i]){++c;for(j=2*i*(i+3)+3,p=2*i+3;j<l;j+=p)s[j]=1}for(p=r;c<n;++p)if(!s[p])++c;return 2*p+1
+  },1,0,0),pon.bind(0,1,(a,b)=>a|b,1,0,0)),
+  "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1,[0,1]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
