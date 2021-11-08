@@ -164,7 +164,7 @@ Partial trains, of course, support constants within them too.
 | ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |
 | ```/:```| ```u/:``` | Diagonals | 2 | Each left | 99 99 |                 |
 | ```\:```| ```u\:``` | Antidiagonals | 2 | Each right | 99 99 |            |
-| ```@:```| ```u@:``` |   TODO  |  N/A |   Zip  | 99 99| Allows uneven args |
+| ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
 
 ## Library Functions
     put A   ->    print A

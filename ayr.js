@@ -113,7 +113,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,det=m=>m.d.length==1?m.d[0].d[0]:m.d[0].d.length==2&&m.d.length==2?m.d[0].d[0]*m.d[1].d[1]-m.d[0].d[1]*m.d[1].d[0]:m.d[0].d.reduce((r,e,i)=>
   r+(-1)**(i+2)*e*det(narr(m.d.slice(1).map(c=>narr(c.d.filter((_,j)=>i!=j))))),0
 )
-,zp=(...a)=>a[0].d.map((n,i)=>narr([n,...a.slice(1).map(n=>n.d[i])]))
+,zp=(a,b,f)=>{
+  let i=Math.min(a.d.length,b.d.length),n=[];for(let x=0;x<i;x++)n.push(f.call(narr([a.d[x]],0,0,a.str),narr([b.d[x]],0,0,a.str)))
+  if(i<a.d.length)n=[...n,...a.d.slice(i).map(n=>narr([n],0,0,a.str))];else if(i<b.d.length)n=[...n,...b.d.slice(i).map(n=>narr([n],0,0,b.str))]
+  return new A(n,i<a.d.length?a.r.cl():b.r.cl())
+}
 ,geti=(a,b)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b)),a):get(a,b)
 ,err=id=>{
   switch(id){
@@ -263,11 +267,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "\\:":op(1,f=>mod(pon.bind(0,0,a=>{a=a.rank(1);a.d=a.d.map(n=>(n.d=n.d.reverse(),n));return dgs(f,a,1)},0,0,2),(a,b)=>{
     b=carr(b,0).rank(Math.max(0,b.ds-1));b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b
   })),
-  "@:":op(1,f=>mod(a=>err(2),(a,b)=>{
-    let i=Math.min(a.d.length,b.d.length),n=[];for(let x=0;x<i;x++)n.push(f.call(narr([a.d[x]],0,0,a.str),narr([b.d[x]],0,0,a.str)))
-    if(i<a.d.length)n=[...n,...a.d.slice(i).map(n=>narr([n],0,0,a.str))];else if(i<b.d.length)n=[...n,...b.d.slice(i).map(n=>narr([n],0,0,b.str))]
-    return new A(n,i<a.d.length?a.r.cl():b.r.cl())
-  }))
+  "@:":op(1,f=>mod(a=>zp(a.cl(),a,f),(a,b)=>zp(a,b,f)))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
