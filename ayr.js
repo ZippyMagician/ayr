@@ -235,7 +235,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     for(;i<r;++i)if(!s[i]){++c;for(j=2*i*(i+3)+3,p=2*i+3;j<l;j+=p)s[j]=1}for(p=r;c<n;++p)if(!s[p])++c;return 2*p+1
   },1,0,0),pon.bind(0,1,(a,b)=>a|b,1,0,0)),
   "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1,[0,1])),
-  "B:":mod(a=>a.ds>0?ayr(':;(-`"&:(^:/)#")&.((],`0#[)")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr('#:=').call(a,b):ayr('#:').call(a,b))
+  "B:":mod(a=>a.ds>0?ayr(':;(-`"&:(^:/)#")&.((],`0#[)")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr('#:=').call(a,b):ayr('#:').call(a,b)),
+  "=:":mod(pon.bind(0,0,a=>(a.d=a.d.map(n=>ayr(n,0)),a),1,0,99),pon.bind(0,1,(a,b)=>+eq(a,b),0,0,99))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
@@ -247,6 +248,9 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(j!=null)return narr(j?r.rank(r.ds-1).d.map(n=>f.call(l.cl(),n)):l.rank(l.ds-1).d.map(n=>f.call(n,r.cl())))
     if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])))}err(1)
   })),
+  '".':op(0,(f,c)=>mod(x=>{
+    if(c.uf){let p;do{p=x.cl();x=f.call(x)}while(!c.call(p,x.cl()))}else for(let i=0;i<+c.call();i++)x=f.call(x);return x
+  },(x,y)=>{if(c.uf)err(2);for(let i=0;i<+c;i++)y=f.call(x.cl(),y);return y})),
   '":':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
     if(l==null||r==null)err(0);let j
     if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;if(j!=null)return new A(j?r.d.map(n=>f.call(l.cl(),n)):l.d.map(n=>f.call(n,r.cl())),j?r.r:l.r,l.b|r.b,l.str|r.str)
