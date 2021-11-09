@@ -179,6 +179,7 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 | ```\:```| ```u\:``` | Antidiagonals | 2 | Each right | 99 99 |            |
 | ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |
 | ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
+| ```;.```| ```u;.y```|   Cut   |  99  |   N/A  |  N/A |                    |
 
 ## Library Functions
     put A   ->    print A

@@ -105,8 +105,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,mapd=(a,f,d)=>a instanceof A?d>0?new A(a.d.map(n=>mapd(n,f,d-1)),a.r,a.b,a.str):f(a):f(a)
 ,get=(a,b)=>{
-  let m=carr(b).rank(b.ds-1),i
-  if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1);
+  let m=carr(b).rank(b.ds-1),i;if(carr(a).d.map((n,i)=>n<0||n>=b.r[i]).reduce((a,b)=>a||b,0))return b.str?32:0
+  if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1)
   else{a.d=a.d.reverse();let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
 }
 ,det=m=>m.d.length==1?m.d[0].d[0]:m.d[0].d.length==2&&m.d.length==2?m.d[0].d[0]*m.d[1].d[1]-m.d[0].d[1]*m.d[1].d[0]:m.d[0].d.reduce((r,e,i)=>
@@ -274,7 +274,13 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "\\:":op(1,f=>mod(pon.bind(0,0,a=>{a=a.rank(1);a.d=a.d.map(n=>(n.d=n.d.reverse(),n));return dgs(f,a,1)},0,0,2),(a,b)=>{
     b=carr(b,0).rank(Math.max(0,b.ds-1));b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b
   })),
-  "@:":op(1,f=>mod(a=>zp(a.cl(),a,f),(a,b)=>zp(a,b,f)))
+  "@:":op(1,f=>mod(a=>zp(a.cl(),a,f),(a,b)=>zp(a,b,f))),
+  ";.":op(0,(f,g)=>mod(a=>{
+    if(g.uf)err(2);let r=carr(g.cl()).d;let s=ayr("$$~.").call(new A(rn(pd(r),0,1),r)).d.map(n=>n.d.length<a.ds?n.d.concat(rn(a.ds-n.d.length,0,0)):n.d);let N=a.cl();for(let i=0;i<a.d.length;i++){
+      let n=a.r.map((v,y,_,z=pd(a.r.slice(0,y)))=>(i%(v*z))/z|0);let o=n.map((v,i)=>v-s[Math.floor(s.length/2)][i])
+      N.d[i]=f.call(geti((f=>(f.d=f.d.map(n=>(n.b=1,n)),f))(new A(s.map(C=>narr(C.map((v,i)=>v+o[i]))),r)),a.cl()))
+    }return N
+  },err.bind(0,2)))
 }
 ,env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
@@ -304,8 +310,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       else if(x.lastIndexOf(".")>x.indexOf("e")&&x.indexOf("e")>-1)t.push({t:0,v:([l,r]=x.split("e"),(+l)**+r)});else t.push({t:0,v:+x})
     }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1]}"`),new A(l.split("").map(c=>c.charCodeAt(0)),l.length,0,1))})
     else if(m=/^\[:|^\]:|^`:/.exec(s))t.push({t:5,v:m[0]})
-    else if(m=RegExp(`^(${Object.keys(syms).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:2,v:m[1]})
-    else if(m=RegExp(`^(${Object.keys(bdrs).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:3,v:m[1]})
+    else if(m=RegExp(`^(${Object.keys(syms).concat(Object.keys(bdrs)).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:bdrs[m[1]]!=null?3:2,v:m[1]})
     else if(m=/^:/.exec(s))t.push({t:6})
     else if(m=/^(\s)/.exec(s))t.push({t:9,v:m[1]})
     else if(m=/^([a-zA-Z]+)/.exec(s))t.push({t:7,v:m[1]})
