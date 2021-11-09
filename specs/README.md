@@ -140,6 +140,7 @@ Partial trains, of course, support constants within them too.
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
 | ```=.``` |  All Equal |  99  |     Xor      |  0 0  |       |
+| ```=:``` |    Eval    |  99  |     Match    | 99 99 |       |
 |  ```~``` |  One-Range |   0  |     Index    | 99 99 |Str(m): alphabet upto arg|
 | ```~.``` |   Indices  |  99  | Interval Ind |  0 1  |       |
 | ```~:``` |   Unique   |   1  |   Unequality |  0 0  |       |
@@ -166,16 +167,17 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 |  Binder |   Usage   | Monadic | Rank | Dyadic | Rank |        Notes       |
 |:-------:|:---------:|:-------:|:----:|:------:|:----:|:------------------:|
 | ```"``` |  ```u"``` |   Each  |   0  |  Each  |  0 0 |                    |
+| ```".```| ```u".v```|  Repeat |  99  | Repeat | 99 99|                    |
 | ```":```| ```u":``` |    Tie  |  99  |   Tie  | 99 99|                    |
 | ```&``` | ```u&v``` | Compose |  N/A |  Atop  |  N/A | Binds if immediate |
-| ```&:```| ```u&:v```|   Hook  |  N/A |  Hook  |  N/A | Binds if immediate |
 | ```&.```| ```u&.v```|  Before |  N/A | Before |  N/A | Binds if immediate |
+| ```&:```| ```u&:v```|   Hook  |  N/A |  Hook  |  N/A | Binds if immediate |
 | ``` ` ```| ```u` ```| Commute |  N/A |  Flip  |  N/A | ```u&`v``` is ```v&u``` |
 | ```/``` |  ```u/``` |  Reduce |  99  | N-wise Reduce | 0 1 |              |
-| ```\``` |  ```u\``` |   Scan  |  99  |  Table |  1 1 |                    |
-| ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |
 | ```/:```| ```u/:``` | Diagonals | 2 | Each left | 99 99 |                 |
+| ```\``` |  ```u\``` |   Scan  |  99  |  Table |  1 1 |                    |
 | ```\:```| ```u\:``` | Antidiagonals | 2 | Each right | 99 99 |            |
+| ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |
 | ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
 
 ## Library Functions
