@@ -235,8 +235,9 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     for(;i<r;++i)if(!s[i]){++c;for(j=2*i*(i+3)+3,p=2*i+3;j<l;j+=p)s[j]=1}for(p=r;c<n;++p)if(!s[p])++c;return 2*p+1
   },1,0,0),pon.bind(0,1,(a,b)=>a|b,1,0,0)),
   "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1,[0,1])),
-  "B:":mod(a=>a.ds>0?ayr(':;(-`"&:(^:/)#")&.((],`0#[)")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr('#:=').call(a,b):ayr('#:').call(a,b)),
-  "=:":mod(pon.bind(0,0,a=>(a.d=a.d.map(n=>ayr(n,0)),a),1,0,99),pon.bind(0,1,(a,b)=>+eq(a,b),0,0,99))
+  "B:":mod(a=>a.ds>0?ayr(':;(,`0#)"&:(-`"&:(^:/)#")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr('#:=').call(a,b):ayr('#:').call(a,b)),
+  "=:":mod(pon.bind(0,0,a=>a.str?ayr(a.d.map(n=>String.fromCharCode(n)).join``):(a.d=a.d.map(n=>ayr(n.d.map(n=>String.fromCharCode(n)).join``)),a),1,0,99)
+          ,pon.bind(0,1,(a,b)=>+eq(a,b),0,0,99))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
