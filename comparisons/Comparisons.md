@@ -18,21 +18,27 @@ Comparisons between `ayr` and a few other languages
 |   Haskell  | ```foldr (*) 1 . map (foldr (+) 0)``` | |
 
 ## Check if parens are balanced
-| Language | Programs | Notes |
+| Language | Program | Notes |
 |:--------:|:--------:|:-----:|
 |    ayr   | ```((=/+/)^.(</>&~."))'()'=\``` | `:((\|+/)^.1=>)(+/1 _1*)"'()'=\:` |
 |    APL   | ```((=/+/)∧(</⊃⍤⍸⍤1))'()'∘.=⊢``` | ```{((=/+/)∧'('=1⌷⍵/⍨∨⌿)'()'∘.=⍵}``` |
 
 ## Generate N rows of Pascal's triangle
-| Language | Programs | Notes |
+| Language | Program | Notes |
 |:--------:|:--------:|:-----:|
 |    ayr   | ```!\`~``` | ```:;1,1,"!&:~"~``` |
 |    APL   | ```⍉(∘.!⍨⍳)``` ||
 
 ## Matrix multiplication
-| Language | Programs | Notes |
+| Language | Program | Notes |
 |:--------:|:--------:|:-----:|
 |    ayr   |```,.\=```|```+/&*\=```|
 |    APL   |```+.×``` |```∘.(+/⍤×)⍥↓∘⍉```|
 |     K    |```+/'*\:```|     |
 |     J    |```+/ .*```|```+/@:*"$```|
+
+## Game of life
+| Language | Program | Notes |
+|:--------:|:-------:|:-----:|
+|    ayr   |[gol.ayr](gol.ayr)||
+|Dyalog Extended|[gol.apl](gol.apl)||
