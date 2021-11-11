@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-//TODO:
-//  - Design and implement more binders + symbols
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
 if(this.d.length==1&&this.d[0]&&this.d[0].b&&!this.b)this.d[0].b=0;this.uf=0}
@@ -22,10 +20,7 @@ A.prototype.rank=function(r,s){
     default:return s?new A([this.cl()],1,1,0):this.cl()//cant remember what this is for but too afraid to change it
   }
 }
-A.prototype.has=function(o){
-  for(n of this.d)if(eq(o,n))return 1
-  return 0
-}
+A.prototype.has=function(o){for(n of this.d)if(eq(o,n))return 1;return 0}
 A.prototype.toString=function(){
   let S="",r=this.r.cl().reverse(),d=this.d.cl()
   while(r.length>1)d=chnk(d,r.pop(),this.str).d
@@ -106,8 +101,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,mapd=(a,f,d)=>a instanceof A?d>0?new A(a.d.map(n=>mapd(n,f,d-1)),a.r,a.b,a.str):f(a):f(a)
 ,get=(a,b)=>{
   let m=carr(b).rank(b.ds-1),i;if(carr(a).d.map((n,i)=>n<0||n>=b.r[i]).reduce((a,b)=>a||b,0))return b.str?32:0
-  if(a.ds==0||sb(a))return carr(m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i],1)
-  else{a.d=a.d.reverse();let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return carr(r,1)}
+  if(a.ds==0||sb(a))return m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i]
+  else{a.d=a.d.reverse();let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return r}
 }
 ,det=m=>m.d.length==1?m.d[0].d[0]:m.d[0].d.length==2&&m.d.length==2?m.d[0].d[0]*m.d[1].d[1]-m.d[0].d[1]*m.d[1].d[0]:m.d[0].d.reduce((r,e,i)=>
   r+(-1)**(i+2)*e*det(narr(m.d.slice(1).map(c=>narr(c.d.filter((_,j)=>i!=j))))),0
@@ -117,7 +112,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(i<a.d.length)n=[...n,...a.d.slice(i).map(n=>narr([n],0,0,a.str))];else if(i<b.d.length)n=[...n,...b.d.slice(i).map(n=>narr([n],0,0,b.str))]
   return new A(n,i<a.d.length?a.r.cl():b.r.cl())
 }
-,geti=(a,b)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b)),a):get(a,b)
+,geti=(a,b)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b)),fix(a),a):get(a,b)
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -247,7 +242,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>f.call(n)),l.rank(l.ds-1).r,l.b,l.str),(l,r)=>{
     if(l==null||r==null)err(0);let j;if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;
     if(j!=null)return narr(j?r.rank(r.ds-1).d.map(n=>f.call(l.cl(),n)):l.rank(l.ds-1).d.map(n=>f.call(n,r.cl())))
-    if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>f.call(n,S.d[i])))}err(1)
+    if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>(v=>sb(v)?v.d[0]:v)(f.call(n,S.d[i]))))}err(1)
   })),
   '".':op(0,(f,c)=>mod(x=>{
     if(c.uf){let p;do{p=x.cl();x=f.call(x)}while(!c.call(p,x.cl()))}else for(let i=0;i<+c.call();i++)x=f.call(x);return x
@@ -255,7 +250,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   '":':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
     if(l==null||r==null)err(0);let j
     if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;if(j!=null)return new A(j?r.d.map(n=>f.call(l.cl(),n)):l.d.map(n=>f.call(n,r.cl())),j?r.r:l.r,l.b|r.b,l.str|r.str)
-    if(JSON.stringify(l.r)==JSON.stringify(r.r))return new A(l.d.map((n,i)=>f.call(n,r.d[i])),r.r,l.b|r.b,l.str|r.str);err(1)
+    if(JSON.stringify(l.r)==JSON.stringify(r.r))return new A(l.d.map((n,i)=>(v=>sb(v)?v.d[0]:v)(f.call(n,r.d[i]))),r.r,l.b|r.b,l.str|r.str);err(1)
   })),
   "`":op(1,f=>mod(l=>f.call(l.cl(),l),(l,r)=>f.call(r,l))),
   "/":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0])):x,2,0,99),pon.bind(0,1,(l,r)=>{
@@ -277,14 +272,12 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   })),
   "@:":op(1,f=>mod(a=>zp(a.cl(),a,f),(a,b)=>zp(a,b,f))),
   ";.":op(0,(f,g)=>mod(a=>{
-    if(g.uf)err(2);let r=carr(g.cl()).d;let s=ayr("$$~.").call(new A(rn(pd(r),0,1),r)).d.map(n=>n.d.length<a.ds?n.d.concat(rn(a.ds-n.d.length,0,0)):n.d);let N=a.cl();for(let i=0;i<a.d.length;i++){
+    if(g.uf)err(2);let r=carr(g.cl()).d;let s=ayr("$$~.").call(new A(rn(pd(r),0,1),r)).d.map(n=>n.d.length<a.ds?n.d.concat(rn(a.ds-n.d.length,0,0)):n.d);let N=a.cl()
+    for(let i=0;i<a.d.length;i++){
       let n=a.r.map((v,y,_,z=pd(a.r.slice(0,y)))=>(i%(v*z))/z|0);let o=n.map((v,i)=>v-s[Math.floor(s.length/2)][i])
       N.d[i]=f.call(geti((f=>(f.d=f.d.map(n=>(n.b=1,n)),f))(new A(s.map(C=>narr(C.map((v,i)=>v+o[i]))),r)),a.cl()))
     }return N
   },err.bind(0,2)))
-}
-,env={
-  put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
 }
 ,chnk=(a,s,str=0,b=0)=>{
   let n=[];for(let x,i=0;i<a.length;i+=s){
@@ -372,7 +365,8 @@ const exec=(t,G=0)=>{
       if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(str(x));fq=[]}
     }if(o.t==7){
       if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
-      else fq.push(env[o.v])
+      else if(!fq.length&&env[o.v]==null)err(3)
+      else fq.push(fq.length?(f=>(f.uf=0,f))(_=>env[o.v]??err(3)):env[o.v])
     }else if(o.t==2||o.t==8&&o.v.uf){
       let[ni,b]=nnw(t,i);if(inst(b)||ni!=i&&b.t==8){
         i=ni;if(b.t==8){if(b.v.uf||b.t==7&&env[b.v]!=null&&env[b.v].uf)fq.push((o.t==8?o.v:syms[o.v]),b.t==7?env[b.v]:b.v);else fq.push(o.t==8?o.v:syms[o.v],b.v)}
@@ -401,11 +395,15 @@ const exec=(t,G=0)=>{
   else if(module!=null){try{ayr(d,0)}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}
   else{try{return ayr(d)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
 }
+,env={
+  put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
+  I:require!=null?ayr(argv._.length?argv._[argv._.length-1]:""):""
+}
 if(module&&module.exports){
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
 Usage:
-    ayr <file> - run a file
-    ayr -u <code> - run the code
+    ayr <file> [stdin]    - run a file
+    ayr -u <code> [stdin] - run the code
 
 Args:
     --debug - Debug code (for internal use)
