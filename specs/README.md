@@ -10,7 +10,7 @@ What follows is an in-depth look at the specs of the `ayr` array language, so an
 * [Trains](#trains)
 * [Symbols](#symbols)
 * [Binders](#binders)
-* [Library functions](#library-functions)
+* [Library builtins](#library-builtins)
 
 ## Array Model
 `ayr` uses the based array model, similar to [BQN](https://github.com/mlochbaum/BQN/blob/master/doc/based.md). Values can be scalars, vectors, or matrices. These correspond to rank 0, 1, and 2 data respectively. 
@@ -181,6 +181,7 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 | ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
 | ```;.```| ```u;.y```|   Cut   |  99  |   N/A  |  N/A |                    |
 
-## Library Functions
+## Library Builtins
     put A   ->    print A
     A put B ->    print B A times
+    I       ->    the input
