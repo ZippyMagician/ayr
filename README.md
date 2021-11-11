@@ -15,6 +15,14 @@ to get a list of commands.
 
 ## TODO
 Current todo list for myself
+- [ ] More symbols + binders
+    * Stencil/cut (`;.`)
+    * Mix (`;:`)
+    * Group (`?`)
+    * Fixpoint (`$:`)
+    * Roll/Deal (`?.`)
+    * Under (maybe)
+    * Filter (`$`)
 - [x] Implement missing symbols + binders
     * ```=```
     * ```~.```
@@ -25,10 +33,6 @@ Current todo list for myself
     * ```&:```
     * monadic `@`
     * dyadic `>.` and `<.`
-- [ ] Design and implement more symbols
-    * Stencil/cut
-    * Mix (inverse of Mold)
-    * etc
 - [x] Higher rank data supported
 - [x] Change rank of `/` and `\` to be major rank - 1, similar to `#`
 - [x] Support more literal num types
