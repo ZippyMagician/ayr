@@ -23,6 +23,8 @@ Current todo list for myself
     * Roll/Deal (`?.`)
     * Under (maybe)
     * Filter (`$`)
+    * Uniq/Union (`$.`)
+    * Sieve builtin
 - [x] Implement missing symbols + binders
     * ```=```
     * ```~.```
