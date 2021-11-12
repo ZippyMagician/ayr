@@ -396,8 +396,7 @@ const exec=(t,G=0)=>{
   else{try{return ayr(d)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
 }
 ,env={
-  put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
-  I:require!=null?ayr(argv._.length?argv._[argv._.length-1]:""):""
+  put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
 }
 if(module&&module.exports){
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
@@ -409,7 +408,7 @@ Args:
     --debug - Debug code (for internal use)
     -0      - The one-range symbol '~' creates a range from [0, N) instead
     -n      - Numbers are outputted in classic JS style instead of ayr style`),process.exit(0);if(argv.u)run(argv.u);else if(!argv._.length){
-console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`)
+console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`);if(require!=null)env.I=argv._.length?ayr(argv._[argv._.length-1]):""
 while((inp=rl.question('\t'))&&inp!="exit"){
   run(inp)
   //what the fuck javascript
