@@ -138,6 +138,7 @@ Partial trains, of course, support constants within them too.
 |  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |       |
 |  ```[``` |  Identity  |  99  |     Left     | 99 99 |       |
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
+|  ```?``` |   Unique   |  99  |     Keys     | 99 1  |       |
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
 | ```=.``` |  All Equal |  99  |     Xor      |  0 0  |       |
 | ```=:``` |    Eval    |  99  |     Match    | 99 99 |       |
@@ -180,6 +181,8 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 | ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |
 | ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
 | ```;.```| ```u;.y```|   Cut   |  99  |   N/A  |  N/A |                    |
+| ```$:```| ```u$:``` | Fixpoint|  99  |Repeat(n)| 0 99| d: takes left arg, not operand |
+| ```$.```| ```u$.``` |  Filter |  99  | Filter | 99 99| d: pass left arg to each check |
 
 ## Library Builtins
     put A   ->    print A
