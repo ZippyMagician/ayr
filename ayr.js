@@ -232,7 +232,13 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1,[0,1])),
   "B:":mod(a=>a.ds>0?ayr(':;(,`0#)"&:(-`"&:(^:/)#")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr('#:=').call(a,b):ayr('#:').call(a,b)),
   "=:":mod(pon.bind(0,0,a=>a.str?ayr(a.d.map(n=>String.fromCharCode(n)).join``):(a.d=a.d.map(n=>ayr(n.d.map(n=>String.fromCharCode(n)).join``)),a),1,0,99)
-          ,pon.bind(0,1,(a,b)=>+eq(a,b),0,0,99))
+          ,pon.bind(0,1,(a,b)=>+eq(a,b),0,0,99)),
+  "?":mod(pon.bind(0,0,a=>{
+    let s=new Set(),n;return new A(n=a.rank(a.ds-1).d.filter(v=>s.has(v)?0:s.add(v)||1),[...a.r.slice(0,a.ds-1),n.length],a.b,a.str)
+  },0,1,99),pon.bind(0,1,(a,b)=>{
+    if(sb(b)||typeof b!='object')return(a.b=1,a);if(a.r[a.ds-1]!=b.r[0])err(2)
+    let m=new Map(),s=[];a.rank(a.ds-1).d.forEach((v,i)=>m.has(b.d[i])?m.get(b.d[i]).push(v):m.set(b.d[i],[v]));for(let v of m.values())s.push(narr(v,1));return narr(s);
+  },0,0,[99,1]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
@@ -277,7 +283,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       let n=a.r.map((v,y,_,z=pd(a.r.slice(0,y)))=>(i%(v*z))/z|0);let o=n.map((v,i)=>v-s[Math.floor(s.length/2)][i])
       N.d[i]=f.call(geti((f=>(f.d=f.d.map(n=>(n.b=1,n)),f))(new A(s.map(C=>narr(C.map((v,i)=>v+o[i]))),r)),a.cl()))
     }return N
-  },err.bind(0,2)))
+  },err.bind(0,2))),
+  "$:":op(1,f=>mod(a=>{let c=[f.call(a.cl())],n;while(!eq(c[0],n=f.call(c[c.length-1].cl()))&&!eq(c[c.length-1],n))c.push(n);return narr(c)}
+    ,(a,b)=>{for(let i=0;i<+a;i++)b=f.call(b);return b})),
+  "$.":op(1,f=>mod(a=>{let c=0;return new A(a.rank(a.ds-1).d.filter(v=>f.call(v)&&++c).flatMap(n=>n.d??n),[...a.r.slice(0,a.ds-1),c],a.b,a.str)}
+    ,(a,b)=>{let c=0;return new A(b.rank(b.ds-1).d.filter(v=>f.call(a,v)&&++c).flatMap(n=>n.d??n),[...b.r.slice(0,b.ds-1),c],b.b,b.str)}))
 }
 ,chnk=(a,s,str=0,b=0)=>{
   let n=[];for(let x,i=0;i<a.length;i+=s){
