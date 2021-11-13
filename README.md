@@ -25,7 +25,7 @@ Current todo list for myself
     * Filter (`$`)
     * Uniq/Union (`$.`)
     * Reduce First (`/.`)
-    * Fold First (```\.````)
+    * Fold First (```\.```)
     * Without (`?:`)
     * Sieve builtin
 - [x] Implement missing symbols + binders
