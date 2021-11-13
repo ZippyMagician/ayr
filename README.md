@@ -18,12 +18,15 @@ Current todo list for myself
 - [ ] More symbols + binders
     * Stencil/cut (`;.`)
     * Mix (`;:`)
-    * Group (`?`)
+    * Keys (`?`)
     * Fixpoint (`$:`)
     * Roll/Deal (`?.`)
     * Under (maybe)
     * Filter (`$`)
     * Uniq/Union (`$.`)
+    * Reduce First (`/.`)
+    * Fold First (```\.````)
+    * Without (`?:`)
     * Sieve builtin
 - [x] Implement missing symbols + binders
     * ```=```
