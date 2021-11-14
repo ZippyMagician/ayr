@@ -78,7 +78,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }
 }
 ,pd=a=>a.reduce((a,b)=>a*b,1)
-,ravel=(a,p=null)=>narr(a.d.flatMap(n=>n instanceof A?(p!=null&&n.str&&(p=1),ravel(n).d):n),0,0,p==null?0:p)
+,ravel=(a,p=null)=>narr(a.ds==0?[a]:a.d.flatMap(n=>n instanceof A?(p!=null&&n.str&&(p=1),ravel(n).d):n),0,0,p==null?0:p)
 ,sort=(a,b)=>{
   if(a instanceof A&&b instanceof A){if(pd(a.r)==pd(b.r))for(i=0;1;i++)if(!eq(a.d[i],b.d[i]))return sort(a.d[i],b.d[i]);else return pd(a.r)-pd(b.r)}
   else return(a instanceof A?pd(a.r):+a)-(b instanceof A?pd(b.r):+b)
@@ -168,8 +168,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       return new A(a.d.concat(b.d),b.ds>1?[...b.r.slice(0,b.ds-1),b.r.pop()+1]:[b.r[0],2],b.b,p)
     }
   },1,1,[99,99])),
-  "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0,99),pon.bind(0,1,(a,b,p)=>{
-    [a,b]=[b,a];let v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0)a=narr([...Array(c.d.length)].map(_=>a))
+  "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0,99),pon.bind(0,1,(b,a,p)=>{
+    let v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0)a=narr([...Array(c.d.length)].map(_=>a))
     if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
     return(n=>ba?(n.r=[n.d.length],n.ds=1,n):n)(b.ds<2?narr(v,a.b|b.b,0,p):new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str))
   },1,1,[99,1])),
@@ -186,8 +186,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     for(i=0;i<=b.d.length;i++)if(us(a)>us(i==0?-Infinity:b.d[i-1])&&us(a)<=us(i==b.d.length?Infinity:b.d[i]))return i
   },0,0,[0,1])),
   "~:":mod(pon.bind(0,0,(a,p)=>{
-    let s=new Set(a.d),d=[];for(n of s.keys())d.push(n);return narr(d,0,0,p?a.str:0)
-  },0,1,1),pon.bind(0,1,(a,b)=>+!eq(a,b),1,0,0)),
+    let s=new Set(a.rank(a.ds-1).d),d=[];for(n of s.keys())d.push(n);return narr(d,0,0,p?a.str:0)
+  },0,1,99),pon.bind(0,1,(a,b)=>+!eq(a,b),1,0,0)),
   ",:":mod(pon.bind(0,0,(a,p)=>narr(a.d,a.b,0,p?a.str:0),0,1,99),pon.bind(0,1,(a,b)=>narr(a.d.map(n=>b.has(n))),0,0,99)),
   "{":mod(pon.bind(0,0,a=>a+1,1,1,0),pon.bind(0,1,(a,b)=>{
     let c=new A([0],1,0,b.str);c=ext(c,a.d,b.str)
@@ -233,12 +233,15 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "B:":mod(a=>a.ds>0?ayr(':;(,`0#)"&:(-`"&:(^:/)#")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr('#:=').call(a,b):ayr('#:').call(a,b)),
   "=:":mod(pon.bind(0,0,a=>a.str?ayr(a.d.map(n=>String.fromCharCode(n)).join``):(a.d=a.d.map(n=>ayr(n.d.map(n=>String.fromCharCode(n)).join``)),a),1,0,99)
           ,pon.bind(0,1,(a,b)=>+eq(a,b),0,0,99)),
-  "?":mod(pon.bind(0,0,a=>{
-    let s=new Set(),n;return new A(n=a.rank(a.ds-1).d.filter(v=>s.has(v)?0:s.add(v)||1),[...a.r.slice(0,a.ds-1),n.length],a.b,a.str)
+  "?":mod(pon.bind(0,0,(a,p)=>{
+    let s=new Set();return narr(a.rank(a.ds-1).d.map(v=>s.has(v)?0:s.add(v)&&1),a.b,0,p)
   },0,1,99),pon.bind(0,1,(a,b)=>{
     if(sb(b)||typeof b!='object')return(a.b=1,a);if(a.r[a.ds-1]!=b.r[0])err(2)
     let m=new Map(),s=[];a.rank(a.ds-1).d.forEach((v,i)=>m.has(b.d[i])?m.get(b.d[i]).push(v):m.set(b.d[i],[v]));for(let v of m.values())s.push(narr(v,1));return narr(s);
-  },0,0,[99,1]))
+  },0,0,[99,1])),
+  "?:":mod(pon.bind(0,0,a=>{
+    for(let i=a.r[0]-1;i;i--){let j=Math.random()*(i+1)|0;[a.d[i],a.d[j]]=[a.d[j],a.d[i]]}return a
+  },1,1,1),pon.bind(0,1,(a,b)=>ayr("[#(:,^./^./&,&~:\\)").call(a,b),0,1,99))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
@@ -259,13 +262,15 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(JSON.stringify(l.r)==JSON.stringify(r.r))return new A(l.d.map((n,i)=>(v=>sb(v)?v.d[0]:v)(f.call(n,r.d[i]))),r.r,l.b|r.b,l.str|r.str);err(1)
   })),
   "`":op(1,f=>mod(l=>f.call(l.cl(),l),(l,r)=>f.call(r,l))),
-  "/":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((acc,v)=>f.call(acc,v),x.d[0])):x,2,0,99),pon.bind(0,1,(l,r)=>{
+  "/":op(1,f=>mod(x=>x.ds?new A(x.rank(1).d.map(n=>n.d.slice(1).reduce((a,v)=>f.call(a,v),n.d[0])),x.ds==1?1:x.r.slice(1),x.b):x,pon.bind(0,1,(l,r)=>{
     if(r.ds==0)return r;let p=0,n=[];r=r.rank(r.ds-1);if(l<0)l=Math.abs(l,p=1)
-    for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((acc,v)=>f.call(acc,v),r.d[i]));return narr(n)
+    for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((a,v)=>f.call(a,v),r.d[i]));return narr(n)
   },0,0,[0,99]))),
-  "\\":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b,0)):x,0,0,99),pon.bind(0,1,(x,y)=>{
+  "/.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((a,v)=>f.call(a,v),x.d[0])):x,2,0,99),(a,b)=>err(2))),
+  "\\":op(1,f=>mod(x=>x.ds?new A(x.rank(1).d.flatMap(x=>(p=x.d[0],x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)))),x.r,x.b):x,pon.bind(0,1,(x,y)=>{
     let n=[];x=carr(x,0).rank(x.ds-1);y=carr(y,0).rank(y.ds-1);for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
   },0,0,99))),
+  "\\.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b,0)):x,0,0,99),(a,b)=>err(2))),
   "@":op(0,(a,b)=>mod(l=>{
     if(b.uf)return a.call(b.call(l));else{if(b<0){b=-b;err(2)}else return mapd(l,n=>a.call(n),b)}
   },(l,r)=>{
@@ -344,8 +349,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(t.length==1)return t[0];if(!t[t.length-1].uf)G=0;let tn=[]
   if(t[0].t==6){
     tn=t.cl();let i=tn.length-2
-    if(!tn[tn.length-2].uf){let x=tn.cl();i--;tn.push(mod(A=>x[x.length-1].call(x[x.length-2],A),(A,B)=>err(0)))}
-    else{let x=tn.cl();tn.push(mod(A=>x[x.length-1].call(A),(A,B)=>x[x.length-1].call(B,A)))}//why do I need to swap the args here???
+    if(i>0&&!tn[i].uf){let x=tn.cl();i--;tn.push(mod(A=>x[x.length-1].call(x[x.length-2],A),(A,B)=>err(0)))}
+    else{let x=tn.cl();tn.push(mod(A=>x[x.length-1].call(A),(A,B)=>x[x.length-1].call(A,B)))}
     for(;i>0;i--){
       if(!tn[i-1].uf&&i>1){let x=tn.cl();i--;let I=i.cl();tn.push(mod(A=>x[I+1].call(x[I],x[x.length-1].call(A)),(A,B)=>x[I+1].call(x[I],x[x.length-1].call(A,B))))}
       else{let x=tn.cl();let I=i.cl();tn.push(mod(A=>x[I].call(x[x.length-1].call(A)),(A,B)=>x[I].call(x[x.length-1].call(A,B))))}

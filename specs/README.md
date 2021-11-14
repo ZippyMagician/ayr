@@ -138,13 +138,14 @@ Partial trains, of course, support constants within them too.
 |  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |       |
 |  ```[``` |  Identity  |  99  |     Left     | 99 99 |       |
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
-|  ```?``` |   Unique   |  99  |     Keys     | 99 1  |       |
+|  ```?``` | Dedup Sieve|  99  |     Keys     | 99 1  |       |
+| ```?:``` |   Shuffle  |   1  |    Without   | 99 99 |m:```[#(:,^./^./&,&~:\)```|
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
 | ```=.``` |  All Equal |  99  |     Xor      |  0 0  |       |
 | ```=:``` |    Eval    |  99  |     Match    | 99 99 |       |
 |  ```~``` |  One-Range |   0  |     Index    | 99 99 |Str(m): alphabet upto arg|
 | ```~.``` |   Indices  |  99  | Interval Ind |  0 1  |       |
-| ```~:``` |   Unique   |   1  |   Unequality |  0 0  |       |
+| ```~:``` |   Unique   |  99  |   Unequality |  0 0  |       |
 |  ```,``` |   Ravel    |  99  |  Concatenate |  1 1  |       |
 | ```,.``` | Determinant|   2  |  Dot Product |  1 1  |       |
 | ```,:``` |   Enlist   |  99  |  Membership  | 99 99 |```1 = 'a' ,: 'hola'```|
@@ -176,8 +177,10 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 | ``` ` ```| ```u` ```| Commute |  N/A |  Flip  |  N/A | ```u&`v``` is ```v&u``` |
 | ```/``` |  ```u/``` |  Reduce |  99  | N-wise Reduce | 0 1 |              |
 | ```/:```| ```u/:``` | Diagonals | 2 | Each left | 99 99 |                 |
+| ```/.```| ```u/.``` | Reduce First| 99| N/A   | N/A  |                    |
 | ```\``` |  ```u\``` |   Scan  |  99  |  Table |  1 1 |                    |
 | ```\:```| ```u\:``` | Antidiagonals | 2 | Each right | 99 99 |            |
+| ```\.```| ```u\.``` | Scan First |99 |   N/A  |  N/A |                    |
 | ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |
 | ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
 | ```;.```| ```u;.y```|   Cut   |  99  |   N/A  |  N/A |                    |
