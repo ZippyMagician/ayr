@@ -83,7 +83,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(a instanceof A&&b instanceof A){if(pd(a.r)==pd(b.r))for(i=0;1;i++)if(!eq(a.d[i],b.d[i]))return sort(a.d[i],b.d[i]);else return pd(a.r)-pd(b.r)}
   else return(a instanceof A?pd(a.r):+a)-(b instanceof A?pd(b.r):+b)
 }
-,ext=(a,l,str=0)=>(a.d=a.d.concat(rn(0,pd(l)-a.d.length,str?32:0)),a.r=l,a.ds=l.length,a)
+,pr=(a,s=0)=>a.d[0]instanceof A?narr([],1):s||a.str?32:0
+,ext=(a,l,str=0)=>(a.d=a.d.concat(rn(0,pd(l)-a.d.length,pr(a,str))),a.r=l,a.ds=l.length,a)
 ,lc=x=>x>=97&&x<=122
 ,uc=x=>x>=65&&x<=90
 ,rn=(l,u=0,f)=>(module!=null&&argv['0']?(l--,u--):0,x=u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()],f!=null?x.map(_=>f.cl()):x)
@@ -100,7 +101,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,mapd=(a,f,d)=>a instanceof A?d>0?new A(a.d.map(n=>mapd(n,f,d-1)),a.r,a.b,a.str):f(a):f(a)
 ,get=(a,b)=>{
-  let m=carr(b).rank(b.ds-1),i;if(carr(a).d.map((n,i)=>n<0||n>=b.r[i]).reduce((a,b)=>a||b,0))return b.str?32:0
+  let m=carr(b).rank(b.ds-1),i;if(carr(a).d.map((n,i)=>n<0||n>=b.r[i]).reduce((a,b)=>a||b,0))return pr(b)
   if(a.ds==0||sb(a))return m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i]
   else{a.d=a.d.reverse();let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return r}
 }
@@ -159,12 +160,12 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(b.ds<=a.ds){
       if(b.r[0]==1&&b.ds==1)b=narr(rn(0,a.r[0],b.d[0]))
       if(a.r[0]>b.d.length)b=ext(b,[a.r[0]],p);else if(b.d.length>a.r[0])
-        for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...rn(0,b.d.length-a.r[0],p?32:0));a.r[0]=b.d.length
+        for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...rn(0,b.d.length-a.r[0],pr(a,p)));a.r[0]=b.d.length
       return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,p)
     }else{
       if(sb(a)||a.ds==0)a=narr(rn(0,b.r[0],a.ds==0?a:a.d[0]))
       if(b.r[0]>a.d.length)b=ext(a,[b.r[0]],p);else if(a.d.length>b.r[0])
-        for(i=0;i<(b.r[1]||1);i++)b.d.splice(i*pd(b.r.slice(1))+b.r[0],0,...rn(0,a.d.length-b.r[0],p?32:0));b.r[0]=a.d.length
+        for(i=0;i<(b.r[1]||1);i++)b.d.splice(i*pd(b.r.slice(1))+b.r[0],0,...rn(0,a.d.length-b.r[0],pr(b,p)));b.r[0]=a.d.length
       return new A(a.d.concat(b.d),b.ds>1?[...b.r.slice(0,b.ds-1),b.r.pop()+1]:[b.r[0],2],b.b,p)
     }
   },1,1,[99,99])),
@@ -237,7 +238,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     let s=new Set();return narr(a.rank(a.ds-1).d.map(v=>s.has(v)?0:s.add(v)&&1),a.b,0,p)
   },0,1,99),pon.bind(0,1,(a,b)=>{
     if(sb(b)||typeof b!='object')return(a.b=1,a);if(a.r[a.ds-1]!=b.r[0])err(2)
-    let m=new Map(),s=[];a.rank(a.ds-1).d.forEach((v,i)=>m.has(b.d[i])?m.get(b.d[i]).push(v):m.set(b.d[i],[v]));for(let v of m.values())s.push(narr(v,1));return narr(s);
+    let m=new Map([...Array(Math.max(...b.d)+1).keys()].map(n=>[n,[]])),s=[];a.rank(a.ds-1).d.forEach((v,i)=>b.d[i]>-1?m.get(b.d[i]).push(v):0)
+    for(let v of m.values())s.push(narr(v,1));return narr(s)
   },0,0,[99,1])),
   "?:":mod(pon.bind(0,0,a=>{
     for(let i=a.r[0]-1;i;i--){let j=Math.random()*(i+1)|0;[a.d[i],a.d[j]]=[a.d[j],a.d[i]]}return a
@@ -248,18 +250,18 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     ,(l,r)=>l==null||r==null?err(0):!a.uf||!b.uf?err(0):a.call(b.call(l,r)))),
   '&:':op(0,(f,g)=>mod(a=>a==null?err(0):f.call(a.cl(),g.call(a)),(a,b)=>a==null||b==null?err(0):f.call(a,g.call(b)))),
   '&.':op(0,(f,g)=>mod(a=>a==null?err(0):g.call(f.call(a.cl()),a),(a,b)=>a==null||b==null?err(0):g.call(f.call(a),b))),
-  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>f.call(n)),l.rank(l.ds-1).r,l.b,l.str),(l,r)=>{
-    if(l==null||r==null)err(0);let j;if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;
-    if(j!=null)return narr(j?r.rank(r.ds-1).d.map(n=>f.call(l.cl(),n)):l.rank(l.ds-1).d.map(n=>f.call(n,r.cl())))
-    if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>(v=>sb(v)?v.d[0]:v)(f.call(n,S.d[i]))))}err(1)
+  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>(l=>sb(l)?l.d[0]:l)(f.call(n))),l.rank(l.ds-1).r,l.b,l.str),(l,r)=>{
+    if(l==null||r==null)err(0);let j,b=l=>sb(l)?l.d[0]:l;if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;
+    if(j!=null)return narr(j?r.rank(r.ds-1).d.map(n=>b(f.call(l.cl(),n))):l.rank(l.ds-1).d.map(n=>b(f.call(n,r.cl()))))
+    if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>b(f.call(n,S.d[i]))))}err(1)
   })),
   '".':op(0,(f,c)=>mod(x=>{
     if(c.uf){let p;do{p=x.cl();x=f.call(x)}while(!c.call(p,x.cl()))}else for(let i=0;i<+c.call();i++)x=f.call(x);return x
   },(x,y)=>{if(c.uf)err(2);for(let i=0;i<+c;i++)y=f.call(x.cl(),y);return y})),
   '":':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.d.map(n=>f.call(n)),l.r,l.b,l.str),(l,r)=>{
-    if(l==null||r==null)err(0);let j
-    if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;if(j!=null)return new A(j?r.d.map(n=>f.call(l.cl(),n)):l.d.map(n=>f.call(n,r.cl())),j?r.r:l.r,l.b|r.b,l.str|r.str)
-    if(JSON.stringify(l.r)==JSON.stringify(r.r))return new A(l.d.map((n,i)=>(v=>sb(v)?v.d[0]:v)(f.call(n,r.d[i]))),r.r,l.b|r.b,l.str|r.str);err(1)
+    if(l==null||r==null)err(0);let j,b=l=>sb(l)?l.d[0]:l
+    if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;if(j!=null)return new A(j?r.d.map(n=>b(f.call(l.cl(),n))):l.d.map(n=>b(f.call(n,r.cl()))),j?r.r:l.r,l.b|r.b,l.str|r.str)
+    if(JSON.stringify(l.r)==JSON.stringify(r.r))return new A(l.d.map((n,i)=>b(f.call(n,r.d[i]))),r.r,l.b|r.b,l.str|r.str);err(1)
   })),
   "`":op(1,f=>mod(l=>f.call(l.cl(),l),(l,r)=>f.call(r,l))),
   "/":op(1,f=>mod(x=>x.ds?new A(x.rank(1).d.map(n=>n.d.slice(1).reduce((a,v)=>f.call(a,v),n.d[0])),x.ds==1?1:x.r.slice(1),x.b):x,pon.bind(0,1,(l,r)=>{
@@ -291,8 +293,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },err.bind(0,2))),
   "$:":op(1,f=>mod(a=>{let c=[f.call(a.cl())],n;while(!eq(c[0],n=f.call(c[c.length-1].cl()))&&!eq(c[c.length-1],n))c.push(n);return narr(c)}
     ,(a,b)=>{for(let i=0;i<+a;i++)b=f.call(b);return b})),
-  "$.":op(1,f=>mod(a=>{let c=0;return new A(a.rank(a.ds-1).d.filter(v=>f.call(v)&&++c).flatMap(n=>n.d??n),[...a.r.slice(0,a.ds-1),c],a.b,a.str)}
-    ,(a,b)=>{let c=0;return new A(b.rank(b.ds-1).d.filter(v=>f.call(a,v)&&++c).flatMap(n=>n.d??n),[...b.r.slice(0,b.ds-1),c],b.b,b.str)}))
+  "$.":op(1,f=>mod(a=>{let c=0;return new A((v=>a.ds>1?v.flatMap(n=>n.d??n):v)(a.rank(a.ds-1).d.filter(v=>f.call(v.cl())&&++c)),[...a.r.slice(0,a.ds-1),c],a.b,a.str)}
+    ,(a,b)=>{let c=0;return new A((v=>b.ds>1?v.flatMap(n=>n.d??n):v)(b.rank(b.ds-1).d.filter(v=>f.call(a,v)&&++c)),[...b.r.slice(0,b.ds-1),c],b.b,b.str)}))
 }
 ,chnk=(a,s,str=0,b=0)=>{
   let n=[];for(let x,i=0;i<a.length;i+=s){
