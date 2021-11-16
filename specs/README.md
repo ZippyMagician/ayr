@@ -156,7 +156,9 @@ Partial trains, of course, support constants within them too.
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
+| ````.``` |    Format  |   0  |     Format   |  0 99 |       |
 | ```B:``` | Encode Binary+| 0 |    Encode+   |  1 0  |       |
+| ```I.``` |   0-range  |   0  |Wrapping Index| 99 99 |       |
 | ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 | ```i:``` |  Identity  |   0  |   Index Of   | 99 99 |By items|
 | ```v.``` |  Nth Prime |   0  |      Or      |  0 0  |       |

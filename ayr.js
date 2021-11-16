@@ -100,10 +100,10 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }return narr(d.map(a=>f.call(narr(a,1))))
 }
 ,mapd=(a,f,d)=>a instanceof A?d>0?new A(a.d.map(n=>mapd(n,f,d-1)),a.r,a.b,a.str):f(a):f(a)
-,get=(a,b)=>{
-  let m=carr(b).rank(b.ds-1),i;if(carr(a).d.map((n,i)=>n<0||n>=b.r[i]).reduce((a,b)=>a||b,0))return pr(b)
-  if(a.ds==0||sb(a))return m.d[(i=sb(a)?a.d[0]:a)>=m.d.length?err(2):i]
-  else{a.d=a.d.reverse();let r=m.d[a.d[0]>=m.d.length?err(2):a.d[0]];for(n of a.d.slice(1))r=r.d[n>=r.d.length?err(2):n];return r}
+,get=(a,b,w)=>{
+  let m=carr(b).rank(b.ds-1),i;if(!w&&carr(a).d.map((n,i)=>n<0||n>=b.r[i]).reduce((a,b)=>a||b,0))return pr(b)
+  if(a.ds==0||sb(a))return m.d[(sb(a)?a.d[0]:a)%m.d.length]
+  else{a.d=a.d.reverse();let r=m.d[a.d[0]%m.d.length];for(n of a.d.slice(1))r=r.d[n%r.d.length];return r}
 }
 ,det=m=>m.d.length==1?m.d[0].d[0]:m.d[0].d.length==2&&m.d.length==2?m.d[0].d[0]*m.d[1].d[1]-m.d[0].d[1]*m.d[1].d[0]:m.d[0].d.reduce((r,e,i)=>
   r+(-1)**(i+2)*e*det(narr(m.d.slice(1).map(c=>narr(c.d.filter((_,j)=>i!=j))))),0
@@ -113,7 +113,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(i<a.d.length)n=[...n,...a.d.slice(i).map(n=>narr([n],0,0,a.str))];else if(i<b.d.length)n=[...n,...b.d.slice(i).map(n=>narr([n],0,0,b.str))]
   return new A(n,i<a.d.length?a.r.cl():b.r.cl())
 }
-,geti=(a,b)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b)),fix(a),a):get(a,b)
+,geti=(a,b,w)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b,w)),fix(a),a):get(a,b,w)
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -152,6 +152,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
   },0,1,99)),
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),1,1,0),pon.bind(0,1,(a,b)=>geti(b,a),0,1,99)),
+  "I.":mod(pon.bind(0,0,(a,p)=>(cid=n=>n.map(n=>argv&&argv['0']?n+1:n-1),p)?uc(a)?narr(cid(rn(65,+a+1)),0,0,1):narr(cid(rn(97,+a+1)),0,0,1):narr(cid(rn(1,+a+1))),1,1,0)
+    ,pon.bind(0,1,(a,b)=>geti(b,a,1),0,1,99)),
   ",":mod(pon.bind(0,0,a=>ravel(a,0),1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.cl().concat(b.d.cl()),1,0,p),0,1,1)),
   ";":mod(pon.bind(0,0,(a,p)=>{
     if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
@@ -243,7 +245,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,0,[99,1])),
   "?:":mod(pon.bind(0,0,a=>{
     for(let i=a.r[0]-1;i;i--){let j=Math.random()*(i+1)|0;[a.d[i],a.d[j]]=[a.d[j],a.d[i]]}return a
-  },1,1,1),pon.bind(0,1,(a,b)=>ayr("[#(:,^./^./&,&~:\\)").call(a,b),0,1,99))
+  },1,1,1),pon.bind(0,1,(a,b)=>ayr("[#(:,^./^./&,&~:\\)").call(a,b),0,1,99)),
+  "`.":mod(pon.bind(0,0,a=>narr(a.toString().split("").map(a=>a.charCodeAt(0)),0,0,1),1,1,0),pon.bind(0,1,(a,b)=>{
+    b=b.toString();let[fl,fr]=[Math.ceil((+a-b.length)/2),Math.ceil((+a-b.length)/2)-(b.length%2?!(a%2):a%2)]
+    return narr((" ".repeat(fl<0?0:fl)+b+" ".repeat(fr<0?0:fr)).split("").map(a=>a.charCodeAt(0)),0,0,1)
+  },0,1,0))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
@@ -371,8 +377,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }else{//normal
     if(t[t.length-1].uf)return ptrain(t,1);tn.push(t[t.length-1]);for(let i=t.length-2;i>=0;i--){
       if(t[i-1]!=null&&!t[i-1].uf){
-        let x=tn.pop();i--;tn.push(mod(A=>t[i+1].call(t[i].call(),x.call()),(A,B)=>t[i+1].call(t[i].call(),x.call())))
-      }else{let x=tn.pop();tn.push(mod(A=>t[i].call(x.call()),(A,B)=>t[i].call(x.call())))}
+        let x=tn.pop();i--;tn.push(mod(_=>t[i+1].call(t[i].call(),x.call()),_=>t[i+1].call(t[i].call(),x.call())))
+      }else{let x=tn.pop();tn.push(mod(_=>t[i].call(x.call()),_=>t[i].call(x.call())))}
     }let x=tn.pop();x.uf=0;return x
   }
 }
