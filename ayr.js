@@ -157,7 +157,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,1,99)),
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),1,1,0),pon.bind(0,1,(a,b)=>geti(b,a),0,1,99)),
   "I.":mod(pon.bind(0,0,(a,p)=>(cid=n=>n.map(n=>argv&&argv['0']?n+1:n-1),p)?uc(a)?narr(cid(rn(65,+a+1)),0,0,1):narr(cid(rn(97,+a+1)),0,0,1):narr(cid(rn(1,+a+1))),1,1,0)
-    ,pon.bind(0,1,(a,b)=>geti(b,a,1),0,1,99)),
+    ,pon.bind(0,1,(a,b,p)=>(f=>f instanceof A?(f.str=p,f):p?narr([f],0,0,1):f)(geti(b,a,1)),0,1,99)),
   ",":mod(pon.bind(0,0,a=>ravel(a,0),1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.cl().concat(b.d.cl()),1,0,p),0,1,1)),
   ";":mod(pon.bind(0,0,(a,p)=>{
     if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
@@ -337,6 +337,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     else if(m=RegExp(`^(${Object.keys(syms).concat(Object.keys(bdrs)).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:bdrs[m[1]]!=null?3:2,v:m[1]})
     else if(m=/^:/.exec(s))t.push({t:6})
     else if(m=/^(\s)/.exec(s))t.push({t:9,v:m[1]})
+    else if(m=RegExp(`^(${Object.keys(env).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:7,v:m[1]})
     else if(m=/^([a-zA-Z]+)/.exec(s))t.push({t:7,v:m[1]})
     else if(m=/^\(|^\)/.exec(s))t.push({t:2,v:m[0]})
     else err(3)
@@ -431,9 +432,9 @@ const exec=(t,G=0)=>{
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
   jn:mod(A=>ayr("([,' ',])/").call(A),(A,B)=>B.str?B:ayr(`#&[}[:,,\\:`).call(A,B)),
   sp:mod(A=>ayr("];:' '~:").call(A),(A,B)=>ayr("];:[~:]").call(A,B)),
-  kV:narr('AEIOU'.split("").map(n=>n.charCodeAt(0))),
-  kA:narr('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split("").map(n=>n.charCodeAt(0))),
-  kC:narr('BCDFGHJKLMNPQRSTVWXYZ'.split("").map(n=>n.charCodeAt(0)))
+  'V.':narr('AEIOU'.split("").map(n=>n.charCodeAt(0)),0,0,1),
+  'A.':narr('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split("").map(n=>n.charCodeAt(0)),0,0,1),
+  'C.':narr('BCDFGHJKLMNPQRSTVWXYZ'.split("").map(n=>n.charCodeAt(0)),0,0,1)
 }
 if(module&&module.exports){
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
