@@ -423,8 +423,7 @@ const exec=(t,G=0)=>{
 }
 ,ayr=(d,g=1)=>exec(strand(grp(lex(d))),g)
 ,run=d=>{
-  if(module!=null&&argv.debug)
-  (console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),ayr(d,0))
+  if(module!=null&&argv.debug)(console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),ayr(d,0))
   else if(module!=null){try{ayr(d,0)}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}
   else{try{return ayr(d)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
 }
