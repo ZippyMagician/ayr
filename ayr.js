@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+
+const { O_DIRECT } = require('constants');
+
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
 if(this.d.length==1&&this.d[0]&&this.d[0].b&&!this.b)this.d[0].b=0;this.uf=0}
@@ -210,8 +213,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     let n=[];for(i=0;i<a.d.length;i++){
       if(i==0&&a.d[i]!=0)n.push(b.d[i].cl())
       else if(a.d[i]!=0){if(typeof n[n.length-1]!='object')n[n.length-1]=[n[n.length-1]];n[n.length-1].push(b.d[i].cl())}
-      else n.push([b.d[i].cl()])
-    }if(n.length==1)return narr(n[0]);return narr(n.map(n=>narr(n,1)),0,1,p)
+      else n.push([])
+    }if(n.length==1)return narr(n[0]);return narr(n.map(n=>narr(n,1,0,p)),0,1)
   },0,1,[99,1])),
   "=.":mod(pon.bind(0,0,a=>a.d.length?+a.d.map(n=>eq(a.d[0],n)).reduce((a,b)=>a&&b,1):1,0,0,99),pon.bind(0,1,(a,b)=>a^b,1,0,0)),
   "i.":mod(pon.bind(0,0,a=>{
@@ -317,6 +320,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,nnw=(t,i)=>{
   let o=1;while(t[i+o]&&t[i+o].t==9)o++;return t[i+o]?[i+o,t[i+o]]:[i+o,{t:10}]
 }
+,mvr=n=>n.vr?n.call():n
 ,ste=n=>n.v=='[:'?bdrs['&']:n.v==']:'?bdrs['&:']:n.v=='`:'?bdrs['`']:err(3)
 ,inst=o=>o.t<2||o.t==4||o.t==7&&(env[o.v]==null?0:!env[o.v].uf)||o.t==8&&!o.v.uf
 ,lex=s=>{
@@ -357,28 +361,30 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(t.length==1)return t[0];if(!t[t.length-1].uf)G=0;let tn=[]
   if(t[0].t==6){
     tn=t.cl();let i=tn.length-2
-    if(i>0&&!tn[i].uf){let x=tn.cl();i--;tn.push(mod(A=>x[x.length-1].call(x[x.length-2],A),(A,B)=>err(0)))}
-    else{let x=tn.cl();tn.push(mod(A=>x[x.length-1].call(A),(A,B)=>x[x.length-1].call(A,B)))}
+    if(i>0&&!tn[i].uf){let x=tn.cl();i--;tn.push(mod(A=>mvr(x[x.length-1]).call(x[x.length-2],A),(A,B)=>err(0)))}
+    else{let x=tn.cl();tn.push(mod(A=>mvr(x[x.length-1]).call(A),(A,B)=>mvr(x[x.length-1]).call(A,B)))}
     for(;i>0;i--){
-      if(!tn[i-1].uf&&i>1){let x=tn.cl();i--;let I=i.cl();tn.push(mod(A=>x[I+1].call(x[I],x[x.length-1].call(A)),(A,B)=>x[I+1].call(x[I],x[x.length-1].call(A,B))))}
-      else{let x=tn.cl();let I=i.cl();tn.push(mod(A=>x[I].call(x[x.length-1].call(A)),(A,B)=>x[I].call(x[x.length-1].call(A,B))))}
+      if(!tn[i-1].uf&&i>1){
+        let x=tn.cl();i--;let I=i.cl();tn.push(mod(A=>mvr(x[I+1]).call(x[I],mvr(x[x.length-1]).call(A)),(A,B)=>mvr(x[I+1]).call(x[I],mvr(x[x.length-1]).call(A,B))))
+      }else{let x=tn.cl();let I=i.cl();tn.push(mod(A=>mvr(x[I]).call(mvr(x[x.length-1]).call(A)),(A,B)=>mvr(x[I]).call(mvr(x[x.length-1]).call(A,B))))}
     }return tn[tn.length-1]
   }if(G){//train
     tn=t.cl();for(let i=tn.length-1;i>=0;){
       if(i>=2&&t[i-1].uf){i-=2;let x=tn.cl();tn.splice(i,0,mod(
-        A=>x[i].t==5?ste(x[i]).call(x[i+1],x[i+2]).call(A):x[i+1].call(x[i].call(A.cl()),x[i+2].call(A))
-       ,(A,B)=>x[i].t==5?ste(x[i]).call(x[i+1],x[i+2]).call(A,B):x[i+1].call(x[i].call(A.cl(),B.cl()),x[i+2].call(A,B)),
+        A=>x[i].t==5?ste(x[i]).call(mvr(x[i+1]),mvr(x[i+2])).call(A):mvr(x[i+1]).call(mvr(x[i]).call(A.cl()),mvr(x[i+2]).call(A))
+       ,(A,B)=>x[i].t==5?ste(x[i]).call(mvr(x[i+1]),mvr(x[i+2])).call(A,B):mvr(x[i+1]).call(mvr(x[i]).call(A.cl(),B.cl()),mvr(x[i+2]).call(A,B)),
       ))}else if(i>=1&&!t[i-1].uf){
-        i-=1;let x=tn.cl();tn.splice(i,0,mod(A=>x[i].t==5?ste(x[i]).call(x[i+1]).call(A):x[i+1].call(x[i],A),(A,B)=>x[i].t==5?ste(x[i]).call(x[i+1]).call(A,B):err(0)))
+        i-=1;let x=tn.cl()
+        tn.splice(i,0,mod(A=>x[i].t==5?ste(x[i]).call(mvr(x[i+1])).call(A):mvr(x[i+1]).call(x[i],A),(A,B)=>x[i].t==5?ste(x[i]).call(mvr(x[i+1])).call(A,B):err(0)))
       }else if(i>=1){
-        i-=1;let x=tn.cl();tn.splice(i,0,mod(A=>x[i].call(x[i+1].call(A)),(A,B)=>x[i].call(A,x[i+1].call(B))))
+        i-=1;let x=tn.cl();tn.splice(i,0,mod(A=>mvr(x[i]).call(mvr(x[i+1]).call(A)),(A,B)=>mvr(x[i]).call(A,mvr(x[i+1]).call(B))))
       }else i--
     }return tn[0]
   }else{//normal
     if(t[t.length-1].uf)return ptrain(t,1);tn.push(t[t.length-1]);for(let i=t.length-2;i>=0;i--){
       if(t[i-1]!=null&&!t[i-1].uf){
-        let x=tn.pop();i--;tn.push(mod(_=>t[i+1].call(t[i].call(),x.call()),_=>t[i+1].call(t[i].call(),x.call())))
-      }else{let x=tn.pop();tn.push(mod(_=>t[i].call(x.call()),_=>t[i].call(x.call())))}
+        let x=tn.pop();i--;tn.push(mod(_=>mvr(t[i+1]).call(mvr(t[i]).call(),x.call()),_=>mvr(t[i+1]).call(t[i].call(),x.call())))
+      }else{let x=tn.pop();tn.push(mod(_=>mvr(t[i]).call(x.call()),_=>mvr(t[i]).call(x.call())))}
     }let x=tn.pop();x.uf=0;return x
   }
 }
@@ -389,7 +395,7 @@ const exec=(t,G=0)=>{
     }if(o.t==7){
       if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
       else if(!fq.length&&env[o.v]==null)err(3)
-      else fq.push(fq.length?(f=>(f.uf=0,f))(_=>env[o.v]??err(3)):env[o.v])
+      else fq.push(fq.length?(f=>(f.uf=0,f.vr=1,f))(_=>env[o.v]??err(3)):env[o.v])
     }else if(o.t==2||o.t==8&&o.v.uf){
       let[ni,b]=nnw(t,i);if(inst(b)||ni!=i&&b.t==8){
         i=ni;if(b.t==8){if(b.v.uf||b.t==7&&env[b.v]!=null&&env[b.v].uf)fq.push((o.t==8?o.v:syms[o.v]),b.t==7?env[b.v]:b.v);else fq.push(o.t==8?o.v:syms[o.v],b.v)}
@@ -419,7 +425,9 @@ const exec=(t,G=0)=>{
   else{try{return ayr(d)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
 }
 ,env={
-  put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim()))
+  put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
+  jn:mod(A=>ayr("([,' ',])/").call(A),(A,B)=>B.str?B:ayr(`#&[}[:,,\\:`).call(A,B)),
+  sp:mod(A=>ayr("];:' '~:").call(A),(A,B)=>ayr("];:[~:]").call(A,B))
 }
 if(module&&module.exports){
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
