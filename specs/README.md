@@ -192,8 +192,12 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 ## Library Builtins
     put A   ->    print A
     A put B ->    print B A times
-    I       ->    the input
     jn A    ->    join vector of strings A on spaces
     A jn B  ->    join vector of strings B with separator A
     sp A    ->    split vector A on spaces
     A sp B  ->    split vector B on character A
+
+    I       ->    the input
+    V       ->    all vowels, capitalized
+    A       ->    all letters, capitalized
+    C       ->    all consonants, capitalized
