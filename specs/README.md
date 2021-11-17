@@ -13,7 +13,7 @@ What follows is an in-depth look at the specs of the `ayr` array language, so an
 * [Library builtins](#library-builtins)
 
 ## Array Model
-`ayr` uses the based array model, similar to [BQN](https://github.com/mlochbaum/BQN/blob/master/doc/based.md). Values can be scalars, vectors, or matrices. These correspond to rank 0, 1, and 2 data respectively. 
+`ayr` uses the based array model, similar to [BQN](https://github.com/mlochbaum/BQN/blob/master/doc/based.md). Values can be scalars, vectors, matrices, etc. These correspond to rank 0, 1, and 2 data respectively. 
 <br>*Note: higher rank data will be supported in the future*
 
 ### Examples
@@ -24,7 +24,7 @@ What follows is an in-depth look at the specs of the `ayr` array language, so an
 1
     1 2 3 ; _4 5 11
  1  2  3
--4  5 11
+_4  5 11
 ```
 
 ## Basic syntax
@@ -46,7 +46,7 @@ Numbers are the basis of an array language. `ayr` supports an array of numeric l
     e2
 100
     _3.76
--3.76
+_3.76
 ```
 `ayr` also supports rational literals, such as `5r4` (`5/4`) and `r3` (`1/3`)
 
@@ -57,7 +57,7 @@ Numbers are the basis of an array language. `ayr` supports an array of numeric l
     'hello'
 hello
     _4 'hello' ; 1 2
-[ -4 ] [ hello ] 
+[ _4 ] [ hello ] 
  [ 1 ]     [ 2 ]
 ```
 *The way output is stylized is implementation dependant*
@@ -71,7 +71,7 @@ A symbol refers to a built in ascii symbol that denotes a monadic/dyadic operati
     > 1 2 3
 1
     1 2 3 -&+ 4 5 6
--5 -7 -9
+_5 _7 _9
 ```
 
 ## User Functions
@@ -130,8 +130,8 @@ Partial trains, of course, support constants within them too.
 |  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |       |
 | ```<.``` | Sort Ascending | 1 |     Nor     |  0 0  |       |
 | ```>.``` | Sort Descending | 1 |    Nand    |  0 0  |       |
-| ```<:``` |  Grade Up  |   0  |    Less/Eq   |  0 0  |       |
-| ```>:``` | Grade Down |   0  |  Greater/Eq  |  0 0  |       |
+| ```<:``` |  Grade Up  |   1  |    Less/Eq   |  0 0  |       |
+| ```>:``` | Grade Down |   1  |  Greater/Eq  |  0 0  |       |
 |  ```^``` |     Exp    |   0  |      Pow     |  0 0  |       |
 | ```^.``` | Up Reverse |  99  |      And     |  0 0  |       |
 | ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
@@ -156,7 +156,7 @@ Partial trains, of course, support constants within them too.
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
-| ````.``` |    Format  |   0  |     Format   |  0 99 |       |
+| ``` `.```|    Format  |   0  |     Format   |  0 99 |       |
 | ```B:``` | Encode Binary+| 0 |    Encode+   |  1 0  |       |
 | ```I.``` |   0-range  |   0  |Wrapping Index| 99 99 |       |
 | ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
