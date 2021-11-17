@@ -201,9 +201,11 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       for(let k=0;k<(a.d[i+1]||1);k++)for(let j=0;j<Math.min(b.r[i],a.d[i]);j++)c.d[j+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0;return c
   },0,1,99)),
   "}":mod(pon.bind(0,0,a=>a-1,1,1,0),pon.bind(0,1,(a,b)=>{
-    if(a.d.length>b.ds)err(2);let c=new A([0],1,0,b.str);c=ext(c,a.d.map((n,i)=>b.r[i]-n),b.str)
-    for(let i=0;i<b.ds&&i<a.d.length;i++)
-      for(let k=a.d[i+1]||0;k>=0;k--)for(let j=a.d[i];j<b.r[i];j++)c.d[j-a.d[i]+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0;return c
+    if(a.d.length>b.ds)err(2);let c=new A([0],1,0,b.str),d=[]
+    for(let i=0;i<a.d.length;i++)if(a.d[i]<0){a.d[i]=-a.d[i];b.d=b.rank(i+1).d.flatMap(n=>n.d.reverse());d[i]=1}
+    c=ext(c,a.d.map((n,i)=>b.r[i]-n),b.str);for(let i=0;i<b.ds&&i<a.d.length;i++)
+      for(let k=a.d[i+1]||0;k>=0;k--)for(let j=a.d[i];j<b.r[i];j++)c.d[j-a.d[i]+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0
+    for(let i=0;i<a.d.length;i++)if(d[i])c.d=c.rank(i+1).d.flatMap(n=>n.d.reverse());return c
   },0,1,99)),
   "|":mod(pon.bind(0,0,a=>+!a,1,0,0),pon.bind(0,1,(a,b)=>b % a,0,0,0)),
   "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a-32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1,0)),
