@@ -1,6 +1,6 @@
 {
   "name": "ayr-lang",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A toy array language",
   "main": "ayr.js",
   "scripts": {
