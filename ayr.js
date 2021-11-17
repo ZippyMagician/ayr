@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-const { O_DIRECT } = require('constants');
-const { toNamespacedPath } = require('path');
-
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
 if(this.d.length==1&&this.d[0]&&this.d[0].b&&!this.b)this.d[0].b=0;this.uf=0}
@@ -61,14 +57,14 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,op=(m,f)=>{let x=new MoD(m?f:null,m?null:f);x.m=m;return x}
 ,carr=(v,b=0)=>v instanceof A?b?(v.b=1,v):v:new A([v],1,b)
 ,narr=(a,b=0,ba=0,s=0)=>new A(ba?a.map(n=>n instanceof A?(n.b=1,n):new A([n],1,1)):a,a.length,b,s)
-,pon=(d,f,S,p,r,a,b)=>{
+,pon=(d,f,S,p,r,a,b,e=0)=>{
   let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}
   if(!d){
-    let x=a.ds==0;a=carr(a);if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0].cl():a.cl(),p?x?p:a.str:0))
-    let na=a.rank(r[1])
+    let x=a.ds==0&&e;a=carr(a)
+    if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0].cl():a.cl(),p?x?p:a.str:0));let na=a.rank(r[1])
     return r[1]>0&&r[1]<a.ds&&S?
-      new A(na.d.flatMap(n=>n instanceof A?ravel(pon(d,f,S,p&&a.str,r,n)).d:pon(d,f,S,p&&a.str,r,n)),a.r,a.b,p?a.str:0)
-     :new A(na.d.map(n=>pon(d,f,S,p&&a.str,r,n)),l&&na.ds>1?na.r.slice(1):na.r,a.b,p?a.str:0)
+      new A(na.d.flatMap(n=>n instanceof A?ravel(pon(d,f,S,p&&a.str,r,n,0,1)).d:pon(d,f,S,p&&a.str,r,n,0,1)),a.r,a.b,p?a.str:0)
+     :new A(na.d.map(n=>pon(d,f,S,p&&a.str,r,n,0,1)),l&&na.ds>1?na.r.slice(1):na.r,a.b,p?a.str:0)
   }else{
     a=carr(a),b=carr(b);if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1)
     else{
