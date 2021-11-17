@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const { O_DIRECT } = require('constants');
+const { toNamespacedPath } = require('path');
 
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
@@ -49,7 +50,7 @@ Number.prototype.ds=0
 Number.prototype.uf=0
 Array.prototype.ds=1
 Array.prototype.uf=0
-Array.prototype.cl=function(){return[...this.map(n=>n.cl())]}
+Array.prototype.cl=function(){return[...this.map(n=>typeof n=='function'?n:n.cl())]}
 Array.prototype.rot=function(n){this.unshift.apply(this,this.splice(n,this.length));return this}
 Object.prototype.cl=function(){return{...this}}
 A.prototype.bind=function(...v){return this.cl()}
@@ -360,7 +361,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }else tn.push(t[i]);return tn.filter(n=>n!=null);//sometimes happens
 }
 ,ptrain=(t,G=0)=>{
-  if(t.length==1)return t[0];if(!t[t.length-1].uf)G=0;let tn=[]
+  if(t.length==1)return t[0];if(!t[t.length-1].uf&&!t[t.length-1].vr||t[t.length-1].vr&&!t[t.length-1].call().uf)G=0;let tn=[]
   if(t[0].t==6){
     tn=t.cl();let i=tn.length-2
     if(i>0&&!tn[i].uf){let x=tn.cl();i--;tn.push(mod(A=>mvr(x[x.length-1]).call(x[x.length-2],A),(A,B)=>err(0)))}
@@ -372,10 +373,10 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     }return tn[tn.length-1]
   }if(G){//train
     tn=t.cl();for(let i=tn.length-1;i>=0;){
-      if(i>=2&&t[i-1].uf){i-=2;let x=tn.cl();tn.splice(i,0,mod(
+      if(i>=2&&(t[i-1].uf||t[i-1].vr&&t[i-1].call().uf)){i-=2;let x=tn.cl();tn.splice(i,0,mod(
         A=>x[i].t==5?ste(x[i]).call(mvr(x[i+1]),mvr(x[i+2])).call(A):mvr(x[i+1]).call(mvr(x[i]).call(A.cl()),mvr(x[i+2]).call(A))
        ,(A,B)=>x[i].t==5?ste(x[i]).call(mvr(x[i+1]),mvr(x[i+2])).call(A,B):mvr(x[i+1]).call(mvr(x[i]).call(A.cl(),B.cl()),mvr(x[i+2]).call(A,B)),
-      ))}else if(i>=1&&!t[i-1].uf){
+      ))}else if(i>=1&&!t[i-1].uf&&!t[i-1].vr){
         i-=1;let x=tn.cl()
         tn.splice(i,0,mod(A=>x[i].t==5?ste(x[i]).call(mvr(x[i+1])).call(A):mvr(x[i+1]).call(x[i],A),(A,B)=>x[i].t==5?ste(x[i]).call(mvr(x[i+1])).call(A,B):err(0)))
       }else if(i>=1){
@@ -383,7 +384,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       }else i--
     }return tn[0]
   }else{//normal
-    if(t[t.length-1].uf)return ptrain(t,1);tn.push(t[t.length-1]);for(let i=t.length-2;i>=0;i--){
+    if(t[t.length-1].uf||t[t.length-1].vr&&t[t.length-1].call().uf)return ptrain(t,1);tn.push(t[t.length-1]);for(let i=t.length-2;i>=0;i--){
       if(t[i-1]!=null&&!t[i-1].uf){
         let x=tn.pop();i--;tn.push(mod(_=>mvr(t[i+1]).call(mvr(t[i]).call(),x.call()),_=>mvr(t[i+1]).call(t[i].call(),x.call())))
       }else{let x=tn.pop();tn.push(mod(_=>mvr(t[i]).call(x.call()),_=>mvr(t[i]).call(x.call())))}
