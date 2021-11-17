@@ -198,6 +198,6 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
     A sp B  ->    split vector B on character A
 
     I       ->    the input
-    V       ->    all vowels, capitalized
-    A       ->    all letters, capitalized
-    C       ->    all consonants, capitalized
+    kV       ->    all vowels, capitalized
+    kA       ->    all letters, capitalized
+    kC       ->    all consonants, capitalized
