@@ -428,9 +428,9 @@ const exec=(t,G=0)=>{
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
   jn:mod(A=>ayr("([,' ',])/").call(A),(A,B)=>B.str?B:ayr(`#&[}[:,,\\:`).call(A,B)),
   sp:mod(A=>ayr("];:' '~:").call(A),(A,B)=>ayr("];:[~:]").call(A,B)),
-  V:narr('AEIOU'.split("").map(n=>n.charCodeAt(0))),
-  A:narr('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split("").map(n=>n.charCodeAt(0))),
-  C:narr('BCDFGHJKLMNPQRSTVWXYZ'.split("").map(n=>n.charCodeAt(0)))
+  kV:narr('AEIOU'.split("").map(n=>n.charCodeAt(0))),
+  kA:narr('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split("").map(n=>n.charCodeAt(0))),
+  kC:narr('BCDFGHJKLMNPQRSTVWXYZ'.split("").map(n=>n.charCodeAt(0)))
 }
 if(module&&module.exports){
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
