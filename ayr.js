@@ -63,7 +63,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,pon=(d,f,S,p,r,a,b)=>{
   let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}
   if(!d){
-    a=carr(a);if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0].cl():a.cl(),p?a.str:0))
+    let x=a.ds==0;a=carr(a);if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0].cl():a.cl(),p?x?p:a.str:0))
     let na=a.rank(r[1])
     return r[1]>0&&r[1]<a.ds&&S?
       new A(na.d.flatMap(n=>n instanceof A?ravel(pon(d,f,S,p&&a.str,r,n)).d:pon(d,f,S,p&&a.str,r,n)),a.r,a.b,p?a.str:0)
@@ -206,8 +206,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       for(let k=a.d[i+1]||0;k>=0;k--)for(let j=a.d[i];j<b.r[i];j++)c.d[j-a.d[i]+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0;return c
   },0,1,99)),
   "|":mod(pon.bind(0,0,a=>+!a,1,0,0),pon.bind(0,1,(a,b)=>b % a,0,0,0)),
-  "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a+32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1,0)),
-  "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a-32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1,0)),
+  "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a-32:a:Math.ceil(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1,0)),
+  "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a+32:a:Math.floor(+a),1,1,0),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1,0)),
   "!":mod(pon.bind(0,0,ft,1,0,0),pon.bind(0,1,(a,b)=>a<b?0:ft(a)/(ft(b)*ft(a-b)),1,0,0)),
   ";:":mod(pon.bind(0,0,a=>new A(carr(a).rank(a.ds?a.ds-1:0).d,a.r.slice(a.ds-1),a.b,a.str),0,1,99),pon.bind(0,1,(b,a,p)=>{
     let n=[];for(i=0;i<a.d.length;i++){
