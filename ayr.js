@@ -156,21 +156,21 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     ,pon.bind(0,1,(a,b,p)=>(f=>f instanceof A?(f.str=p,f):p?narr([f],0,0,1):f)(geti(b,a,1)),0,1,99)),
   ",":mod(pon.bind(0,0,a=>ravel(a,0),1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.cl().concat(b.d.cl()),1,0,p),0,1,1)),
   ";":mod(pon.bind(0,0,(a,p)=>{
-    if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
-    let m=Math.max(...a.d.map(n=>n.ds==0?err(2):n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(n,[m],p).d)),[m,...a.r],a.b,p)
+    if(a.ds==1&&a.d.reduce((a,n)=>a&&n.ds==0,1))return carr(a,0);if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
+    let m=Math.max(...a.d.map(n=>n.ds==0?1:n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(carr(n,0),[m],p).d)),[m,...a.r],a.b,p)
   },1,1,1),pon.bind(0,1,(a,b,p)=>{
     if(b.ds<=a.ds){
-      if(b.r[0]==1&&b.ds==1)b=narr(rn(0,a.r[0],b.d[0]))
+      if(b.ds==0)b=narr([b]);if(a.ds==0)a=narr([a]);if(b.r[0]==1&&b.ds==1)b=narr(rn(0,a.r[0],b.d[0]))
       if(a.r[0]>b.d.length)b=ext(b,[a.r[0]],p);else if(b.d.length>a.r[0])
         for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...rn(0,b.d.length-a.r[0],pr(a,p)));a.r[0]=b.d.length
       return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,p)
     }else{
-      if(sb(a)||a.ds==0)a=narr(rn(0,b.r[0],a.ds==0?a:a.d[0]))
+      if(b.ds==0)b=narr([b]);if(sb(a)||a.ds==0)a=narr(rn(0,b.r[0],a.ds==0?a:a.d[0]))
       if(b.r[0]>a.d.length)b=ext(a,[b.r[0]],p);else if(a.d.length>b.r[0])
         for(i=0;i<(b.r[1]||1);i++)b.d.splice(i*pd(b.r.slice(1))+b.r[0],0,...rn(0,a.d.length-b.r[0],pr(b,p)));b.r[0]=a.d.length
       return new A(a.d.concat(b.d),b.ds>1?[...b.r.slice(0,b.ds-1),b.r.pop()+1]:[b.r[0],2],b.b,p)
     }
-  },1,1,[99,99])),
+  },1,1,99)),
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0,99),pon.bind(0,1,(b,a,p)=>{
     let v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0)a=narr([...Array(c.d.length)].map(_=>a))
     if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
@@ -235,7 +235,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     for(;i<r;++i)if(!s[i]){++c;for(j=2*i*(i+3)+3,p=2*i+3;j<l;j+=p)s[j]=1}for(p=r;c<n;++p)if(!s[p])++c;return 2*p+1
   },1,0,0),pon.bind(0,1,(a,b)=>a|b,1,0,0)),
   "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1,[0,1])),
-  "B:":mod(a=>a.ds>0?ayr(':;(,`0#)"&:(-`"&:(^:/)#")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr('#:=').call(a,b):ayr('#:').call(a,b)),
+  "B:":mod(a=>a.ds>0?ayr(':;(,`0#)"&:(-`"&:(^:/)#")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr(';&#:').call(a,b):ayr('#:').call(a,b)),
   "=:":mod(pon.bind(0,0,a=>a.str?ayr(a.d.map(n=>String.fromCharCode(n)).join``):(a.d=a.d.map(n=>ayr(n.d.map(n=>String.fromCharCode(n)).join``)),a),1,0,99)
           ,pon.bind(0,1,(a,b)=>+eq(a,b),0,0,99)),
   "?":mod(pon.bind(0,0,(a,p)=>{
