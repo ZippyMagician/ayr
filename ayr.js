@@ -154,7 +154,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),1,1,0),pon.bind(0,1,(a,b)=>geti(b,a),0,1,99)),
   "I.":mod(pon.bind(0,0,(a,p)=>(cid=n=>n.map(n=>argv&&argv['0']?n+1:n-1),p)?uc(a)?narr(cid(rn(65,+a+1)),0,0,1):narr(cid(rn(97,+a+1)),0,0,1):narr(cid(rn(1,+a+1))),1,1,0)
     ,pon.bind(0,1,(a,b,p)=>(f=>f instanceof A?(f.str=p,f):p?narr([f],0,0,1):f)(geti(b,a,1)),0,1,99)),
-  ",":mod(pon.bind(0,0,a=>ravel(a,0),1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.cl().concat(b.d.cl()),1,0,p),0,1,1)),
+  ",":mod(pon.bind(0,0,a=>ravel(a,0),1,1,99),pon.bind(0,1,(a,b,p)=>narr(a.d.cl().concat(b.d.cl()),0,0,p),0,1,1)),
   ";":mod(pon.bind(0,0,(a,p)=>{
     if(a.ds==1&&a.d.reduce((a,n)=>a&&n.ds==0,1))return carr(a,0);if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
     let m=Math.max(...a.d.map(n=>n.ds==0?1:n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(carr(n,0),[m],p).d)),[m,...a.r],a.b,p)
