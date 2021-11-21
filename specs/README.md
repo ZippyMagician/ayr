@@ -141,7 +141,7 @@ Partial trains, of course, support constants within them too.
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
 | ```].``` |    Nudge   |   1  |  Couple Back | 99 99 |       |
 |  ```?``` | Dedup Sieve|  99  |     Keys     | 99 1  |       |
-| ```?:``` |   Shuffle  |   1  |    Without   | 99 99 |m:```[#(:,^./^./&,&~:\)```|
+| ```?:``` |   Shuffle  |   1  |    Without   | 99 99 |m: ```[#(:,^./^./&,&~:\)```|
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
 | ```=.``` |  All Equal |  99  |     Xor      |  0 0  |       |
 | ```=:``` |    Eval    |  99  |     Match    | 99 99 |       |
@@ -163,6 +163,7 @@ Partial trains, of course, support constants within them too.
 | ```I.``` |   0-range  |   0  |Wrapping Index| 99 99 |       |
 | ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 | ```i:``` |  Identity  |   0  |   Index Of   | 99 99 |By items|
+| ```K.``` |  Self Keys |  99  |     Keys+    |  99 1 |m: ```⌸```, d: ```#$.&?```|
 | ```v.``` |  Nth Prime |   0  |      Or      |  0 0  |       |
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 
