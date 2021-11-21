@@ -253,7 +253,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     return narr((" ".repeat(fl<0?0:fl)+b+" ".repeat(fr<0?0:fr)).split("").map(a=>a.charCodeAt(0)),0,0,1)
   },0,1,0)),
   "[.":mod(pon.bind(0,0,a=>(a.d.shift(),a.r[0]--,a),1,1,1),pon.bind(0,1,(a,b)=>narr([carr(a),carr(b)]),0,0,99)),
-  "].":mod(pon.bind(0,0,(a,p)=>(a.d=[pr(a,p),...a.d],a.r[0]++,a),1,1,1),pon.bind(0,1,(a,b)=>narr([carr(b),carr(a)]),0,0,99))
+  "].":mod(pon.bind(0,0,(a,p)=>(a.d=[pr(a,p),...a.d],a.r[0]++,a),1,1,1),pon.bind(0,1,(a,b)=>narr([carr(b),carr(a)]),0,0,99)),
+  "K.":mod(pon.bind(0,0,a=>ayr("#$.((|0=:~1)-`~&#)?]").call(a),0,0,99),pon.bind(0,1,(a,b)=>ayr("#$.&?").call(a,b),0,0,[99,1]))
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
