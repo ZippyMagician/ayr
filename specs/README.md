@@ -137,7 +137,9 @@ Partial trains, of course, support constants within them too.
 | ```^:``` |  Ceiling   |   0  |     Max      |  0 0  |Str(m): uppercase|
 |  ```$``` |    Shape   |  99  |    Reshape   | 99 99 |       |
 |  ```[``` |  Identity  |  99  |     Left     | 99 99 |       |
+| ```[.``` | Nudge Left |   1  |    Couple    | 99 99 |       |
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
+| ```].``` |    Nudge   |   1  |  Couple Back | 99 99 |       |
 |  ```?``` | Dedup Sieve|  99  |     Keys     | 99 1  |       |
 | ```?:``` |   Shuffle  |   1  |    Without   | 99 99 |m:```[#(:,^./^./&,&~:\)```|
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
