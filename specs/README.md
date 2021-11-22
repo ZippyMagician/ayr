@@ -199,8 +199,12 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
     A jn B  ->    join vector of strings B with separator A
     sp A    ->    split vector A on spaces
     A sp B  ->    split vector B on character A
+    su A    ->    >. A
+    A su B  ->    B~>:A
+    sd A    ->    <. A
+    A sd B  ->    B~<:A
 
     I       ->    the input
-    V.       ->    all vowels, capitalized
-    A.       ->    all letters, capitalized
-    C.       ->    all consonants, capitalized
+    V.      ->    all vowels, capitalized
+    A.      ->    all letters, capitalized
+    C.      ->    all consonants, capitalized
