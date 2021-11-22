@@ -331,7 +331,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       if(m[2]!=null)m[1]=m[2];let x=m[1].replace(/_/g,'-').replace(/(?<=-?)(?<!\d)(e|r)/,'1$1'),l,r;if(x=="--"||x=="-")t.push({t:0,v:x=="--"?-Infinity:Infinity})
       else if(x.indexOf("r")>-1)t.push({t:0,v:([l,r]=x.split("r"),+l/+r)})
       else if(x.lastIndexOf(".")>x.indexOf("e")&&x.indexOf("e")>-1)t.push({t:0,v:([l,r]=x.split("e"),(+l)**+r)});else t.push({t:0,v:+x})
-    }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1]}"`),new A(l.split("").map(c=>c.charCodeAt(0)),l.length,0,1))})
+    }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1].replace(/"/g,'\\"')}"`),new A(l.split("").map(c=>c.charCodeAt(0)),l.length,0,1))})
     else if(m=/^\[:|^\]:|^`:/.exec(s))t.push({t:5,v:m[0]})
     else if(m=RegExp(`^(${Object.keys(syms).concat(Object.keys(bdrs)).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:bdrs[m[1]]!=null?3:2,v:m[1]})
     else if(m=/^:/.exec(s))t.push({t:6})
@@ -353,7 +353,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,strand=t=>{
   if(t.length==1)return t;let tn=[],b=[];for(let i=0;i<=t.length;i++)
-    if(t[i]!=null&&inst(t[i]))b.push(t[i].t==7?{t:env[t[i].v].call()instanceof A?4:0,v:env[t[i].v].call()}:t[i])
+    if(t[i]!=null&&t[i].t==7&&t[i].v=='js'&&nnw(t,i)[1].v&&nnw(t,i)[1].v.str){[i,]=nnw(t,i);tn.push({t:7,v:'js'},t[i])}
+    else if(t[i]!=null&&inst(t[i]))b.push(t[i].t==7?{t:env[t[i].v].call()instanceof A?4:0,v:env[t[i].v].call()}:t[i])
     else if((t[i]==null||t[i].t==9&&t[i].v=='\n'||t[i].t==2||t[i].t==3||t[i].t==7||t[i].t==8)&&b.length==1)
       tn.push(...(t[i]!=null?[b.pop(),t[i]]:[b.pop()]));
     else if((t[i]==null||!(t[i].t==9&&t[i].v==' '))&&b.length){
