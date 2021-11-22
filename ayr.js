@@ -236,7 +236,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },1,0,0),pon.bind(0,1,(a,b)=>a|b,1,0,0)),
   "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1,[0,1])),
   "B:":mod(a=>a.ds>0?ayr(':;(,`0#)"&:(-`"&:(^:/)#")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr(';&#:').call(a,b):ayr('#:').call(a,b)),
-  "=:":mod(pon.bind(0,0,a=>a.str?ayr(a.d.map(n=>String.fromCharCode(n)).join``):(a.d=a.d.map(n=>ayr(n.d.map(n=>String.fromCharCode(n)).join``)),a),1,0,99)
+  "=:":mod(pon.bind(0,0,a=>a.str?ayr(a.toString()):(a.d=a.d.map(n=>ayr(n.toString())),a),1,0,99)
           ,pon.bind(0,1,(a,b)=>+eq(a,b),0,0,99)),
   "?":mod(pon.bind(0,0,(a,p)=>{
     let s=new Set();return narr(a.rank(a.ds-1).d.map(v=>s.has(v)?0:s.add(v)&&1),a.b,0,p)
@@ -396,7 +396,8 @@ const exec=(t,G=0)=>{
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
       if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(str(x));fq=[]}
     }if(o.t==7){
-      if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
+      if(o.v=='js'&&nnw(t,i)[1].t==1&&nnw(t,i)[1].v.str){[i,o]=nnw(t,i);fq.push(eval(str(o.v)))}
+      else if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
       else if(!fq.length&&env[o.v]==null)err(3)
       else fq.push(fq.length?(f=>(f.uf=0,f.vr=1,f))(_=>env[o.v]??err(3)):env[o.v])
     }else if(o.t==2||o.t==8&&o.v.uf){
