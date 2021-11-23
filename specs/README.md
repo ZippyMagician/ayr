@@ -180,14 +180,15 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 | ```&.```| ```u&.v```|  Before |  N/A | Before |  N/A | Binds if immediate |
 | ```&:```| ```u&:v```|   Hook  |  N/A |  Hook  |  N/A | Binds if immediate |
 | ``` ` ```| ```u` ```| Commute |  N/A |  Flip  |  N/A | ```u&`v``` is ```v&u``` |
-| ```/``` |  ```u/``` |  Reduce |  99  | N-wise Reduce | 0 1 |              |
+| ```/``` |  ```u/``` |  Reduce |   1  | N-wise Reduce | 0 1 |              |
 | ```/:```| ```u/:``` | Diagonals | 2 | Each left | 99 99 |                 |
 | ```/.```| ```u/.``` | Reduce First| 99| N/A   | N/A  |                    |
-| ```\``` |  ```u\``` |   Scan  |  99  |  Table |  1 1 |                    |
+| ```\``` |  ```u\``` |   Scan  |   1  |  Table |  1 1 |                    |
 | ```\:```| ```u\:``` | Antidiagonals | 2 | Each right | 99 99 |            |
 | ```\.```| ```u\.``` | Scan First |99 |   N/A  |  N/A |                    |
-| ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Depth if right arg is immediate |
+| ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Rank if right arg is immediate |
 | ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
+| ```@.```| ```u@.v```|    At   |  99  |    At  | 99 99| Depth if right arg is immediate |
 | ```;.```| ```u;.y```|   Cut   |  99  |   N/A  |  N/A |                    |
 | ```$:```| ```u$:``` | Fixpoint|  99  |Repeat(n)| 0 99| d: takes left arg, not operand |
 | ```$.```| ```u$.``` |  Filter |  99  | Filter | 99 99| d: pass left arg to each check |
