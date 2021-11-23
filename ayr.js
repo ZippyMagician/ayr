@@ -52,7 +52,10 @@ Array.prototype.rot=function(n){this.unshift.apply(this,this.splice(n,this.lengt
 Object.prototype.cl=function(){return{...this}}
 A.prototype.bind=function(...v){return this.cl()}
 A.prototype.call=function(...v){return this.cl()}
+let envs=[];
 const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
+,cle=_=>{envs.push(env);env=envs[envs.length-1].cl()}
+,ucle=_=>env=envs.pop()
 ,ft=a=>a<2?1:eval('for(let n=2,x=1;n<=a;n++)x*=n')
 ,us=a=>sb(a)?a.d[0]:a.ds==0?a:err(2)
 ,op=(m,f)=>{let x=new MoD(m?f:null,m?null:f);x.m=m;return x}
@@ -339,23 +342,29 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       else if(x.lastIndexOf(".")>x.indexOf("e")&&x.indexOf("e")>-1)t.push({t:0,v:([l,r]=x.split("e"),(+l)**+r)});else t.push({t:0,v:+x})
     }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1].replace(/"/g,'\\"')}"`),new A(l.split("").map(c=>c.charCodeAt(0)),l.length,0,1))})
     else if(m=/^\[:|^\]:|^`:/.exec(s))t.push({t:5,v:m[0]})
+    else if(m=/^\(|^\)|^{{|^}}/.exec(s))t.push({t:2,v:m[0]})
     else if(m=RegExp(`^(${Object.keys(syms).concat(Object.keys(bdrs)).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:bdrs[m[1]]!=null?3:2,v:m[1]})
     else if(m=/^:/.exec(s))t.push({t:6})
     else if(m=/^(\s)/.exec(s))t.push({t:9,v:m[1]})
     else if(m=RegExp(`^(${Object.keys(env).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:7,v:m[1]})
     else if(m=/^([a-zA-Z]+)/.exec(s))t.push({t:7,v:m[1]})
-    else if(m=/^\(|^\)/.exec(s))t.push({t:2,v:m[0]})
     else err(3)
     s=s.slice(m&&m[0].length||1);
   }
   return t;
 }
 ,grp=t=>{
-  let tn=[],b=[],ig=0,oc=0;for(let i=0;i<=t.length;i++){if(ig){
-    if(t[i]==null)err(5);else if(t[i].t==2&&t[i].v=='('){b.push(t[i]);oc++}else if(t[i].t==2&&t[i].v==')'){
+  let tn=[],b=[],ig=0,oc=0,ib=0,i2=(x,n)=>x!=null&&x.t==2&&x.v==n;for(let i=0;i<=t.length;i++){if(ig){
+    if(t[i]==null)err(5);else if(i2(t[i],'(')){b.push(t[i]);oc++}else if(i2(t[i],')')){
       if(oc==0){tn.push({t:8,v:exec(strand(grp(b)),1)});ig=0;b=[]}else{b.push(t[i]);oc--}
     }else b.push(t[i])
-  }else if(t[i]!=null&&t[i].t==2&&t[i].v=='(')ig=1;else if(t[i]!=null&&t[i].t==2&&t[i].v==')')err(5);else if(t[i]!=null)tn.push(t[i])}return tn
+  }else if(ib){
+    if(t[i]==null)err(5);else if(i2(t[i],'{{')){b.push(t[i]);oc++}else if(i2(t[i],'}}')){
+      if(oc==0){let B=b.cl()
+        tn.push({t:8,v:mod(a=>{cle();env.y=a;let r=exec(strand(grp(B)));ucle();return r},(a,b)=>{cle();env.x=a;env.y=b;let r=exec(strand(grp(B)));ucle();return r})})
+        ib=0;b=[]
+      }else{b.push(t[i]);oc--}}else b.push(t[i])
+  }else if(i2(t[i],'('))ig=1;else if(i2(t[i],')'))err(5);else if(i2(t[i],'{{'))ib=1;else if(i2(t[i],'}}'))err(5);else if(t[i]!=null)tn.push(t[i])}return tn
 }
 ,strand=t=>{
   if(t.length==1)return t;let tn=[],b=[];for(let i=0;i<=t.length;i++)
@@ -434,7 +443,7 @@ const exec=(t,G=0)=>{
   else if(module!=null){try{ayr(d,0)}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}
   else{try{return ayr(d)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
 }
-,env={
+let env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
   jn:mod(A=>ayr("([,' ',])/").call(A),(A,B)=>B.str?B:ayr(`#&[}[:,,\\:`).call(A,B)),
   sp:mod(A=>ayr("];:' '~:").call(A),(A,B)=>ayr("];:[~:]").call(A,B)),
