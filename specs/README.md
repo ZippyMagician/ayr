@@ -30,9 +30,14 @@ _4  5 11
 ## Basic syntax
 General types come in the form of signed floats and strings, which may or may not be scalar values. A vector, similar to **APL**, is denoted with a series of these general values separated by spaces. To create a matrix, you can currently use `;` to separate vectors or grouping (`()`) similar to how APL generally does it.
 
-Incomplete operations within groups **or** assigned to a variable are called [Trains](#trains).
+Incomplete operations within groups **or** assigned to a variable are called [Trains](#trains). Binders are left-assosciative, while symbols are right-assosciative.
 
-Binders are left-assosciative, while symbols are right-assosciative.
+ayr also supports block syntax, which can take one or two variables. The right variable is `y`, and the left is `x`. For example:
+```
+    {{ 3 * y }} 4
+12
+```
+These can be used in any place any other symbol or group could also be used.
 
 ### Data Types
 #### Numbers
