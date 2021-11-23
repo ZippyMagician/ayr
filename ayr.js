@@ -64,7 +64,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     let x=a.ds==0&&e;a=carr(a)
     if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0].cl():a.cl(),p?x?p:a.str:0));let na=a.rank(r[1]),t
     return r[1]>0&&r[1]<a.ds&&S?
-      new A(na.d.flatMap(n=>(f=>f instanceof A?(t=f.r,f.d):f)(pon(d,f,S,p&&a.str,r,n,0,1))),a.r.map((v,i)=>t[i]??v),a.b,p?a.str:0)
+      new A(na.d.flatMap(n=>(f=>f instanceof A?f.ds!=n.ds?(t=na.r,f.b=1,f):(t=f.r,f.d):f)(pon(d,f,S,p&&a.str,r,n,0,1))),a.r.map((v,i)=>t[i]??v),a.b,p?a.str:0)
      :new A(na.d.map(n=>pon(d,f,S,p&&a.str,r,n,0,1)),l&&na.ds>1?na.r.slice(1):na.r,a.b,p?a.str:0)
   }else{
     a=carr(a),b=carr(b);if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1)
