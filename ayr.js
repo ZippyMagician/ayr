@@ -283,11 +283,13 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(r.ds==0)return r;let p=0,n=[];r=r.rank(r.ds-1);if(l<0)l=Math.abs(l,p=1)
     for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((a,v)=>f.call(a,v),r.d[i]));return narr(n)
   },0,0),1,[0,99])),
-  "/.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((a,v)=>f.call(a,v),x.d[0])):x,2,0),(a,b)=>err(2),99,99)),
+  "/.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((a,v)=>f.call(a,v),x.d[0])):x,2,0)
+                  ,pon.bind(0,1,(x,y)=>ayr("]~<:&[").call(bdrs['"'].call(f).call(x),y),1,1),99,99)),
   "\\":op(1,f=>mod((r,x)=>x.ds?new A(x.rank(r,1).d.flatMap(x=>(p=x.d[0],x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)))),x.r,x.b):x,pon.bind(0,1,(x,y)=>{
     let n=[];x=carr(x,0).rank(x.ds-1);y=carr(y,0).rank(y.ds-1);for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
   },0,0),1,99)),
-  "\\.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b,0)):x,0,0),(a,b)=>err(2),99,99)),
+  "\\.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b,0)):x,0,0)
+                   ,pon.bind(0,1,(x,y)=>ayr("]~>:&[").call(bdrs['"'].call(f).call(x),y),1,1),99,99)),
   "@":op(0,(a,b)=>mod(l=>{
     if(b.uf)return a.call(b.call(l));else if(a.rk==null)err(1);else{let n=a.cl();n.rk[0]=b;return n.call(l)}
   },(l,r)=>{

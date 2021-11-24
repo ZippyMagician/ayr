@@ -1,6 +1,4 @@
 # Specs of ayr
-*Todo: Formatting of sections, expand once more things implemented*
-
 What follows is an in-depth look at the specs of the `ayr` array language, so any individual can gain knowledge of how the language works.
 
 ## Table of Contents
@@ -16,7 +14,7 @@ What follows is an in-depth look at the specs of the `ayr` array language, so an
 `ayr` uses the based array model, similar to [BQN](https://github.com/mlochbaum/BQN/blob/master/doc/based.md). Values can be scalars, vectors, matrices, etc. These correspond to rank 0, 1, and 2 data respectively. 
 <br>*Note: higher rank data will be supported in the future*
 
-### Examples
+### Example Code
 ```
     <2 3 6
 [ 2 3 6 ]
@@ -55,21 +53,12 @@ _3.76
 ```
 `ayr` also supports rational literals, such as `5r4` (`5/4`) and `r3` (`1/3`)
 
-### Examples
-```
-    13
-13
-    'hello'
-hello
-    _4 'hello' ; 1 2
-[ _4 ] [ hello ] 
- [ 1 ]     [ 2 ]
-```
-*The way output is stylized is implementation dependant*
+#### Strings
+Furtermore, ayr supports strings, albeit in a form nearly indistinguishable from numbers. For example, `'hello world' + 3` will print a string where each character is offset from 3 by the string `hello world`. Character matrices and higher rank data is also supported. To display a string in numeric form, you can use the `+` prefix.
 
-A symbol refers to a built in ascii symbol that denotes a monadic/dyadic operation. A binder refers to a symbol that monadically and/or dyadically takes a symbol on does something with them. For example, take the `+` (add) symbol, `-` (subtract/negate) symbol, `>` (first) symbol, and the `&` (atop) binder
+### Symbols and Binders
+A symbol refers to a built in ascii symbol that denotes a monadic/dyadic operation. A binder refers to a symbol that monadically and/or dyadically takes a symbol and does something with them. For example, take the `+` (add) symbol, `-` (subtract/negate) symbol, `>` (first) symbol, and the `&` (atop) binder:
 
-### Examples
 ```
     1 2 + 3
 4 5
@@ -86,7 +75,7 @@ User functions refer to, as the name implies, functions defined by the user. For
     4 add 5
 9
 ```
-They are defined with the syntax `<name> : <expression>`
+They are defined with the syntax `<name> : <expression>`. These can be constant values, incomplete trains, blocks, etc.
 
 ## Trains
 There are two types of trains: partial trains and J-style trains. First the default, J-style:<br>
@@ -168,7 +157,7 @@ Partial trains, of course, support constants within them too.
 | ```I.``` |   0-range  |   0  |Wrapping Index| 99 99 |       |
 | ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 | ```i:``` |  Identity  |   0  |   Index Of   | 99 99 |By items|
-| ```K.``` |  Self Keys |  99  |     Keys+    |  99 1 |m: ```⌸```, d: ```#$.&?```|
+| ```K.``` |  Self Keys |  99  |     Keys+    |  99 1 |m: ```⊢∘⊂⌸```, d: ```#$.&?```|
 | ```v.``` |  Nth Prime |   0  |      Or      |  0 0  |       |
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 
@@ -187,10 +176,10 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 | ``` ` ```| ```u` ```| Commute |  N/A |  Flip  |  N/A | ```u&`v``` is ```v&u``` |
 | ```/``` |  ```u/``` |  Reduce |   1  | N-wise Reduce | 0 1 |              |
 | ```/:```| ```u/:``` | Diagonals | 2 | Each left | 99 99 |                 |
-| ```/.```| ```u/.``` | Reduce First| 99| N/A   | N/A  |                    |
+| ```/.```| ```u/.``` | Reduce First| 99|Sort Up|99 99 |                    |
 | ```\``` |  ```u\``` |   Scan  |   1  |  Table |  1 1 |                    |
 | ```\:```| ```u\:``` | Antidiagonals | 2 | Each right | 99 99 |            |
-| ```\.```| ```u\.``` | Scan First |99 |   N/A  |  N/A |                    |
+| ```\.```| ```u\.``` | Scan First |99 |Sort Down|99 99|                    |
 | ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Rank if right arg is immediate |
 | ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
 | ```@.```| ```u@.v```|    At   |  99  |    At  | 99 99| Depth if right arg is immediate |
