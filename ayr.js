@@ -152,9 +152,9 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   ">.":mod(pon.bind(0,0,a=>{a.d=a.d.rank(a.ds-1).sort((a,b)=>-sort(a,b)).flatMap(n=>n.d??n);return a},1,1),pon.bind(0,1,(a,b)=>+!(a&&b),1,0),1,0),
   "^":mod(pon.bind(0,0,a=>2.7184*+a,1,0),pon.bind(0,1,(a,b)=>(+a)**+b,1,0),0,0),
   "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),0,0),pon.bind(0,1,(a,b)=>{
-    let nr=a instanceof A?a.d:[a];if(nr.indexOf(-1)>-1)nr[nr.indexOf(-1)]=pd(b.r)/nr.reduce((a,b)=>a*(b>-1?b:1),1);b=carr(b);let[lo,ln]=[pd(b.r),pd(nr)]
-    if(lo==ln){b.r=nr;b.ds=nr.length;return b}
-    else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);b.ds=nr.length;return b}
+    let wc=[-1,1/0],nr=a instanceof A?a.d:[a]
+    if(wc.map(n=>nr.indexOf(n)>-1).reduce((a,b)=>a||b,1))nr[nr.indexOf(wc.filter(n=>nr.indexOf(n)>-1)[0])]=pd(b.r)/nr.reduce((a,b)=>a*(wc.indexOf(b)==-1?b:1),1)
+    b=carr(b);let[lo,ln]=[pd(b.r),pd(nr)];if(lo==ln){b.r=nr;b.ds=nr.length;return b}else if(lo>ln){b.r=nr;b.d=b.d.slice(0,ln);b.ds=nr.length;return b}
     else{let nd=[];for(i=0;i<ln;i++)nd.push(b.d[i%lo]);return new A(nd,nr,b.b,b.str)}
   },0,1),99,99),
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),1,1),pon.bind(0,1,(a,b)=>geti(b,a),0,1),0,99),
