@@ -179,7 +179,7 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 | ```/.```| ```u/.``` | Reduce First| 99|Sort Up|99 99 |                    |
 | ```\``` |  ```u\``` |   Scan  |   1  |  Table |  1 1 |                    |
 | ```\:```| ```u\:``` | Antidiagonals | 2 | Each right | 99 99 |            |
-| ```\.```| ```u\.``` | Scan First |99 |Sort Down|99 99|                    |
+| ```\.```| ```u\.``` | Suffixes|   1  |Sort Down|99 99|                    |
 | ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Rank if right arg is immediate |
 | ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
 | ```@.```| ```u@.v```|    At   |  99  |    At  | 99 99| Depth if right arg is immediate |

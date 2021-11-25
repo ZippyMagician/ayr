@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
-function A(d,r,b=0,str=0){this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;fix(this);this.str=str;
-if(this.d.length==1&&this.d[0]&&this.d[0].b&&!this.b)this.d[0].b=0;this.uf=0}
+function A(d,r,b=0,str=0){
+  this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;this.str=str;if(this.d.length==1&&this.d[0].ds&&this.d[0].b&&!this.b)this.d[0].b=0;this.uf=0
+  let f=this.d.reduce((acc,x)=>acc||x instanceof A,false);if(f)f=this.d.length>1&&this.ds==1||this.d.reduce((acc,x)=>acc||x instanceof A&&x.b,false)
+  if(f)this.d=this.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1));while(this.r[this.ds-1]==1&&this.ds>1){this.r.pop();this.ds-=1}
+}
 function MoD(f1,f2,...r){this.f1=f1;this.f2=f2;this.bd=[];this.uf=1;this.rk=r.length?r:null}
 MoD.prototype.bind=function(...v){this.bd.push(...v);return this}
 MoD.prototype.call=function(...a){
@@ -52,8 +55,7 @@ Array.prototype.rot=function(n){this.unshift.apply(this,this.splice(n,this.lengt
 Object.prototype.cl=function(){return{...this}}
 A.prototype.bind=function(...v){return this.cl()}
 A.prototype.call=function(...v){return this.cl()}
-let envs=[];
-const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
+let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,cle=_=>{envs.push(env);env=envs[envs.length-1].cl()}
 ,ucle=_=>env=envs.pop()
 ,ft=a=>a<2?1:eval('for(let n=2,x=1;n<=a;n++)x*=n')
@@ -117,7 +119,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(i<a.d.length)n=[...n,...a.d.slice(i).map(n=>narr([n],0,0,a.str))];else if(i<b.d.length)n=[...n,...b.d.slice(i).map(n=>narr([n],0,0,b.str))]
   return new A(n,i<a.d.length?a.r.cl():b.r.cl())
 }
-,geti=(a,b,w)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b,w)),fix(a),a):get(a,b,w)
+,geti=(a,b,w)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b,w)),a=fix(a),a):get(a,b,w)
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -277,25 +279,31 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(JSON.stringify(l.r)==JSON.stringify(r.r))return new A(l.d.map((n,i)=>b(f.call(n,r.d[i]))),r.r,l.b|r.b,l.str|r.str);err(1)
   })),
   "`":op(1,f=>mod(l=>f.call(l.cl(),l),(l,r)=>f.call(r,l))),
-  "/":op(1,f=>mod((r,x)=>x.ds?new A(x.rank(r,1).d.map(n=>n.d.slice(1).reduce((a,v)=>f.call(a,v),n.d[0])),x.ds==1?1:x.r.slice(1),x.b):x,pon.bind(0,1,(l,r)=>{
+  "/":op(1,f=>mod((r,x)=>x.ds?x.d.length==1?x.d[0]:
+    x.ds<=r?x.d.slice(1).reduce((a,v)=>f.call(a,v),x.d[0])
+   :new A(x.rank(r,1).d.map(n=>n.d.slice(1).reduce((a,v)=>f.call(a,v),n.d[0])),x.r.slice(1),x.b):x
+  ,pon.bind(0,1,(l,r)=>{
     if(r.ds==0)return r;let p=0,n=[];r=r.rank(r.ds-1);if(l<0)l=Math.abs(l,p=1)
     for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((a,v)=>f.call(a,v),r.d[i]));return narr(n)
   },0,0),1,[0,99])),
   "/.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((a,v)=>f.call(a,v),x.d[0])):x,2,0)
                   ,pon.bind(0,1,(x,y)=>ayr("]~<:&[").call(bdrs['"'].call(f).call(x),y),1,1),99,99)),
-  "\\":op(1,f=>mod((r,x)=>x.ds?new A(x.rank(r,1).d.flatMap(x=>(p=x.d[0],x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)))),x.r,x.b):x,pon.bind(0,1,(x,y)=>{
+  "\\":op(1,f=>mod((r,x)=>x.ds?
+    x.ds<=r?(p=x.d[0],x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)))
+   :new A(x.rank(r,1).d.flatMap(x=>(p=x.d[0],x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)))),x.r,x.b):x
+  ,pon.bind(0,1,(x,y)=>{
     let n=[];x=carr(x,0).rank(x.ds-1);y=carr(y,0).rank(y.ds-1);for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
   },0,0),1,99)),
-  "\\.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b,0)):x,0,0)
-                   ,pon.bind(0,1,(x,y)=>ayr("]~>:&[").call(bdrs['"'].call(f).call(x),y),1,1),99,99)),
+  "\\.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(bd=x.rank(x.ds-1),narr(bd.d.map((n,i,o)=>f.call(narr(o.slice(0,o.length-i).cl(),0,0,n.ds==0?bd.str:n.str))),x.b)):x,1,0)
+                   ,pon.bind(0,1,(x,y)=>ayr("]~>:&[").call(bdrs['"'].call(f).call(x),y),1,1),1,99)),
   "@":op(0,(a,b)=>mod(l=>{
     if(b.uf)return a.call(b.call(l));else if(a.rk==null)err(1);else{let n=a.cl();n.rk[0]=b;return n.call(l)}
   },(l,r)=>{
     if(b.uf)return a.call(b.call(l),b.call(r));if(b.ds==0)b=[b,b];if(a.rk==null)err(1);else{let n=a.cl();n.rk[1]=b;return n.call(l,r)}
   })),
-  "/:":op(1,f=>mod(pon.bind(0,0,dgs.bind(0,f),0,0),(_,a,b)=>{a=carr(a,0).rank(Math.max(0,a.ds-1));a.d=a.d.map(n=>f.call(n,b.cl()));fix(a);a.str=0;return a},2,99)),
+  "/:":op(1,f=>mod(pon.bind(0,0,dgs.bind(0,f),0,0),(_,a,b)=>{a=carr(a,0).rank(Math.max(0,a.ds-1));a.d=a.d.map(n=>f.call(n,b.cl()));a=fix(a);a.str=0;return a},2,99)),
   "\\:":op(1,f=>mod(pon.bind(0,0,a=>{a=a.rank(1);a.d=a.d.map(n=>(n.d=n.d.reverse(),n));return dgs(f,a,1)},0,0),(_,a,b)=>{
-    b=carr(b,0).rank(Math.max(0,b.ds-1));b.d=b.d.map(n=>f.call(a.cl(),n));fix(b);b.str=0;return b
+    b=carr(b,0).rank(Math.max(0,b.ds-1));b.d=b.d.map(n=>f.call(a.cl(),n));b=fix(b);b.str=0;return b
   },2,99)),
   "@:":op(1,f=>mod(a=>zp(a.cl(),a,f),(a,b)=>zp(a,b,f))),
   "@.":op(0,(a,b)=>mod(l=>{
