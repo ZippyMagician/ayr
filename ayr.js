@@ -214,9 +214,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "!":mod(pon.bind(0,0,ft,1,0),pon.bind(0,1,(a,b)=>a<b?0:ft(a)/(ft(b)*ft(a-b)),1,0),0,0),
   ";:":mod(pon.bind(0,0,a=>new A(carr(a).rank(a.ds?a.ds-1:0).d,a.r.slice(a.ds-1),a.b,a.str),0,1),pon.bind(0,1,(b,a,p)=>{
     let n=[];for(i=0;i<a.d.length;i++){
-      if(i==0&&a.d[i]!=0)n.push(b.d[i].cl())
-      else if(a.d[i]!=0){if(typeof n[n.length-1]!='object')n[n.length-1]=[n[n.length-1]];n[n.length-1].push(b.d[i].cl())}
-      else n.push([])
+      if(i==0&&a.d[i]!=0)n.push([b.d[i].cl()]);else if(a.d[i]!=0)n[n.length-1].push(b.d[i].cl());else n.push([])
     }if(n.length==1)return narr(n[0]);return narr(n.map(n=>narr(n,1,0,p)),0,1)
   },0,1),99,[99,1]),
   "=.":mod(pon.bind(0,0,a=>a.d.length?+a.d.map(n=>eq(a.d[0],n)).reduce((a,b)=>a&&b,1):1,0,0),pon.bind(0,1,(a,b)=>a^b,1,0),99,0),
