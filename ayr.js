@@ -146,8 +146,8 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   ">":mod(pon.bind(0,0,a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,0,1),pon.bind(0,1,(a,b)=>+(a>b),0,0),99,0),
   "<:":mod(pon.bind(0,0,a=>narr([...Array(a.d.length).keys()].sort((i,j)=>sort(a.d[i],a.d[j]))),0,0),pon.bind(0,1,(a,b)=>+(a<=b),1,0),1,0),
   ">:":mod(pon.bind(0,0,a=>narr([...Array(a.d.length).keys()].sort((i,j)=>-sort(a.d[i],a.d[j]))),0,0),pon.bind(0,1,(a,b)=>+(a>=b),1,0),1,0),
-  "<.":mod(pon.bind(0,0,a=>{a.d=a.d.sort(sort);return a},1,1),pon.bind(0,1,(a,b)=>+(!a&&!b),1,0),1,0),
-  ">.":mod(pon.bind(0,0,a=>{a.d=a.d.sort((a,b)=>-sort(a,b));return a},1,1),pon.bind(0,1,(a,b)=>+!(a&&b),1,0),1,0),
+  "<.":mod(pon.bind(0,0,a=>{a.d=a.d.rank(a.ds-1).sort(sort).flatMap(n=>n.d??n);return a},1,1),pon.bind(0,1,(a,b)=>+(!a&&!b),1,0),1,0),
+  ">.":mod(pon.bind(0,0,a=>{a.d=a.d.rank(a.ds-1).sort((a,b)=>-sort(a,b)).flatMap(n=>n.d??n);return a},1,1),pon.bind(0,1,(a,b)=>+!(a&&b),1,0),1,0),
   "^":mod(pon.bind(0,0,a=>2.7184*+a,1,0),pon.bind(0,1,(a,b)=>(+a)**+b,1,0),0,0),
   "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),0,0),pon.bind(0,1,(a,b)=>{
     let nr=a instanceof A?a.d:[a];if(nr.indexOf(-1)>-1)nr[nr.indexOf(-1)]=pd(b.r)/nr.reduce((a,b)=>a*(b>-1?b:1),1);b=carr(b);let[lo,ln]=[pd(b.r),pd(nr)]
@@ -238,7 +238,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(argv!=null&&argv['0'])n++;if(n<2)return 2;if(n==2)return 3;let l=n*(Math.log(n)+Math.log(Math.log(n)))|0,r=Math.sqrt(l)+1|0,c=1,i=0,s,p,j;l=(l-1)/2|0;r=r/2-1|0;s=Array(l)
     for(;i<r;++i)if(!s[i]){++c;for(j=2*i*(i+3)+3,p=2*i+3;j<l;j+=p)s[j]=1}for(p=r;c<n;++p)if(!s[p])++c;return 2*p+1
   },1,0),pon.bind(0,1,(a,b)=>a|b,1,0),0,0),
-  "|.":mod(pon.bind(0,0,a=>(a.d=a.d.reverse(),a),1,1),pon.bind(0,1,(a,b)=>(b.d=b.d.rot(+a),b),1,1),1,[0,1]),
+  "|.":mod(pon.bind(0,0,a=>(a.d=a.rank(a.ds-1).d.reverse().flatMap(n=>n.d??n),a),1,1),pon.bind(0,1,(a,b)=>(b.d=b.rank(b.ds-1).d.rot(+a).flatMap(n=>n.d??n),b),1,1),1,[0,1]),
   "B:":mod(a=>a.ds>0?ayr(':;(,`0#)"&:(-`"&:(^:/)#")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr(';&#:').call(a,b):ayr('#:').call(a,b)),
   "=:":mod(pon.bind(0,0,a=>a.str?ayr(a.toString()):(a.d=a.d.map(n=>ayr(n.toString())),a),1,0)
           ,pon.bind(0,1,(a,b)=>+eq(a,b),0,0),99,99),
@@ -256,7 +256,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     b=b.toString();let[fl,fr]=[Math.ceil((+a-b.length)/2),Math.ceil((+a-b.length)/2)-(b.length%2?!(a%2):a%2)]
     return narr((" ".repeat(fl<0?0:fl)+b+" ".repeat(fr<0?0:fr)).split("").map(a=>a.charCodeAt(0)),0,0,1)
   },0,1),0,0),
-  "[.":mod(pon.bind(0,0,a=>(a.d.shift(),a.r[0]--,a),1,1),pon.bind(0,1,(a,b)=>narr([carr(a),carr(b)]),0,0),1,99),
+  "[.":mod(pon.bind(0,0,a=>(a.d=a.rank(a.ds-1).d,a.d.shift(),a.d=a.d.flatMap(n=>n.d??n),a.r[a.ds-1]--,a),1,1),pon.bind(0,1,(a,b)=>narr([carr(a),carr(b)]),0,0),1,99),
   "].":mod(pon.bind(0,0,(a,p)=>(a.d=[pr(a,p),...a.d],a.r[0]++,a),1,1),pon.bind(0,1,(a,b)=>narr([carr(b),carr(a)]),0,0),1,99),
   "K.":mod(pon.bind(0,0,a=>ayr("#$.((|0=:~1)-`~&#)?]").call(a),0,0),pon.bind(0,1,(a,b)=>ayr("#$.&?").call(a,b),0,0),99,[99,1])
 }
@@ -466,7 +466,7 @@ Args:
     -0      - The one-range symbol '~' creates a range from [0, N) instead
     -n      - Numbers are outputted in classic JS style instead of ayr style`),process.exit(0);if(argv.u)run(argv.u);else if(!argv._.length){
 console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`);if(require!=null)env.I=argv._.length?ayr(argv._[argv._.length-1]):""
-while((inp=rl.question('\t'))&&inp!="exit"){
+while((inp=rl.question('    '))&&inp!="exit"){
   run(inp)
   //what the fuck javascript
   Object.values(syms).forEach(mod=>{mod.bd=[]})
