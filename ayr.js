@@ -252,9 +252,9 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "?:":mod(pon.bind(0,0,a=>{
     for(let i=a.r[0]-1;i;i--){let j=Math.random()*(i+1)|0;[a.d[i],a.d[j]]=[a.d[j],a.d[i]]}return a
   },1,1),pon.bind(0,1,(a,b)=>ayr("[#(:,^./^./&,&~:\\)").call(a,b),0,1),1,99),
-  "`.":mod(pon.bind(0,0,a=>narr(a.toString().split("").map(a=>a.charCodeAt(0)),0,0,1),1,1),pon.bind(0,1,(a,b)=>{
+  "`.":mod(pon.bind(0,0,a=>sta(a.toString()),1,1),pon.bind(0,1,(a,b)=>{
     b=b.toString();let[fl,fr]=[Math.ceil((+a-b.length)/2),Math.ceil((+a-b.length)/2)-(b.length%2?!(a%2):a%2)]
-    return narr((" ".repeat(fl<0?0:fl)+b+" ".repeat(fr<0?0:fr)).split("").map(a=>a.charCodeAt(0)),0,0,1)
+    return sta(" ".repeat(fl<0?0:fl)+b+" ".repeat(fr<0?0:fr))
   },0,1),0,0),
   "[.":mod(pon.bind(0,0,a=>(a.d=a.rank(a.ds-1).d,a.d.shift(),a.d=a.d.flatMap(n=>n.d??n),a.r[a.ds-1]--,a),1,1),pon.bind(0,1,(a,b)=>narr([carr(a),carr(b)]),0,0),1,99),
   "].":mod(pon.bind(0,0,(a,p)=>(a.d=[pr(a,p),...a.d],a.r[0]++,a),1,1),pon.bind(0,1,(a,b)=>narr([carr(b),carr(a)]),0,0),1,99),
@@ -328,6 +328,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(f)a.d=a.d.map(e=>e instanceof A?(e.b=1,e):new A([e],1,1));while(a.r[a.ds-1]==1&&a.ds>1){a.r.pop();a.ds-=1}return a
 }
 ,str=s=>argv!=null&&!argv.n&&typeof s=='number'?s.toString().replace('-','_').replace('Infinity','_'):s.toString()
+,sta=s=>narr(s.split("").map(n=>n.charCodeAt(0)),0,0,1)
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
 ,mex=f=>f.uf?f:f.call()
 ,nnw=(t,i)=>{
@@ -342,7 +343,7 @@ const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       if(m[2]!=null)m[1]=m[2];let x=m[1].replace(/_/g,'-').replace(/(?<=-?)(?<!\d)(e|r)/,'1$1'),l,r;if(x=="--"||x=="-")t.push({t:0,v:x=="--"?-Infinity:Infinity})
       else if(x.indexOf("r")>-1)t.push({t:0,v:([l,r]=x.split("r"),+l/+r)})
       else if(x.lastIndexOf(".")>x.indexOf("e")&&x.indexOf("e")>-1)t.push({t:0,v:([l,r]=x.split("e"),(+l)**+r)});else t.push({t:0,v:+x})
-    }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1].replace(/"/g,'\\"')}"`),new A(l.split("").map(c=>c.charCodeAt(0)),l.length,0,1))})
+    }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1].replace(/"/g,'\\"')}"`),sta(l))})
     else if(m=/^\[:|^\]:|^`:/.exec(s))t.push({t:5,v:m[0]})
     else if(m=/^\(|^\)|^{{|^}}/.exec(s))t.push({t:2,v:m[0]})
     else if(m=RegExp(`^(${Object.keys(syms).concat(Object.keys(bdrs)).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:bdrs[m[1]]!=null?3:2,v:m[1]})
@@ -451,9 +452,9 @@ let env={
   sp:mod(A=>ayr("];:' '~:").call(A),(A,B)=>ayr("];:[~:]").call(A,B)),
   su:ayr("~`&.`<:"),
   sd:ayr("~`&.`>:"),
-  'V.':narr('AEIOU'.split("").map(n=>n.charCodeAt(0)),0,0,1),
-  'A.':narr('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split("").map(n=>n.charCodeAt(0)),0,0,1),
-  'C.':narr('BCDFGHJKLMNPQRSTVWXYZ'.split("").map(n=>n.charCodeAt(0)),0,0,1)
+  'V.':sta('AEIOU'),
+  'A.':sta('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+  'C.':sta('BCDFGHJKLMNPQRSTVWXYZ')
 }
 if(module&&module.exports){
 if(argv._[0]=='help'||argv.h||argv.help)console.log(`ayr ${require('./package.json').version}:
