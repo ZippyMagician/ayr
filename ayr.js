@@ -258,7 +258,10 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,1),0,0),
   "[.":mod(pon.bind(0,0,a=>(a.d=a.rank(a.ds-1).d,a.d.shift(),a.d=a.d.flatMap(n=>n.d??n),a.r[a.ds-1]--,a),1,1),pon.bind(0,1,(a,b)=>narr([carr(a),carr(b)]),0,0),1,99),
   "].":mod(pon.bind(0,0,(a,p)=>(a.d=[pr(a,p),...a.d],a.r[0]++,a),1,1),pon.bind(0,1,(a,b)=>narr([carr(b),carr(a)]),0,0),1,99),
-  "K.":mod(pon.bind(0,0,a=>ayr("#$.((|0=:~1)-`~&#)?]").call(a),0,0),pon.bind(0,1,(a,b)=>ayr("#$.&?").call(a,b),0,0),99,[99,1])
+  "K.":mod(pon.bind(0,0,a=>ayr("#$.((|0=:~1)-`~&#)?]").call(a),0,0),pon.bind(0,1,(a,b)=>ayr("#$.&?").call(a,b),0,0),99,[99,1]),
+  "|:":mod(pon.bind(0,0,(a,p)=>(p=syms["~"].call(narr([a],0,0,p)),p.d=p.d.reverse(),p),1,1),pon.bind(0,1,(a,b)=>{
+    b=b.cl();for(let i of a.d){let[n]=b.r.splice(a.ds-i-1,1);b.r.push(n)}return b
+  },0,1),0,[1,99])
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
