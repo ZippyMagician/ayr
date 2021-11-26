@@ -292,7 +292,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "/.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((a,v)=>f.call(a,v),x.d[0])):x,2,0)
                   ,pon.bind(0,1,(x,y)=>ayr("]~<:&[").call(bdrs['"'].call(f).call(x),y),1,1),99,99)),
   "\\":op(1,f=>mod((r,x)=>x.ds?
-    x.ds<=r?(p=x.d[0],x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)))
+    x.ds<=r?(p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b))
    :new A(x.rank(r,1).d.flatMap(x=>(p=x.d[0],x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)))),x.r,x.b):x
   ,pon.bind(0,1,(x,y)=>{
     let n=[];x=carr(x,0).rank(x.ds-1);y=carr(y,0).rank(y.ds-1);for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
