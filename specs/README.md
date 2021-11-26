@@ -54,7 +54,16 @@ _3.76
 `ayr` also supports rational literals, such as `5r4` (`5/4`) and `r3` (`1/3`)
 
 #### Strings
-Furtermore, ayr supports strings, albeit in a form nearly indistinguishable from numbers. For example, `'hello world' + 3` will print a string where each character is offset from 3 by the string `hello world`. Character matrices and higher rank data is also supported. To display a string in numeric form, you can use the `+` prefix.
+Furthermore, ayr supports strings, albeit in a form nearly indistinguishable from numbers. For example, `'hello world' + 3` will print a string where each character is offset from 3 by the string `hello world`. Character matrices and higher rank data is also supported. To display a string in numeric form, you can use the `+` prefix.
+
+#### Ranked Data
+Data in general within ayr, like other array languages, is in the form of arrays. For instance, strings are just arrays of numbers. Every array has rank; that is, the shape of the array. For example, an array of rank `3 2` would look like this:
+```
+0 0 0
+0 0 0
+```
+As an array gains dimensions, these are represented by a new number being appended to the rank, representing the depth in that dimension. This array has `3` rows and `2` columns. An array that contains two `3 2` arrays would have the shape `3 2 2`, and so on.<br>
+These could also be referred to as **axes**: the first axes is the newest dimension; in this case being the *columns*. A one dimensional array's first axes would be its *row*.
 
 ### Symbols and Binders
 A symbol refers to a built in ascii symbol that denotes a monadic/dyadic operation. A binder refers to a symbol that monadically and/or dyadically takes a symbol and does something with them. For example, take the `+` (add) symbol, `-` (subtract/negate) symbol, `>` (first) symbol, and the `&` (atop) binder:
@@ -119,6 +128,7 @@ Partial trains, of course, support constants within them too.
 | ```%:``` |  Square Rt |   0  |   Nth Root   |  0 0  |       |
 |   `\|`   | Boolean Not|   0  |    Residue   |  0 0  |       |
 |  `\|.`   |   Reverse  |   1  |    Rotate    |  0 1  |       |
+|  `\|:`   |   Descend  |   0  |     Axes     |  1 99 |       |
 |  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
 |  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |       |
 |  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |       |
