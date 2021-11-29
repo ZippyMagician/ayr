@@ -131,10 +131,10 @@ Partial trains, of course, support constants within them too.
 |  `\|:`   |   Descend  |   0  |     Axes     |  1 99 |       |
 |  ```!``` |  Factorial |   0  |   Binomial   |  0 0  |       |
 |  ```<``` |    Cover   |  99  |   Less Than  |  0 0  |       |
-|  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |       |
 | ```<.``` | Sort Ascending | 1 |     Nor     |  0 0  |       |
-| ```>.``` | Sort Descending | 1 |    Nand    |  0 0  |       |
 | ```<:``` |  Grade Up  |   1  |    Less/Eq   |  0 0  |       |
+|  ```>``` |   Uncover  |  99  | Greater Than |  0 0  |       |
+| ```>.``` | Sort Descending | 1 |    Nand    |  0 0  |       |
 | ```>:``` | Grade Down |   1  |  Greater/Eq  |  0 0  |       |
 |  ```^``` |     Exp    |   0  |      Pow     |  0 0  |       |
 | ```^.``` | Up Reverse |  99  |      And     |  0 0  |       |
@@ -162,6 +162,7 @@ Partial trains, of course, support constants within them too.
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
+| ```}:``` |     Tail   |  99  |     Count    | 99 99 |       |
 | ``` `.```|    Format  |   0  |     Format   |  0 99 |       |
 | ```B:``` | Encode Binary+| 0 |    Encode+   |  1 0  |       |
 | ```I.``` |   0-range  |   0  |Wrapping Index| 99 99 |       |
