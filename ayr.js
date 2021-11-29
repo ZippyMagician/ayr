@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-if(require!=null){f=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
+if(require!=null){fs=require('fs');argv=require('minimist')(process.argv.slice(2));rl=require('readline-sync')}
 function A(d,r,b=0,str=0){
   this.r=typeof r==='number'?[r]:r;this.ds=this.r.length;this.d=d;this.b=b;this.str=str;if(this.d.length==1&&this.d[0].ds&&this.d[0].b&&!this.b)this.d[0].b=0;this.uf=0
   let f=this.d.reduce((acc,x)=>acc||x instanceof A,false);if(f)f=this.d.length>1&&this.ds==1||this.d.reduce((acc,x)=>acc||x instanceof A&&x.b,false)
@@ -81,7 +81,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       if(aln>bln)
         return new A(fl(a.rank(r[0]).d.map(v=>pon(d,f,S,p,r,v,sb(b)?b.d[0]:b)),n=r[0]>1&&r[0]<a.ds),S&&n?a.r:a.rank(r[0]).r,a.b|b.b,p?a.str|b.str:0)
       else if(bln>aln)
-        return new A(fl(b.rank(r[1]).d.map(v=>pon(d,f,S,p,r,sb(a)?a.d[0]:a,v)),n=r[1]>1&&r[1]<b.ds),S&&n?b.r:b.rank(r[1]).r,a.b|b.b,p?a.str|b.str:0)
+        return new A(fl(b.rank(r[1]).d.map(v=>pon(d,f,S,p,r,sb(a)?a.d[0]:a,v)),n=r[1]>0&&r[1]<b.ds),S&&n?b.r:b.rank(r[1]).r,a.b|b.b,p?a.str|b.str:0)
       return new A(
         fl(a.rank(r[0]).d.map((v,i)=>pon(d,f,S,p,r,v,r[1]==0&&sb(b)?b.d[0]:b.rank(r[1]).d[i])),n=r[0]>1&&r[0]<a.ds)
        ,S&&n?a.r:a.rank(r[0]).r,a.b|b.b,p?a.str|b.str:0)
@@ -194,7 +194,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
         for(i=0;i<(b.r[1]||1);i++)b.d.splice(i*pd(b.r.slice(1))+b.r[0],0,...rn(0,a.d.length-b.r[0],pr(b,p)));b.r[0]=a.d.length
       return new A(a.d.concat(b.d),b.ds>1?[...b.r.slice(0,b.ds-1),b.r.pop()+1]:[b.r[0],2],b.b,p)
     }
-  },1,1),1,99),
+  },0,1),1,99),
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0),pon.bind(0,1,(b,a,p)=>{
     let v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0)a=narr([...Array(c.d.length)].map(_=>a))
     if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
@@ -361,7 +361,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
 ,mex=f=>f.uf?f:f.call()
 ,nnw=(t,i)=>{
-  let o=1;while(t[i+o]&&t[i+o].t==9)o++;return t[i+o]?[i+o,t[i+o]]:[i+o,{t:10}]
+  let o=1;while(t[i+o]&&t[i+o].t==9&&t[i+1].v!='\n')o++;return t[i+o]?[i+o,t[i+o]]:[i+o,{t:10}]
 }
 ,mvr=n=>n.vr?n.call():n
 ,ste=n=>n.v=='[:'?bdrs['&']:n.v==']:'?bdrs['&:']:n.v=='`:'?bdrs['`']:err(3)
@@ -442,12 +442,12 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 const exec=(t,G=0)=>{
   let fq=[],V,h,j;for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
-      if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(str(x));fq=[]}
+      if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(str(x))}fq=[]
     }if(o.t==7){
       if(o.v=='js'&&nnw(t,i)[1].t==1&&nnw(t,i)[1].v.str){[i,o]=nnw(t,i);fq.push(eval(str(o.v)))}
       else if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
       else if(!fq.length&&env[o.v]==null)err(3)
-      else fq.push(fq.length?(f=>(f.uf=0,f.vr=1,f))(_=>env[o.v]??err(3)):env[o.v])
+      else fq.push(fq.length?env[o.v]!=null&&env[o.v].uf?env[o.v]:(f=>(f.uf=0,f.vr=1,f))(_=>env[o.v]??err(3)):env[o.v])
     }else if(o.t==2||o.t==8&&o.v.uf){
       let[ni,b]=nnw(t,i);if(inst(b)||ni!=i&&b.t==8){
         i=ni;if(b.t==8){if(b.v.uf||b.t==7&&env[b.v]!=null&&env[b.v].uf)fq.push((o.t==8?o.v:syms[o.v]),b.t==7?env[b.v]:b.v);else fq.push(o.t==8?o.v:syms[o.v],b.v)}
@@ -502,4 +502,4 @@ while((inp=rl.question('    '))&&inp!="exit"){
   Object.values(syms).forEach(mod=>{mod.bd=[]})
   Object.values(bdrs).forEach(mod=>{mod.bd=[]})
   Object.values(env).forEach(mod=>{if(mod.uf)mod.bd=[]})
-}}else f.readFile(__dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))}else{(self||globalThis||window).runAyr=run}
+}}else fs.readFile(__dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))}else{(self||globalThis||window).runAyr=run}
