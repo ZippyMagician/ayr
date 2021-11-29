@@ -38,7 +38,7 @@ A.prototype.toString=function(){
         if(x.str)S+=str(x);else for(y of x.d)S+=(x.b?" ":" ".repeat(l-str(y).length))+str(y)+" ";if(x.b&&!x.str)S=S.trimEnd()+']';S+='\n'
       }
       if(this.b)S=S.trimEnd()+' ]';break
-    default:let m=this.rank(this.ds-1);for(let n of m.d)S+=str(n)+"\n"+"\n".repeat(this.ds-2);break
+    default:let m=this.cl().rank(this.ds-1);for(let n of m.d)S+=str(n)+"\n"+"\n".repeat(this.ds-2);break
   }
   return S.trimEnd()
 }
@@ -75,12 +75,13 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }else{
     a=carr(a),b=carr(b);if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1)
     else{
+      const fl=n=>n.flatMap(x=>x.ds&&S?x.d:x)
       let aln=pd(a.rank(r[0],1).r),bln=pd(b.rank(r[1],1).r)
       if((r[0]>a.ds-1||sb(a)&&r[0]==0)&&(r[1]>b.ds-1||sb(b)))
         return(n=>p&&a.str|b.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(sb(a)&&r[0]==0?a.d[0].cl():a.cl(),sb(b)&&r[1]==0?b.d[0].cl():b.cl(),p?a.str|b.str:0))
-      if(aln>bln)return new A(a.rank(r[0]).d.map(v=>pon(d,f,S,p,r,v,sb(b)?b.d[0]:b)),S?a.r:a.rank(r[0]).r,a.b|b.b,p?a.str|b.str:0)
-      else if(bln>aln)return new A(b.rank(r[1]).d.map(v=>pon(d,f,S,p,r,sb(a)?a.d[0]:a,v)),S?b.r:b.rank(r[1]).r,a.b|b.b,p?a.str|b.str:0)
-      return new A(a.rank(r[0]).d.map((v,i)=>pon(d,f,S,p,r,v,r[1]==0&&sb(b)?b.d[0]:b.rank(r[1]).d[i])),S?a.r:a.rank(r[0]).r,a.b|b.b,p?a.str|b.str:0)
+      if(aln>bln)return new A(fl(a.rank(r[0]).d.map(v=>pon(d,f,S,p,r,v,sb(b)?b.d[0]:b))),S?a.r:a.rank(r[0]).r,a.b|b.b,p?a.str|b.str:0)
+      else if(bln>aln)return new A(fl(b.rank(r[1]).d.map(v=>pon(d,f,S,p,r,sb(a)?a.d[0]:a,v))),S?b.r:b.rank(r[1]).r,a.b|b.b,p?a.str|b.str:0)
+      return new A(fl(a.rank(r[0]).d.map((v,i)=>pon(d,f,S,p,r,v,r[1]==0&&sb(b)?b.d[0]:b.rank(r[1]).d[i]))),S?a.r:a.rank(r[0]).r,a.b|b.b,p?a.str|b.str:0)
     }
   }
 }
