@@ -122,7 +122,7 @@ Partial trains, of course, support constants within them too.
 | ```+.``` |    TODO    | TODO |      GCD     |  0 0  |       |
 | ```+:``` |   Double   |   0  |   Abs Add    |  0 0  |       |
 |  ```-``` |   Negate   |   0  |   Subtract   |  0 0  |Str(m): swaps case|
-| ```-.``` |    TODO    | TODO |     TODO     |  TODO |       |
+| ```-.``` |  Permute   |  99  | Unintersect  | 99 99 |       |
 | ```-:``` |   Halve    |   0  |  Abs Diff    |  0 0  |       |
 |  ```*``` |   Signum   |   0  |   Multiply   |  0 0  |Str(m): case sig (`1 _1 0 = *'Ab '`)|
 | ```*.``` |   Factors  |   0  |      LCM     |  0 0  |       |
@@ -149,6 +149,7 @@ Partial trains, of course, support constants within them too.
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
 | ```].``` |    Nudge   |   1  |  Couple Back | 99 99 |       |
 |  ```?``` | Dedup Sieve|  99  |     Keys     | 99 1  |       |
+| ```?.``` |     Roll   |   0  |     Deal     |  1 99 |       |
 | ```?:``` |   Shuffle  |   1  |    Without   | 99 99 |m: ```[#(:,^./^./&,&~:\)```|
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
 | ```=.``` |  All Equal |  99  |     Xor      |  0 0  |       |

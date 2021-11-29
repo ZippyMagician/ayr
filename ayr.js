@@ -264,6 +264,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     let m=new Map([...Array(Math.max(...b.d)+1).keys()].map(n=>[n,[]])),s=[];a.rank(a.ds-1).d.forEach((v,i)=>b.d[i]>-1?m.get(b.d[i]).push(v):0)
     for(let v of m.values())s.push(narr(v,1));return narr(s)
   },0,0),99,[99,1]),
+  "?.":mod(pon.bind(0,0,a=>Math.floor(Math.random()*a),1,1),pon.bind(0,1,(a,b)=>ayr("{{x{?:I.y}}").call(a,b),0,0),0,0),
   "?:":mod(pon.bind(0,0,a=>{
     for(let i=a.r[0]-1;i;i--){let j=Math.random()*(i+1)|0;[a.d[i],a.d[j]]=[a.d[j],a.d[i]]}return a
   },1,1),pon.bind(0,1,(a,b)=>ayr("[#(:,^./^./&,&~:\\)").call(a,b),0,1),1,99),
