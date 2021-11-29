@@ -119,12 +119,16 @@ Partial trains, of course, support constants within them too.
 |  Symbol  |   Monadic  | Rank |    Dyadic    |  Rank | Notes |
 |:--------:|:----------:|:----:|:------------:|:-----:|:-----:|
 |  ```+``` |     Abs    |   0  |      Add     |  0 0  |Str(m): converts to nums|
+| ```+.``` |    TODO    | TODO |      GCD     |  0 0  |       |
 | ```+:``` |   Double   |   0  |   Abs Add    |  0 0  |       |
 |  ```-``` |   Negate   |   0  |   Subtract   |  0 0  |Str(m): swaps case|
+| ```-.``` |    TODO    | TODO |     TODO     |  TODO |       |
 | ```-:``` |   Halve    |   0  |  Abs Diff    |  0 0  |       |
 |  ```*``` |   Signum   |   0  |   Multiply   |  0 0  |Str(m): case sig (`1 _1 0 = *'Ab '`)|
-| ```*:``` |   Square   |   0  |   N * \|N\|  |  0 0  |       |   
+| ```*.``` |   Factors  |   0  |      LCM     |  0 0  |       |
+| ```*:``` |   Square   |   0  |   N * \|N\|  |  0 0  |       |
 |  ```%``` | Reciprocal |   0  |    Divide    |  0 0  |       |
+| ```%.``` |    TODO    | TODO |     TODO     |  TODO |       |
 | ```%:``` |  Square Rt |   0  |   Nth Root   |  0 0  |       |
 |   `\|`   | Boolean Not|   0  |    Residue   |  0 0  |       |
 |  `\|.`   |   Reverse  |   1  |    Rotate    |  0 1  |       |

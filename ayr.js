@@ -46,6 +46,7 @@ A.prototype.cl=function(){return new A(this.d.map(n=>n.cl()),this.r.cl(),this.b,
 Number.prototype.call=function(...v){return +this}
 Number.prototype.bind=function(...v){return +this}
 Number.prototype.cl=function(){return this==Infinity?+this:+JSON.parse(JSON.stringify(this))}
+Number.prototype.rank=function(...v){return narr([+this]).rank(...v)}
 Number.prototype.ds=0
 Number.prototype.uf=0
 Array.prototype.ds=1
@@ -119,6 +120,9 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   if(i<a.d.length)n=[...n,...a.d.slice(i).map(n=>narr([n],0,0,a.str))];else if(i<b.d.length)n=[...n,...b.d.slice(i).map(n=>narr([n],0,0,b.str))]
   return new A(n,i<a.d.length?a.r.cl():b.r.cl())
 }
+,ftrs=n=>{let f=[],i=1,d=0;while(i<Math.sqrt(n)|0){if(n%i==0){f.splice(d,0,i);if(i!=n/i)f.splice(-d,0,n/i);d++}i++}let t=f[f.length-1];f[f.length-1]=f[0];f[0]=t;return f}
+,gcd=(x,y)=>{x=Math.abs(x);y=Math.abs(y);while(y)[x,y]=[y,x%y];return x}
+,lcm=(x,y)=>x&&y?Math.abs(x*y/gcd(x,y)):0
 ,geti=(a,b,w)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b,w)),a=fix(a),a):get(a,b,w)
 ,err=id=>{
   switch(id){
@@ -135,12 +139,22 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   f2?new MoD(f.bind(0),f2.bind(0),...r):f instanceof MoD?(f.f1=f.f1.bind(0),f.f2=f.f2.bind(0),f):new MoD(A=>f.call(A),(A,B)=>f.call(A,B),...r)
 ,syms={
   "+":mod(pon.bind(0,0,a=>a<0?-a:+a,1,0),pon.bind(0,1,(a,b)=>+a+ +b,1,1),0,0),
+  "+.":mod(pon.bind(0,0,a=>err(2),0,0),pon.bind(0,1,(a,b)=>gcd(a,b),0,0),99,0),
   "+:":mod(pon.bind(0,0,a=>a*2,1,1),pon.bind(0,1,(a,b)=>Math.abs(a+b),1,0),0,0),
   "-":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a-32:uc(a)?a+32:a:-a,1,1),pon.bind(0,1,(a,b)=>+a-+b,1,1),0,0),
+  "-.":mod(pon.bind(0,0,a=>{
+    let y=a.rank(a.ds-1).d,r=[];const p=(y,t)=>{let i,x;if(!y.length)r.push(t);for(i=0;i<y.length;i++){x=y.splice(i,1)[0];p(y,t.concat(x));y.splice(i,0,x)}};p(y,[])
+    return new A(r.flatMap(n=>n.flatMap(x=>x.ds?x.d:x)),[...a.r,ft(y.length)],a.b,a.str)
+  },0,0),pon.bind(0,1,(a,b)=>{
+    a=a.rank(a.ds-1),b=b.rank(b.ds-1);let r=[],A=new Set(...a.d),B=new Set(...b.d);for(let a of a.d)if(!B.has(a))r.push(a.cl());for(let b of b.d)if(!A.has(b))r.push(b.cl())
+    return narr(r)
+  },0,0),99,99),
   "-:":mod(pon.bind(0,0,a=>a/2,1,1),pon.bind(0,1,(a,b)=>Math.abs(a-b),1,0),0,0),
   "*":mod(pon.bind(0,0,(a,p)=>p?uc(a)?1:lc(a)?-1:0:a==0?0:a>0?1:-1,1,0),pon.bind(0,1,(a,b)=>+a*+b,1,0),0,0),
+  "*.":mod(pon.bind(0,0,a=>narr(ftrs(a)),0,0),pon.bind(0,1,(a,b)=>lcm(a,b),0,0),0,0),
   "*:":mod(pon.bind(0,0,a=>a**2,1,0),pon.bind(0,1,(a,b)=>a*Math.abs(b),1,0),0,0),
   "%":mod(pon.bind(0,0,a=>1/+a,1,0),pon.bind(0,1,(a,b)=>+a/+b,1,0),0,0),
+  "%.":mod(pon.bind(0,0,a=>err(2),0,0),pon.bind(0,1,(a,b)=>err(2),0,0),99,0),
   "%:":mod(pon.bind(0,0,a=>a**.5,1,1),pon.bind(0,1,(a,b)=>b**(1/a),1,0),0,0),
   "]":mod(pon.bind(0,0,a=>a,1,1),pon.bind(0,1,(a,b)=>b,1,1),99,99),
   "[":mod(pon.bind(0,0,a=>a,1,1),pon.bind(0,1,(a,b)=>a,1,1),99,99),
