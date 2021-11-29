@@ -210,6 +210,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       for(let k=a.d[i+1]||0;k>=0;k--)for(let j=a.d[i];j<b.r[i];j++)c.d[j-a.d[i]+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0
     for(let i=0;i<a.d.length;i++)if(d[i])c.d=c.rank(i+1).d.flatMap(n=>n.d.reverse());return c}catch(_){return narr([])}
   },0,1),0,99),
+  "}:":mod(pon.bind(0,0,(a,p)=>p?narr(a.d[a.d.length-1].cl(),0,0,1):a.d[a.d.length-1].cl(),0,1),pon.bind(0,1,(a,b)=>ayr("[:+/\"&`,:~:&[=:\\]").call(a,b),0,0),99,99),
   "|":mod(pon.bind(0,0,a=>+!a,1,0),pon.bind(0,1,(a,b)=>b % a,0,0),0,0),
   "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a-32:a:Math.ceil(+a),1,1),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1),0,0),
   "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a+32:a:Math.floor(+a),1,1),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1),0,0),
