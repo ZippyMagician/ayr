@@ -20,7 +20,7 @@ A.prototype.rank=function(r,s){
     case 0:return this.cl()
     case 1:return chnk(this.d,this.r[0],this.str,this.b)
     case 3:case 4:case 5:case 6:case 7:case 8:case 9:
-    case 2:return(f=>(f.d=f.d.map(n=>(n.r=[pd(this.r.slice(0,2)),...this.r.slice(0,2)],n.ds=1,n)),f))(chnk(this.d,pd(this.r.slice(0,2)),this.str,this.b))
+    case 2:return(f=>(f.d=f.d.map(n=>(n.r=this.r.slice(0,this.ds-1),n.ds=this.ds-1,n)),f))(chnk(this.d,pd(this.r.slice(0,this.ds-1)),this.str,this.b))
     default:return s?new A([this.cl()],1,1,0):this.cl()//cant remember what this is for but too afraid to change it
   }
 }
