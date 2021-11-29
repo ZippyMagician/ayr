@@ -40,7 +40,7 @@ A.prototype.toString=function(){
       if(this.b)S=S.trimEnd()+' ]';break
     default:let m=this.cl().rank(this.ds-1);for(let n of m.d)S+=str(n)+"\n"+"\n".repeat(this.ds-2);break
   }
-  return S.trimEnd()
+  return !this.str?S.trimEnd():S
 }
 A.prototype.cl=function(){return new A(this.d.map(n=>n.cl()),this.r.cl(),this.b,this.str)}
 Number.prototype.call=function(...v){return +this}
@@ -127,7 +127,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,ftrs=n=>{let f=[],i=1,d=0;while(i<Math.sqrt(n)|0){if(n%i==0){f.splice(d,0,i);if(i!=n/i)f.splice(-d,0,n/i);d++}i++}let t=f[f.length-1];f[f.length-1]=f[0];f[0]=t;return f}
 ,gcd=(x,y)=>{x=Math.abs(x);y=Math.abs(y);while(y)[x,y]=[y,x%y];return x}
 ,lcm=(x,y)=>x&&y?Math.abs(x*y/gcd(x,y)):0
-,geti=(a,b,w)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b,w)),a=fix(a),a):get(a,b,w)
+,geti=(a,b,w)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b,w)),a=fix(a),a.str=b.str,a):get(a,b,w)
 ,err=id=>{
   switch(id){
     case 0:throw("[0] ARG ERROR")
@@ -361,7 +361,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,resc=r=>r.replace(/[^A-Za-z0-9_]/g,'\\$&')
 ,mex=f=>f.uf?f:f.call()
 ,nnw=(t,i)=>{
-  let o=1;while(t[i+o]&&t[i+o].t==9&&t[i+1].v!='\n')o++;return t[i+o]?[i+o,t[i+o]]:[i+o,{t:10}]
+  let o=1;while(t[i+o]&&t[i+o].t==9)o++;return t[i+o]?[i+o,t[i+o]]:[i+o,{t:10}]
 }
 ,mvr=n=>n.vr?n.call():n
 ,ste=n=>n.v=='[:'?bdrs['&']:n.v==']:'?bdrs['&:']:n.v=='`:'?bdrs['`']:err(3)
@@ -393,7 +393,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }else if(ib){
     if(t[i]==null)err(5);else if(i2(t[i],'{{')){b.push(t[i]);oc++}else if(i2(t[i],'}}')){
       if(oc==0){let B=b.cl()
-        tn.push({t:8,v:mod(a=>{cle();env.y=a;let r=exec(strand(grp(B)));ucle();return r},(a,b)=>{cle();env.x=a;env.y=b;let r=exec(strand(grp(B)));ucle();return r})})
+        tn.push({t:8,v:mod(a=>{cle();env.y=a;let r=exec(strand(grp(B)),1);ucle();return r},(a,b)=>{cle();env.x=a;env.y=b;let r=exec(strand(grp(B)),1);ucle();return r})})
         ib=0;b=[]
       }else{b.push(t[i]);oc--}}else b.push(t[i])
   }else if(i2(t[i],'('))ig=1;else if(i2(t[i],')'))err(5);else if(i2(t[i],'{{'))ib=1;else if(i2(t[i],'}}'))err(5);else if(t[i]!=null)tn.push(t[i])}return tn
@@ -442,14 +442,15 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 const exec=(t,G=0)=>{
   let fq=[],V,h,j;for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
-      if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,G).call();if(!G&&x!=null)console.log(str(x))}fq=[]
+      if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,0).call();if(G)return x;if(x!=null)console.log(str(x))}fq=[]
     }if(o.t==7){
       if(o.v=='js'&&nnw(t,i)[1].t==1&&nnw(t,i)[1].v.str){[i,o]=nnw(t,i);fq.push(eval(str(o.v)))}
       else if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
       else if(!fq.length&&env[o.v]==null)err(3)
-      else fq.push(fq.length?env[o.v]!=null&&env[o.v].uf?env[o.v]:(f=>(f.uf=0,f.vr=1,f))(_=>env[o.v]??err(3)):env[o.v])
+      else fq.push(fq.length?env[o.v]!=null&&env[o.v].uf?env[o.v]:(f=>(f.uf=0,f.vr=1,f))(_=>env[o.v]??(console.log("V:",o.v),err(3))):env[o.v])
     }else if(o.t==2||o.t==8&&o.v.uf){
-      let[ni,b]=nnw(t,i);if(inst(b)||ni!=i&&b.t==8){
+      let[ni,b]=nnw(t,i);if(t.slice(i,ni).reduce((a,b)=>a||b.t==9&&b.v=='\n',false))fq.push(o.t==8?o.v:syms[o.v])
+      else if(inst(b)||ni!=i&&b.t==8){
         i=ni;if(b.t==8){if(b.v.uf||b.t==7&&env[b.v]!=null&&env[b.v].uf)fq.push((o.t==8?o.v:syms[o.v]),b.t==7?env[b.v]:b.v);else fq.push(o.t==8?o.v:syms[o.v],b.v)}
         else fq.push(o.t==8?o.v:syms[o.v],b.t==7?env[b.v]:b.v)
       }else fq.push(o.t==8?o.v:syms[o.v])
@@ -460,13 +461,13 @@ const exec=(t,G=0)=>{
         fq.push(bdrs[o.v].call(...(f=>j?f.reverse():f)([fq.pop(),inst(f)||f.t==8?f.t==7?env[f.v]:f.v:syms[f.v]])))
       }else fq.push(bdrs[o.v].call(fq.pop()))
     }else if(o.t<2||o.t==4||o.t==8){
-      if(t.slice(i,nnw(t,i)[0]-i).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
+      if(!fq.length&&t.slice(i,nnw(t,i)[0]).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
         if(G&&nnw(t,i)[0]+1>=t.length)return o.v;else if(!G)console.log(str(o.v))
       }else fq.push(o.v);
     }else if(o.t==5||o.t==6)fq.push(o)
   }if(fq.length){
     if(V)env[V]=ptrain(fq,1);else if(!G&&fq[fq.length-1].uf)err(0)
-    else var x=ptrain(fq,G);if(!V){if(G)return mex(x);else{x=x.call();if(x!=null)console.log(str(x))}}
+    else var x=ptrain(fq,G);if(G)return mex(x);else{x=x.call();if(x!=null)console.log(str(x))}
   }
 }
 ,ayr=(d,g=1)=>exec(strand(grp(lex(d))),g)
