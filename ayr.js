@@ -166,8 +166,8 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   ">":mod(pon.bind(0,0,a=>a instanceof A?a.b?(a.b=0,a):a.d[0]:a,0,1),pon.bind(0,1,(a,b)=>+(a>b),0,0),99,0),
   "<:":mod(pon.bind(0,0,a=>narr([...Array(a.d.length).keys()].sort((i,j)=>sort(a.d[i],a.d[j]))),0,0),pon.bind(0,1,(a,b)=>+(a<=b),1,0),1,0),
   ">:":mod(pon.bind(0,0,a=>narr([...Array(a.d.length).keys()].sort((i,j)=>-sort(a.d[i],a.d[j]))),0,0),pon.bind(0,1,(a,b)=>+(a>=b),1,0),1,0),
-  "<.":mod(pon.bind(0,0,a=>{a.d=a.d.rank(a.ds-1).sort(sort).flatMap(n=>n.d??n);return a},1,1),pon.bind(0,1,(a,b)=>+(!a&&!b),1,0),1,0),
-  ">.":mod(pon.bind(0,0,a=>{a.d=a.d.rank(a.ds-1).sort((a,b)=>-sort(a,b)).flatMap(n=>n.d??n);return a},1,1),pon.bind(0,1,(a,b)=>+!(a&&b),1,0),1,0),
+  "<.":mod(pon.bind(0,0,a=>{a.d=a.rank(a.ds-1).d.sort(sort).flatMap(n=>n.d??n);return a},1,1),pon.bind(0,1,(a,b)=>+(!a&&!b),1,0),1,0),
+  ">.":mod(pon.bind(0,0,a=>{a.d=a.rank(a.ds-1).d.sort((a,b)=>-sort(a,b)).flatMap(n=>n.d??n);return a},1,1),pon.bind(0,1,(a,b)=>+!(a&&b),1,0),1,0),
   "^":mod(pon.bind(0,0,a=>2.7184*+a,1,0),pon.bind(0,1,(a,b)=>(+a)**+b,1,0),0,0),
   "$":mod(pon.bind(0,0,a=>a instanceof A?narr(a.r):narr([0]),0,0),pon.bind(0,1,(a,b)=>{
     let wc=[-1,1/0],nr=a instanceof A?a.d:[a]
@@ -470,7 +470,7 @@ const exec=(t,G=0)=>{
     }else if(o.t==5||o.t==6)fq.push(o)
   }if(fq.length){
     if(V)env[V]=ptrain(fq,1);else if(!G&&fq[fq.length-1].uf)err(0)
-    else var x=ptrain(fq,G);if(G)return mex(x);else{x=x.call();if(x!=null)console.log(str(x))}
+    else var x=ptrain(fq,G);if(G)return mex(x);else if(x!=null){x=x.call();if(x!=null)console.log(str(x))}
   }
 }
 ,ayr=(d,g=1)=>exec(strand(grp(lex(d))),g)
