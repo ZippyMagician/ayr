@@ -148,7 +148,7 @@ Partial trains, of course, support constants within them too.
 | ```[.``` | Nudge Left |   1  |    Couple    | 99 99 |       |
 |  ```]``` |  Identity  |  99  |     Right    | 99 99 |       |
 | ```].``` |    Nudge   |   1  |  Couple Back | 99 99 |       |
-|  ```?``` | Dedup Sieve|  99  |     Keys     | 99 1  |       |
+|  ```?``` | Dedup Sieve|  99  |     Group    | 99 1  |       |
 | ```?.``` |     Roll   |   0  |     Deal     |  1 99 |       |
 | ```?:``` |   Shuffle  |   1  |    Without   | 99 99 |m: ```[#(:,^./^./&,&~:\)```|
 |  ```=``` | Transpose  |   2  |   Equality   |  0 0  |       |
@@ -173,7 +173,7 @@ Partial trains, of course, support constants within them too.
 | ```I.``` |   0-range  |   0  |Wrapping Index| 99 99 |       |
 | ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 | ```i:``` |  Identity  |   0  |   Index Of   | 99 99 |By items|
-| ```K.``` |  Self Keys |  99  |     Keys+    |  99 1 |m: ```⊢∘⊂⌸```, d: ```#$.&?```|
+| ```K.``` |    Keys    |  99  |    Group+    |  99 1 |m: ```⊢∘⊂⌸```, d: ```#$.&?```|
 | ```v.``` |  Nth Prime |   0  |      Or      |  0 0  |       |
 | ```v:``` |   Floor    |   0  |     Min      |  0 0  |Str(m): lowercase|
 

@@ -148,7 +148,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "-":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a-32:uc(a)?a+32:a:-a,1,1),pon.bind(0,1,(a,b)=>+a-+b,1,1),0,0),
   "-.":mod(pon.bind(0,0,a=>{
     let y=a.rank(a.ds-1).d,r=[];const p=(y,t)=>{let i,x;if(!y.length)r.push(t);for(i=0;i<y.length;i++){x=y.splice(i,1)[0];p(y,t.concat(x));y.splice(i,0,x)}};p(y,[])
-    return new A(r.flatMap(n=>n.flatMap(x=>x.ds?x.d:x)),[...a.r,ft(y.length)],a.b,a.str)
+    return new A(r.flatMap(n=>n.flatMap(x=>n.ds>1&&x.ds?x.d:x)),[...a.r,ft(y.length)],a.b,a.str)
   },0,0),pon.bind(0,1,(a,b)=>{
     a=a.rank(a.ds-1),b=b.rank(b.ds-1);let r=[],A=new Set(...a.d),B=new Set(...b.d);for(let a of a.d)if(!B.has(a))r.push(a.cl());for(let b of b.d)if(!A.has(b))r.push(b.cl())
     return narr(r)
@@ -278,7 +278,10 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,1),0,0),
   "[.":mod(pon.bind(0,0,a=>(a.d=a.rank(a.ds-1).d,a.d.shift(),a.d=a.d.flatMap(n=>n.d??n),a.r[a.ds-1]--,a),1,1),pon.bind(0,1,(a,b)=>narr([carr(a),carr(b)]),0,0),1,99),
   "].":mod(pon.bind(0,0,(a,p)=>(a.d=[pr(a,p),...a.d],a.r[0]++,a),1,1),pon.bind(0,1,(a,b)=>narr([carr(b),carr(a)]),0,0),1,99),
-  "K.":mod(pon.bind(0,0,a=>ayr("#$.((|0=:~1)-`~&#)?]").call(a),0,0),pon.bind(0,1,(a,b)=>ayr("#$.&?").call(a,b),0,0),99,[99,1]),
+  "K.":mod(pon.bind(0,0,a=>{
+    a=a.rank(a.ds-1);let r=[];let m=new Map([...a.d.map(n=>[str(n),[]])]);a.d.forEach((n,i)=>m.set(str(n),[...m.get(str(n)),i]))
+    return narr(Array.from(m.values()).map(n=>narr(n,1)))
+  },0,0),pon.bind(0,1,(a,b)=>ayr("#$.&?").call(a,b),0,0),99,[99,1]),
   "|:":mod(pon.bind(0,0,(a,p)=>(p=syms["~"].call(narr([a],0,0,p)),p.d=p.d.reverse(),p),1,1),pon.bind(0,1,(a,b)=>{
     b=b.cl();for(let i of a.d){let[n]=b.r.splice(a.ds-i-1,1);b.r.push(n)}return b
   },0,1),0,[1,99])
