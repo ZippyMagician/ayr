@@ -509,4 +509,4 @@ while((inp=rl.question('    '))&&inp!="exit"){
   Object.values(syms).forEach(mod=>{mod.bd=[]})
   Object.values(bdrs).forEach(mod=>{mod.bd=[]})
   Object.values(env).forEach(mod=>{if(mod.uf)mod.bd=[]})
-}}else{env.I=ayr(argv._[1],1);fs.readFile(__dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))}}else{(self||globalThis||window).runAyr=run}
+}}else{env.I=ayr(argv._[1],1);fs.readFile(process.cwd()+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))}}else{(self||globalThis||window).runAyr=run}
