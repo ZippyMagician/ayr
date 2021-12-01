@@ -221,6 +221,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     for(let i=0;i<b.ds&&i<a.d.length;i++)
       for(let k=0;k<(a.d[i+1]||1);k++)for(let j=0;j<Math.min(b.r[i],a.d[i]);j++)c.d[j+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0;return c
   },0,1),0,99),
+  "{.":mod(pon.bind(0,0,a=>ayr(";,\\/:/").call(a),0,0),pon.bind(0,1,(a,b,p)=>{let n=a.d.cl();b.d.map(v=>n.indexOf(v)>-1?0:n.push(v));return narr(n,a.b,0,p)},0,1),1,1),
   "}":mod(pon.bind(0,0,a=>a-1,1,1),pon.bind(0,1,(a,b)=>{
     if(a.d.length>b.ds)err(2);try{let c=new A([0],1,0,b.str),d=[]
     for(let i=0;i<a.d.length;i++)if(a.d[i]<0){a.d[i]=-a.d[i];b.d=b.rank(i+1).d.flatMap(n=>n.d.reverse());d[i]=1}
@@ -479,7 +480,6 @@ const exec=(t,G=0)=>{
 }
 ,ayr=(d,g=1)=>exec(strand(grp(lex(d))),g)
 ,run=d=>{
-  console.trace("RUN:",d)
   if(module!=null&&argv.debug)(console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),ayr(d,0))
   else if(module!=null){try{ayr(d,0)}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}
   else{try{return ayr(d,0)}catch(e){e.toString().startsWith("[")?0:console.log(e)}}

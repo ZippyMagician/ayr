@@ -160,10 +160,10 @@
        </script>
 
        <script type="text/javascript">
-           setInterval(function() {
+           code.onchange = function () {
                bytes.innerHTML = code.value.length;
                stackTemplate();
-           }, 1);
+           }
 
            document.addEventListener ("keydown", e => {
                if(e.code === "Escape") out.innerHTML = RUNCODE(header.value + '\n' + code.value + '\n' + footer.value, ins.value, flags.value || "");
