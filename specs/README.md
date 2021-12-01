@@ -77,6 +77,18 @@ A symbol refers to a built in ascii symbol that denotes a monadic/dyadic operati
 _5 _7 _9
 ```
 
+### Control Flow
+Basic control flow can be achieved in ayr through the use of `:`. In general,
+```
+COND : IF
+ELSE
+```
+is equivalent to JS'
+```
+if (COND) { IF }
+else { ELSE }
+```
+
 ## User Functions
 User functions refer to, as the name implies, functions defined by the user. For instance,
 ```
