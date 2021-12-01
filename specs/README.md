@@ -178,6 +178,7 @@ Partial trains, of course, support constants within them too.
 | ```#.``` | Decode Binary | 0 |    Decode    |  0 0  |       |
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
+| ```{.``` |  Catalogue |   1  |     Union    |  1 1  |       |
 | ```}```  |  Decrement |   0  |     Drop     | 99 99 |       |
 | ```}:``` |     Tail   |  99  |     Count    | 99 99 |       |
 | ``` `.```|    Format  |   0  |     Format   |  0 99 |       |
