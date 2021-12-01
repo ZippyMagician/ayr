@@ -98,7 +98,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,ext=(a,l,str=0)=>(a.d=a.d.concat(rn(0,pd(l)-a.d.length,pr(a,str))),a.r=l,a.ds=l.length,a)
 ,lc=x=>x>=97&&x<=122
 ,uc=x=>x>=65&&x<=90
-,rn=(l,u=0,f)=>(module!=null&&argv['0']?(l--,u--):0,x=u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()],f!=null?x.map(_=>f.cl()):x)
+,rn=(l,u=0,f)=>(argv!=null&&argv['0']?(l--,u--):0,x=u?[...Array(u-l)].map((_,i)=>i+l):[...Array(l).keys()],f!=null?x.map(_=>f.cl()):x)
 ,eq=(a,b)=>a instanceof A?b instanceof A?JSON.stringify(a.r)==JSON.stringify(b.r)&&a.d.reduce((a,x,i)=>a&&eq(x,b.d[i]),1):err(2):+a==+b
 ,eachN=(a,f,p=[])=>{
   let x=a.map((n,i)=>n instanceof A?eachN(n.d,f,[i,...p]).d:f(n,[i,...p])).filter(n=>n!=null&&n.length!=0)
@@ -480,7 +480,7 @@ const exec=(t,G=0)=>{
 ,run=d=>{
   if(module!=null&&argv.debug)(console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),ayr(d,0))
   else if(module!=null){try{ayr(d,0)}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}
-  else{try{return ayr(d)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
+  else{try{return ayr(d,0)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
 }
 let env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
@@ -510,4 +510,4 @@ while((inp=rl.question('    '))&&inp!="exit"){
   Object.values(bdrs).forEach(mod=>{mod.bd=[]})
   Object.values(env).forEach(mod=>{if(mod.uf)mod.bd=[]})
 }}else{env.I=ayr(argv._[1],1);fs.readFile(process.cwd()+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").replace(/\#\!\/.+\n/,"").trim()))}}
-else{(self||globalThis||window).runAyr=run}
+window.runAyr=run
