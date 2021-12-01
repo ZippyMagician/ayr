@@ -443,9 +443,10 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }
 }
 const exec=(t,G=0)=>{
-  let fq=[],V,h,j;for(let i=0;i<t.length;i++){
+  let fq=[],V,h,j,F=[0];for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
-      if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,0).call();if(G)return x;if(x!=null)console.log(str(x))}fq=[]
+      if(F[0]==1)F=[2,F[1],fq.cl()];else if(F[0]==2){let x;if(ptrain(F[1],0).call())x=ptrain(F[2],0).call();else x=ptrain(fq,0).call();if(x!=null)return x;F=[0]}
+      else if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,0).call();if(G)return x;if(x!=null)console.log(str(x))}fq=[]
     }if(o.t==7){
       if(o.v=='js'&&nnw(t,i)[1].t==1&&nnw(t,i)[1].v.str){[i,o]=nnw(t,i);fq.push(eval(str(o.v)))}
       else if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
@@ -460,16 +461,18 @@ const exec=(t,G=0)=>{
     }else if(o.t==3){
       if(!fq.length)err(0)
       else if(!bdrs[o.v].m){
-        [i,f]=nnw(t,i),j=0;if(f.t==3&&f.v=='`')[i,f]=nnw(t,i),j=1;if(!inst(f)&&f.t!=2&&f.t!=8)err(0)
+        let f;[i,f]=nnw(t,i),j=0;if(f.t==3&&f.v=='`')[i,f]=nnw(t,i),j=1;if(!inst(f)&&f.t!=2&&f.t!=8)err(0)
         fq.push(bdrs[o.v].call(...(f=>j?f.reverse():f)([fq.pop(),inst(f)||f.t==8?f.t==7?env[f.v]:f.v:syms[f.v]])))
       }else fq.push(bdrs[o.v].call(fq.pop()))
     }else if(o.t<2||o.t==4||o.t==8){
-      if(!fq.length&&t.slice(i,nnw(t,i)[0]).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
+      if(!fq.length&&F[0]==0&&t.slice(i,nnw(t,i)[0]).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
         if(G&&nnw(t,i)[0]+1>=t.length)return o.v;else if(!G)console.log(str(o.v))
       }else fq.push(o.v);
-    }else if(o.t==5||o.t==6)fq.push(o)
+    }else if(o.t==5)fq.push(o);else if(o.t==6&&fq.length)(F=[1,fq.cl()],fq=[]);else if(o.t==6)fq.push(o)
   }if(fq.length){
-    if(V)env[V]=ptrain(fq,1);else if(!G&&fq[fq.length-1].uf)err(0)
+    if(F[0]==1){let x;if(ptrain(F[1],0).call())x=ptrain(fq,0).call();if(x!=null){if(G)return x;else console.log(str(x))}}
+    else if(F[0]==2){let x;if(ptrain(F[1],0).call())x=ptrain(F[2],0).call();else x=ptrain(fq,0).call();if(x!=null){if(G)return x;else console.log(str(x))}}
+    else if(V)env[V]=ptrain(fq,1);else if(!G&&fq[fq.length-1].uf)err(0)
     else var x=ptrain(fq,G);if(G)return mex(x);else if(x!=null){x=x.call();if(x!=null)console.log(str(x))}
   }
 }
@@ -499,11 +502,11 @@ Args:
     --debug - Debug code (for internal use)
     -0      - The one-range symbol '~' creates a range from [0, N) instead
     -n      - Numbers are outputted in classic JS style instead of ayr style`),process.exit(0);if(argv.u)run(argv.u);else if(!argv._.length){
-console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`);if(require!=null)env.I=argv._.length?ayr(argv._[argv._.length-1]):""
+console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`);env.I=argv._.length?ayr(argv._[argv._.length-1]):sta("")
 while((inp=rl.question('    '))&&inp!="exit"){
   run(inp)
   //what the fuck javascript
   Object.values(syms).forEach(mod=>{mod.bd=[]})
   Object.values(bdrs).forEach(mod=>{mod.bd=[]})
   Object.values(env).forEach(mod=>{if(mod.uf)mod.bd=[]})
-}}else fs.readFile(__dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))}else{(self||globalThis||window).runAyr=run}
+}}else{env.I=ayr(argv._[1],1);fs.readFile(__dirname+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").trim()))}}else{(self||globalThis||window).runAyr=run}
