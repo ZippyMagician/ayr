@@ -130,13 +130,13 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,geti=(a,b,w)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b,w)),a=fix(a),a.str=b.str,a):get(a,b,w)
 ,err=id=>{
   switch(id){
-    case 0:throw("[0] ARG ERROR")
-    case 1:throw("[1] RANK ERROR")
-    case 2:throw("[2] DOMAIN ERROR")
-    case 3:throw("[3] NAME ERROR")
-    case 4:throw("[4] FILE ERROR")
-    case 5:throw("[5] GROUP ERROR")
-    default:throw(`[${id}] GENERIC ERROR`)
+    case 0:if(module==null)console.log("[0] ARG ERROR");throw("[0] ARG ERROR")
+    case 1:if(module==null)console.log("[1] RANK ERROR");throw("[1] RANK ERROR")
+    case 2:if(module==null)console.log("[2] DOMAIN ERROR");throw("[2] DOMAIN ERROR")
+    case 3:if(module==null)console.log("[3] NAME ERROR");throw("[3] NAME ERROR")
+    case 4:if(module==null)console.log("[4] FILE ERROR");throw("[4] FILE ERROR")
+    case 5:if(module==null)console.log("[5] GROUP ERROR");throw("[5] GROUP ERROR")
+    default:if(module==null)console.log(`[${id}] GENERIC ERROR`);throw(`[${id}] GENERIC ERROR`)
   }
 }
 ,mod=(f,f2,...r)=>
@@ -234,9 +234,9 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a+32:a:Math.floor(+a),1,1),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1),0,0),
   "!":mod(pon.bind(0,0,ft,1,0),pon.bind(0,1,(a,b)=>a<b?0:ft(a)/(ft(b)*ft(a-b)),1,0),0,0),
   ";:":mod(pon.bind(0,0,a=>new A(carr(a).rank(a.ds?a.ds-1:0).d,a.r.slice(a.ds-1),a.b,a.str),0,1),pon.bind(0,1,(b,a,p)=>{
-    let n=[];for(i=0;i<a.d.length;i++){
+    b=b.rank(b.ds-1);if(b.d.length!=a.d.length)err(1);let n=[];for(i=0;i<a.d.length;i++){
       if(i==0&&a.d[i]!=0)n.push([b.d[i].cl()]);else if(a.d[i]!=0)n[n.length-1].push(b.d[i].cl());else n.push([])
-    }if(n.length==1)return narr(n[0]);return narr(n.map(n=>narr(n,1,0,p)),0,1)
+    }if(n.length==1)return narr(n[0]);return narr(n.map(n=>narr(n,1,0,p)))
   },0,1),99,[99,1]),
   "=.":mod(pon.bind(0,0,a=>a.d.length?+a.d.map(n=>eq(a.d[0],n)).reduce((a,b)=>a&&b,1):1,0,0),pon.bind(0,1,(a,b)=>a^b,1,0),99,0),
   "i.":mod(pon.bind(0,0,a=>{
@@ -291,7 +291,8 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     ,(l,r)=>l==null||r==null?err(0):!a.uf||!b.uf?err(0):a.call(b.call(l,r)))),
   '&:':op(0,(f,g)=>mod(a=>a==null?err(0):f.call(a.cl(),g.call(a)),(a,b)=>a==null||b==null?err(0):f.call(a,g.call(b)))),
   '&.':op(0,(f,g)=>mod(a=>a==null?err(0):g.call(f.call(a.cl()),a),(a,b)=>a==null||b==null?err(0):g.call(f.call(a),b))),
-  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>(l=>sb(l)?l.d[0]:l)(f.call(n))),l.rank(l.ds-1).r,l.b,l.str),(l,r)=>{
+  '"':op(1,f=>mod(l=>l==null?err(0):l.ds==0?new A([f.call(l)],1,0):new A(l.rank(l.ds-1).d.map(n=>(l=>sb(l)?l.d[0]:l)(f.call(sb(n)?n.d[0]:n))),l.rank(l.ds-1).r,l.b,l.str)
+  ,(l,r)=>{
     if(l==null||r==null)err(0);let j,b=l=>sb(l)?l.d[0]:l;if(l.ds==0||sb(l))j=1;else if(r.ds==0||sb(r))j=0;
     if(j!=null)return narr(j?r.rank(r.ds-1).d.map(n=>b(f.call(l.cl(),n))):l.rank(l.ds-1).d.map(n=>b(f.call(n,r.cl()))))
     if(JSON.stringify(l.r)==JSON.stringify(r.r)){let F=l.rank(l.ds-1),S=r.rank(r.ds-1);return narr(F.d.map((n,i)=>b(f.call(n,S.d[i]))))}err(1)
@@ -375,7 +376,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       if(m[2]!=null)m[1]=m[2];let x=m[1].replace(/_/g,'-').replace(/(?<=-?)(?<!\d)(e|r)/,'1$1'),l,r;if(x=="--"||x=="-")t.push({t:0,v:x=="--"?-Infinity:Infinity})
       else if(x.indexOf("r")>-1)t.push({t:0,v:([l,r]=x.split("r"),+l/+r)})
       else if(x.lastIndexOf(".")>x.indexOf("e")&&x.indexOf("e")>-1)t.push({t:0,v:([l,r]=x.split("e"),(+l)**+r)});else t.push({t:0,v:+x})
-    }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1].replace(/"/g,'\\"')}"`),sta(l))})
+    }else if(m=/^'((?:[^'\\]|\\.)*)'/.exec(s))t.push({t:1,v:(l=JSON.parse(`"${m[1].replace(/"/g,'\\"').replace(/\n/g,'\\n')}"`),sta(l))})
     else if(m=/^\[:|^\]:|^`:/.exec(s))t.push({t:5,v:m[0]})
     else if(m=/^\(|^\)|^{{|^}}/.exec(s))t.push({t:2,v:m[0]})
     else if(m=RegExp(`^(${Object.keys(syms).concat(Object.keys(bdrs)).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:bdrs[m[1]]!=null?3:2,v:m[1]})
@@ -384,9 +385,9 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     else if(m=RegExp(`^(${Object.keys(env).sort((a,b)=>b.length-a.length).map(resc).join('|')})`).exec(s))t.push({t:7,v:m[1]})
     else if(m=/^([a-zA-Z]+)/.exec(s))t.push({t:7,v:m[1]})
     else err(3)
-    s=s.slice(m&&m[0].length||1);
+    s=s.slice(m&&m[0].length||1)
   }
-  return t;
+  return t
 }
 ,grp=t=>{
   let tn=[],b=[],ig=0,oc=0,ib=0,i2=(x,n)=>x!=null&&x.t==2&&x.v==n;for(let i=0;i<=t.length;i++){if(ig){
@@ -446,7 +447,7 @@ const exec=(t,G=0)=>{
   let fq=[],V,h,j,F=[0];for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
       if(F[0]==1)F=[2,F[1],fq.cl()];else if(F[0]==2){let x;if(ptrain(F[1],0).call())x=ptrain(F[2],0).call();else x=ptrain(fq,0).call();if(x!=null)return x;F=[0]}
-      else if(V){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,0).call();if(G)return x;if(x!=null)console.log(str(x))}fq=[]
+      else if(V&&fq.length){env[V]=(h=ptrain(fq,1),h.uf?h:h.call());V=0}else{let x=ptrain(fq,0).call();if(G)return x;if(x!=null)console.log(str(x))}fq=[]
     }if(o.t==7){
       if(o.v=='js'&&nnw(t,i)[1].t==1&&nnw(t,i)[1].v.str){[i,o]=nnw(t,i);fq.push(eval(str(o.v)))}
       else if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
@@ -478,9 +479,10 @@ const exec=(t,G=0)=>{
 }
 ,ayr=(d,g=1)=>exec(strand(grp(lex(d))),g)
 ,run=d=>{
+  console.trace("RUN:",d)
   if(module!=null&&argv.debug)(console.log(lex(d)),console.log(grp(lex(d))),console.log(strand(grp(lex(d)))),ayr(d,0))
   else if(module!=null){try{ayr(d,0)}catch(e){argv.debug||e.toString().startsWith("[")?console.error(e):console.error("[/] INTERNAL ERROR")}}
-  else{try{return ayr(d,0)}catch(e){return e.toString().startsWith("[")?e:"[/] INTERNAL ERROR"}}
+  else{try{return ayr(d,0)}catch(e){e.toString().startsWith("[")?0:console.log(e)}}
 }
 let env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
@@ -510,4 +512,4 @@ while((inp=rl.question('    '))&&inp!="exit"){
   Object.values(bdrs).forEach(mod=>{mod.bd=[]})
   Object.values(env).forEach(mod=>{if(mod.uf)mod.bd=[]})
 }}else{env.I=ayr(argv._[1],1);fs.readFile(process.cwd()+"/"+argv._[0],'utf8',(e,d)=>e?err(4):run(d.replace(/\r\n/g,"\n").replace(/\#\!\/.+\n/,"").trim()))}}
-window.runAyr=run
+if(require==null)window.runAyr=run

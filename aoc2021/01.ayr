@@ -1,6 +1,6 @@
 #!/usr/bin/env ayr
-one:+/1=2</
-two:+/1=2</3+/ 
+one:+/2</
+two:+/2</3+/ 
 
 input:=:&>"'\n'sp js'sta(fs.readFileSync("./01.txt","utf8"))'
 one input
