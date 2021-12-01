@@ -1,0 +1,8 @@
+#!/usr/bin/env ayr
+fread: js'mod(a=>sta(fs.readFileSync(process.cwd()+"/"+a,"utf8")),_=>err(2))'
+import: =:fread
+
+={{
+    import y,'.ayr'
+    <=:'aoc',y
+}}'01'
