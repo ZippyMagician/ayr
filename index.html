@@ -109,25 +109,10 @@
         <script type="text/javascript" src="ayr.js"></script><script type="text/javascript" src="site/main.js"></script>
 
         <script type="text/javascript">
-            console.log = async (...txt) => {
-                out.innerHTML += txt.join(" ") + "\n"
-            }
-
-            function encodeLink(a) {
-                return btoa(a);
-            }
-
-            function decodeLink(a) {
-                return atob(a);
-            }
-
-            function qstr(qs) {
-                var s = location.href.replace("?","?&").split("&");
-                for(i = 1; i < s.length; i++) {
-                    if(s[i].split("=")[0] == qs) return s[i].split("=").slice(1).join("=");
-                }
-                return "";
-            }
+            console.log=(...txt)=>out.innerHTML+=txt.join(" ")+"\n"
+            function encodeLink(a){return btoa(a).replace(/=/g,"@")}
+            function decodeLink(a){return atob(a.replace(/@/g,"="))}
+            function qstr(qs){var s=location.href.split("#");if(s.length>1)return s[1]}
 
             function toggleTemplate() {
                 let div = document.getElementById("se-template");
@@ -150,7 +135,7 @@
             var out = document.getElementById("debug_output");
             var flags = document.getElementById("flags");
 
-            if(qstr("code").length) [header.value, code.value, footer.value, ins.value, flags.value] = qstr("code").split("||").map(decodeLink);
+            if(qstr("code").length) [header.value, code.value, footer.value, ins.value, flags.value] = qstr("code").split("/").map(decodeLink);
 
             // out.innerHTML = runArn(code.value, ins.value);
             
@@ -162,15 +147,15 @@
                     " bytes\n\n";
 
                 template.value = h +
-                    '```\n' + code.value + '\n```' + '\n[Try it!](https://zippymagician.github.io/ayr?code=' +
-                    [header.value, code.value, footer.value, ins.value, flags.value].map(n=>encodeLink(n)).join("||")
+                    '```\n' + code.value + '\n```' + '\n[Try it!](https://zippymagician.github.io/ayr#' +
+                    [header.value, code.value, footer.value, ins.value, flags.value].map(n=>encodeLink(n)).join("/") +
                     ")\n\n# Explained\n\nELABORATE HERE";
             }
 
             function fetchLink() {
                 out.innerHTML = '[`' +
-			        code.value + '` ' + bytes.innerHTML + ' bytes](https://zippymagician.github.io/ayr?code=' +
-                    [header.value, code.value, footer.value, ins.value, flags.value].map(n=>encodeLink(n)).join("||") + ')';
+			        code.value + '` ' + bytes.innerHTML + ' bytes](https://zippymagician.github.io/ayr#' +
+                    [header.value, code.value, footer.value, ins.value, flags.value].map(n=>encodeLink(n)).join("/") + ')';
             }
        </script>
 
