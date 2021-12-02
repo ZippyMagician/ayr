@@ -40,7 +40,7 @@ A.prototype.toString=function(){
       if(this.b)S=S.trimEnd()+' ]';break
     default:let m=this.cl().rank(this.ds-1);for(let n of m.d)S+=str(n)+"\n"+"\n".repeat(this.ds-2);break
   }
-  return !this.str?S.trimEnd():S
+  return !this.str?S.trimEnd():S.replace(/\r?\n$/,"")
 }
 A.prototype.cl=function(){return new A(this.d.map(n=>n.cl()),this.r.cl(),this.b,this.str)}
 Number.prototype.call=function(...v){return +this}
@@ -222,6 +222,9 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       for(let k=0;k<(a.d[i+1]||1);k++)for(let j=0;j<Math.min(b.r[i],a.d[i]);j++)c.d[j+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0;return c
   },0,1),0,99),
   "{.":mod(pon.bind(0,0,a=>ayr(";,\\/:/").call(a),0,0),pon.bind(0,1,(a,b,p)=>{let n=a.d.cl();b.d.map(v=>n.indexOf(v)>-1?0:n.push(v));return narr(n,a.b,0,p)},0,1),1,1),
+  "{:":mod(pon.bind(0,0,(a,p)=>p?narr(a.d[0].cl(),0,0,1):a.d[0].cl(),0,1),pon.bind(0,1,(b,a)=>{
+    if(a.r[0]!=b.r[0])err(1);let B=b.cl().rank(b.ds-1);let n=[];for(let i=0;i<a.r[0];i++)n.push(a.d[i]>=B.d.length?err(2):B.d[a.d[i]].d[i]);return narr(n,0,0,b.str)
+  },0,0),99,[2,1]),
   "}":mod(pon.bind(0,0,a=>a-1,1,1),pon.bind(0,1,(a,b)=>{
     if(a.d.length>b.ds)err(2);try{let c=new A([0],1,0,b.str),d=[]
     for(let i=0;i<a.d.length;i++)if(a.d[i]<0){a.d[i]=-a.d[i];b.d=b.rank(i+1).d.flatMap(n=>n.d.reverse());d[i]=1}
