@@ -1,7 +1,7 @@
 #!/usr/bin/env ayr
-one:+/2</
-two:+/2</3+/ 
+one: +/2</
+two: +/2</3+/ 
 
-input:=:"fread'./01.txt'
-one input
-two input
+i: =:"fread'./01.txt'
+one i
+two i
