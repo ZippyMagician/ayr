@@ -163,7 +163,12 @@
        </script>
 
        <script type="text/javascript">
-           code.onchange = function () {
+           code.oninput = function () {
+               bytes.innerHTML = code.value.length;
+               stackTemplate();
+           }
+	       
+	   code.onkeyup = function () {
                bytes.innerHTML = code.value.length;
                stackTemplate();
            }
