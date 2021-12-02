@@ -261,7 +261,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     if(argv!=null&&argv['0'])n++;if(n<2)return 2;if(n==2)return 3;let l=n*(Math.log(n)+Math.log(Math.log(n)))|0,r=Math.sqrt(l)+1|0,c=1,i=0,s,p,j;l=(l-1)/2|0;r=r/2-1|0;s=Array(l)
     for(;i<r;++i)if(!s[i]){++c;for(j=2*i*(i+3)+3,p=2*i+3;j<l;j+=p)s[j]=1}for(p=r;c<n;++p)if(!s[p])++c;return 2*p+1
   },1,0),pon.bind(0,1,(a,b)=>a|b,1,0),0,0),
-  "|.":mod(pon.bind(0,0,a=>(a.d=a.rank(a.ds-1).d.reverse().flatMap(n=>n.d??n),a),1,1),pon.bind(0,1,(a,b)=>(b.d=b.rank(b.ds-1).d.rot(+a).flatMap(n=>n.d??n),b),1,1),1,[0,1]),
+  "|.":mod(pon.bind(0,0,a=>(a.d=a.rank(a.ds-1).d.reverse().flatMap(n=>a.d[0].ds?n:n.d??n),a),1,1),pon.bind(0,1,(a,b)=>(b.d=b.rank(b.ds-1).d.rot(+a).flatMap(n=>n.d??n),b),1,1),1,[0,1]),
   "B:":mod(a=>a.ds>0?ayr(':;(,`0#)"&:(-`"&:(^:/)#")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr(';&#:').call(a,b):ayr('#:').call(a,b)),
   "=:":mod(pon.bind(0,0,a=>a.str?ayr(str((a.b=0,a))):(a.d=a.d.map(n=>ayr(str((n.b=0,n)))),a),1,0)
           ,pon.bind(0,1,(a,b)=>+eq(a,b),0,0),99,99),
