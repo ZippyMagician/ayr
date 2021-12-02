@@ -394,7 +394,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   let tn=[],b=[],ig=0,oc=0,ib=0,i2=(x,n)=>x!=null&&x.t==2&&x.v==n;for(let i=0;i<=t.length;i++){if(ig){
     if(t[i]==null)err(5);else if(i2(t[i],'(')){b.push(t[i]);oc++}else if(i2(t[i],')')){
       if(oc==0){
-        let v;try{v=exec(strand(grp(b)))}catch(e){
+        let v;try{v=exec(strand(grp(b)),1)}catch(e){
           let B=b.cl(),u;v=mod(a=>exec(strand(grp(B)),1).call(a),(a,b)=>exec(strand(grp(B)),1).call(a,b))
           v.uf=(inst(u=nnw(t,i)[1])||u.t==3)&&u.t!=10&&!t.slice(i,nnw(t,i)[0]).reduce((a,b)=>a||b.t==9&&b.v=='\n',0)&&!inst(B.filter(n=>n.t!=9).reduce((a,b)=>b,{t:10}),1)
         }tn.push({t:8,v});ig=0;b=[]
