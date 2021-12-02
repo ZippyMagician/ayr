@@ -260,7 +260,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },1,0),pon.bind(0,1,(a,b)=>a|b,1,0),0,0),
   "|.":mod(pon.bind(0,0,a=>(a.d=a.rank(a.ds-1).d.reverse().flatMap(n=>n.d??n),a),1,1),pon.bind(0,1,(a,b)=>(b.d=b.rank(b.ds-1).d.rot(+a).flatMap(n=>n.d??n),b),1,1),1,[0,1]),
   "B:":mod(a=>a.ds>0?ayr(':;(,`0#)"&:(-`"&:(^:/)#")#:').call(a):ayr('#:').call(a),(a,b)=>b.ds>0?ayr(';&#:').call(a,b):ayr('#:').call(a,b)),
-  "=:":mod(pon.bind(0,0,a=>a.str?ayr(a.toString()):(a.d=a.d.map(n=>ayr(n.toString())),a),1,0)
+  "=:":mod(pon.bind(0,0,a=>a.str?ayr(str((a.b=0,a))):(a.d=a.d.map(n=>ayr(str((n.b=0,n)))),a),1,0)
           ,pon.bind(0,1,(a,b)=>+eq(a,b),0,0),99,99),
   "?":mod(pon.bind(0,0,(a,p)=>{
     let s=new Set();return narr(a.rank(a.ds-1).d.map(v=>s.has(v)?0:s.add(v)&&1),a.b,0,p)
@@ -393,7 +393,12 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,grp=t=>{
   let tn=[],b=[],ig=0,oc=0,ib=0,i2=(x,n)=>x!=null&&x.t==2&&x.v==n;for(let i=0;i<=t.length;i++){if(ig){
     if(t[i]==null)err(5);else if(i2(t[i],'(')){b.push(t[i]);oc++}else if(i2(t[i],')')){
-      if(oc==0){tn.push({t:8,v:exec(strand(grp(b)),1)});ig=0;b=[]}else{b.push(t[i]);oc--}
+      if(oc==0){
+        let v;try{v=exec(strand(grp(b)))}catch(e){
+          let B=b.cl(),u;v=mod(a=>exec(strand(grp(B)),1).call(a),(a,b)=>exec(strand(grp(B)),1).call(a,b))
+          v.uf=inst(u=nnw(t,i)[1])&&u.t!=10&&!t.slice(i,nnw(t,i)[0]).reduce((a,b)=>a||b.t==9&&b.v=='\n',0)&&!inst(B.filter(n=>n.t!=9).reduce((a,b)=>b,{t:10}),1)
+        }tn.push({t:8,v});ig=0;b=[]
+      }else{b.push(t[i]);oc--}
     }else b.push(t[i])
   }else if(ib){
     if(t[i]==null)err(5);else if(i2(t[i],'{{')){b.push(t[i]);oc++}else if(i2(t[i],'}}')){
@@ -453,7 +458,7 @@ const exec=(t,G=0)=>{
       if(o.v=='js'&&nnw(t,i)[1].t==1&&nnw(t,i)[1].v.str){[i,o]=nnw(t,i);fq.push(eval(str(o.v)))}
       else if(nnw(t,i)[1].t==6){[i,]=nnw(t,i);if(fq.length)fq.push((f=>(f.uf=0,f))(mod(a=>(env[o.v]=a),(a,b)=>err(2))));else V=o.v}
       else if(!fq.length&&env[o.v]==null)err(3)
-      else fq.push(fq.length?env[o.v]!=null&&env[o.v].uf?env[o.v]:(f=>(f.uf=0,f.vr=1,f))(_=>env[o.v]??(console.log("V:",o.v),err(3))):env[o.v])
+      else fq.push(fq.length?env[o.v]!=null&&env[o.v].uf?env[o.v]:(f=>(f.uf=0,f.vr=1,f))(_=>env[o.v]??err(3)):env[o.v])
     }else if(o.t==2||o.t==8&&o.v.uf){
       let[ni,b]=nnw(t,i);if(t.slice(i,ni).reduce((a,b)=>a||b.t==9&&b.v=='\n',false))fq.push(o.t==8?o.v:syms[o.v])
       else if(inst(b)||ni!=i&&b.t==8){
@@ -467,7 +472,7 @@ const exec=(t,G=0)=>{
         fq.push(bdrs[o.v].call(...(f=>j?f.reverse():f)([fq.pop(),inst(f)||f.t==8?f.t==7?env[f.v]:f.v:syms[f.v]])))
       }else fq.push(bdrs[o.v].call(fq.pop()))
     }else if(o.t<2||o.t==4||o.t==8){
-      if(!fq.length&&F[0]==0&&t.slice(i,nnw(t,i)[0]).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
+      if(!fq.length&&!V&&F[0]==0&&t.slice(i,nnw(t,i)[0]).reduce((a,b)=>a||b.t==9&&b.v=='\n',false)){
         if(G&&nnw(t,i)[0]+1>=t.length)return o.v;else if(!G)console.log(str(o.v))
       }else fq.push(o.v);
     }else if(o.t==5)fq.push(o);else if(o.t==6&&fq.length)(F=[1,fq.cl()],fq=[]);else if(o.t==6)fq.push(o)
@@ -488,6 +493,7 @@ let env={
   put:mod(A=>console.log(A.toString()),(A,B)=>console.log((B.toString()+"\n").repeat(+A.call()).trim())),
   jn:mod(A=>ayr("([,' ',])/").call(A),(A,B)=>B.str?B:ayr(`#&[}[:,,\\:`).call(A,B)),
   sp:mod(A=>ayr("];:' '~:").call(A),(A,B)=>ayr("];:[~:]").call(A,B)),
+  fread:mod(A=>narr(fs.readFileSync(str(A),"utf8").split(/\r?\n/g).map(sta)),(A,B)=>narr(fs.readFileSync(str(A),str(B)).split(/\r?\n/g).map(sta))),
   su:ayr("~`&.`<:"),
   sd:ayr("~`&.`>:"),
   'V.':sta('AEIOU'),

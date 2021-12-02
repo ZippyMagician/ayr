@@ -2,6 +2,6 @@
 one:+/2</
 two:+/2</3+/ 
 
-input:=:&>"'\n'sp js'sta(fs.readFileSync("./01.txt","utf8"))'
+input:=:"fread'./01.txt'
 one input
 two input
