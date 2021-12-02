@@ -65,7 +65,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,carr=(v,b=0)=>v instanceof A?b?(v.b=1,v):v:new A([v],1,b)
 ,narr=(a,b=0,ba=0,s=0)=>new A(ba?a.map(n=>n instanceof A?(n.b=1,n):new A([n],1,1)):a,a.length,b,s)
 ,pon=(d,f,S,p,r,a,b,e=0)=>{
-  if(a.ds==1&&!a.b&&a.r[0]==1)a=a.d[0];if(b!=null&&b.ds==1&&!b.b&&b.r[0]==1)b=b.d[0];let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}//Q:is this worth it?
+  if(a.ds==1&&!a.b&&a.r[0]==1&&!a.str)a=a.d[0];if(b!=null&&b.ds==1&&!b.b&&b.r[0]==1)b=b.d[0];let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}//Q:is this worth it?
   if(!d){
     let x=a.ds==0&&e;a=carr(a)
     if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0].cl():a.cl(),p?x?p:a.str:0));let na=a.rank(r[1]),t
@@ -154,7 +154,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     return narr(r)
   },0,0),99,99),
   "-:":mod(pon.bind(0,0,a=>a/2,1,1),pon.bind(0,1,(a,b)=>Math.abs(a-b),1,0),0,0),
-  "*":mod(pon.bind(0,0,(a,p)=>p?uc(a)?1:lc(a)?-1:0:a==0?0:a>0?1:-1,1,0),pon.bind(0,1,(a,b)=>+a*+b,1,0),0,0),
+  "*":mod(pon.bind(0,0,(a,p)=>p?uc(a)?1:lc(a)?-1:0:a==0?0:a>0?1:-1,1,1),pon.bind(0,1,(a,b)=>+a*+b,1,0),0,0),
   "*.":mod(pon.bind(0,0,a=>narr(ftrs(a)),0,0),pon.bind(0,1,(a,b)=>lcm(a,b),0,0),0,0),
   "*:":mod(pon.bind(0,0,a=>a**2,1,0),pon.bind(0,1,(a,b)=>a*Math.abs(b),1,0),0,0),
   "%":mod(pon.bind(0,0,a=>1/+a,1,0),pon.bind(0,1,(a,b)=>+a/+b,1,0),0,0),
