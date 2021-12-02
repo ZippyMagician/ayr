@@ -183,6 +183,7 @@ Partial trains, of course, support constants within them too.
 | ```}:``` |     Tail   |  99  |     Count    | 99 99 |       |
 | ``` `.```|    Format  |   0  |     Format   |  0 99 |       |
 | ```B:``` | Encode Binary+| 0 |    Encode+   |  1 0  |       |
+| ```E.``` |     N/A    | N/A  |    Match     | 99 99 |       |
 | ```I.``` |   0-range  |   0  |Wrapping Index| 99 99 |       |
 | ```i.``` |  Unindices |   1  | CTX Unindices|  99 1 |(d) case takes orig shape of data on left|
 | ```i:``` |  Identity  |   0  |   Index Of   | 99 99 |By items|

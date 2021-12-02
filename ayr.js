@@ -65,7 +65,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,carr=(v,b=0)=>v instanceof A?b?(v.b=1,v):v:new A([v],1,b)
 ,narr=(a,b=0,ba=0,s=0)=>new A(ba?a.map(n=>n instanceof A?(n.b=1,n):new A([n],1,1)):a,a.length,b,s)
 ,pon=(d,f,S,p,r,a,b,e=0)=>{
-  let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}
+  if(a.ds==1&&!a.b&&a.r[0]==1)a=a.d[0];if(b!=null&&b.ds==1&&!b.b&&b.r[0]==1)b=b.d[0];let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}//Q:is this worth it?
   if(!d){
     let x=a.ds==0&&e;a=carr(a)
     if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0].cl():a.cl(),p?x?p:a.str:0));let na=a.rank(r[1]),t
@@ -285,7 +285,8 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,0),pon.bind(0,1,(a,b)=>ayr("#$.&?").call(a,b),0,0),99,[99,1]),
   "|:":mod(pon.bind(0,0,(a,p)=>(p=syms["~"].call(narr([a],0,0,p)),p.d=p.d.reverse(),p),1,1),pon.bind(0,1,(a,b)=>{
     b=b.cl();for(let i of a.d){let[n]=b.r.splice(a.ds-i-1,1);b.r.push(n)}return b
-  },0,1),0,[1,99])
+  },0,1),0,[1,99]),
+  "E.":mod(pon.bind(0,0,a=>err(2),0,0),pon.bind(0,1,(a,b)=>ayr("{{(x=:);.($x)]y}}").call(a,b),1,0),99,99)
 }
 ,bdrs={
   '&':op(0,(a,b)=>mod(l=>l==null?err(0):!a.uf?b.call(a,l):!b.uf?a.call(l,b):a.call(b.call(l))
@@ -343,9 +344,9 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   ";.":op(0,(f,g)=>mod(a=>{
     if(g.uf)err(2);let r=carr(g.cl()).d;let s=ayr("$$~.").call(new A(rn(pd(r),0,1),r)).d.map(n=>n.d.length<a.ds?n.d.concat(rn(a.ds-n.d.length,0,0)):n.d);let N=a.cl()
     for(let i=0;i<a.d.length;i++){
-      let n=a.r.map((v,y,_,z=pd(a.r.slice(0,y)))=>(i%(v*z))/z|0);let o=n.map((v,i)=>v-s[Math.floor(s.length/2)][i])
+      let n=a.r.map((v,y,_,z=pd(a.r.slice(0,y)))=>(i%(v*z))/z|0);let o=n.map((v,i)=>s.length%2?v-s[Math.floor(s.length/2)][i]:v)
       N.d[i]=f.call(geti((f=>(f.d=f.d.map(n=>(n.b=1,n)),f))(new A(s.map(C=>narr(C.map((v,i)=>v+o[i]))),r)),a.cl()))
-    }return N
+    }N.str=0;return N
   },err.bind(0,2))),
   "$:":op(1,f=>mod(a=>{let c=[f.call(a.cl())],n;while(!eq(c[0],n=f.call(c[c.length-1].cl()))&&!eq(c[c.length-1],n))c.push(n);return narr(c)}
     ,(a,b)=>{for(let i=0;i<+a;i++)b=f.call(b);return b})),
