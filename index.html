@@ -115,6 +115,7 @@
             function qstr(qs){var s=location.href.split("#");if(s.length>1)return s[1]}
 
             function toggleTemplate() {
+                stackTemplate();
                 let div = document.getElementById("se-template");
                 let button = document.getElementById("se-template-toggle");
                 if (div.style.display === "none") {
@@ -129,13 +130,15 @@
             var code = document.getElementById("code");
             var header = document.getElementById("code-header");
             var footer = document.getElementById("code-footer");
-            var byteslm = document.getElementById("bytes");
+            var bytes = document.getElementById("bytes");
             var template = document.getElementById("template");
             var ins = document.getElementById("ins");
             var out = document.getElementById("debug_output");
             var flags = document.getElementById("flags");
 
             if(qstr("code").length) [header.value, code.value, footer.value, ins.value, flags.value] = qstr("code").split("/").map(decodeLink);
+            bytes.innerHTML = code.value.length;
+            stackTemplate();
 
             // out.innerHTML = runArn(code.value, ins.value);
             
@@ -165,8 +168,9 @@
                stackTemplate();
            }
 
-           document.addEventListener ("keydown", e => {
-               if(e.code === "Escape") out.innerHTML = RUNCODE(header.value + '\n' + code.value + '\n' + footer.value, ins.value, flags.value || "");
+           document.addEventListener("keydown", e => {
+               bytes.innerHTML = code.value.length;
+               if(e.code === "Escape") RUNCODE(header.value + '\n' + code.value + '\n' + footer.value, ins.value, flags.value || "");
            });
         </script>
     </body>
