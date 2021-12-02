@@ -396,7 +396,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       if(oc==0){
         let v;try{v=exec(strand(grp(b)))}catch(e){
           let B=b.cl(),u;v=mod(a=>exec(strand(grp(B)),1).call(a),(a,b)=>exec(strand(grp(B)),1).call(a,b))
-          v.uf=inst(u=nnw(t,i)[1])&&u.t!=10&&!t.slice(i,nnw(t,i)[0]).reduce((a,b)=>a||b.t==9&&b.v=='\n',0)&&!inst(B.filter(n=>n.t!=9).reduce((a,b)=>b,{t:10}),1)
+          v.uf=(inst(u=nnw(t,i)[1])||u.t==3)&&u.t!=10&&!t.slice(i,nnw(t,i)[0]).reduce((a,b)=>a||b.t==9&&b.v=='\n',0)&&!inst(B.filter(n=>n.t!=9).reduce((a,b)=>b,{t:10}),1)
         }tn.push({t:8,v});ig=0;b=[]
       }else{b.push(t[i]);oc--}
     }else b.push(t[i])
@@ -450,6 +450,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }
 }
 const exec=(t,G=0)=>{
+  //console.log("E:",t)
   let fq=[],V,h,j,F=[0];for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
       if(F[0]==1)F=[2,F[1],fq.cl()];else if(F[0]==2){let x;if(ptrain(F[1],0).call())x=ptrain(F[2],0).call();else x=ptrain(fq,0).call();if(x!=null)return x;F=[0]}
