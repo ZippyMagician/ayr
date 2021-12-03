@@ -2,6 +2,6 @@
 one: +/2</
 two: +/2</3+/ 
 
-i: =:"fread'./01.txt'
-one i
-two i
+in: =:"fread'./01.txt'
+one in
+two in

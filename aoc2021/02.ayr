@@ -6,6 +6,6 @@ down: 0 1&*
 one: */+/
 two: :(+/&>*>+/&*+\&>&|.);:=;
 
-i: =:"fread'./02.txt'
-one i
-two i
+in: =:"fread'./02.txt'
+one in
+two in
