@@ -377,7 +377,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,ste=n=>n.v=='[:'?bdrs['&']:n.v==']:'?bdrs['&:']:n.v=='`:'?bdrs['`']:err(3)
 ,inst=o=>o.t<2||o.t==4||o.t==7&&(env[o.v]==null?0:!env[o.v].uf)||o.t==8&&!o.v.uf
 ,lex=s=>{
-  let m,l,t=[];while(s){
+  let m,l,t=[];if(s!=null)s=s.replace(/NL\./g,"\n").replace(/DS\..*(?:\n|$)/g,"\n");while(s){
     if(m=/^((?:_?\d*)?r_?\d+)|^(__|(?:_?\d*\.?\d*)?(?:e_?)?\d*\.?\d+|_)/.exec(s)){
       if(m[2]!=null)m[1]=m[2];let x=m[1].replace(/_/g,'-').replace(/(?<=-?)(?<!\d)(e|r)/,'1$1'),l,r;if(x=="--"||x=="-")t.push({t:0,v:x=="--"?-Infinity:Infinity})
       else if(x.indexOf("r")>-1)t.push({t:0,v:([l,r]=x.split("r"),+l/+r)})

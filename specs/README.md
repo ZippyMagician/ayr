@@ -37,6 +37,8 @@ ayr also supports block syntax, which can take one or two variables. The right v
 ```
 These can be used in any place any other symbol or group could also be used.
 
+`NL.` can be used as a line separator, and `DS.` is used to denote comments
+
 ### Data Types
 #### Numbers
 Numbers are the basis of an array language. `ayr` supports an array of numeric literals, and will support more in the future.
