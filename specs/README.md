@@ -214,6 +214,7 @@ Dyadic `B:` is equivalent to ```#:=``` when >r0 data is passed on the right.
 | ```@``` | ```u@v``` | Compose |  N/A |  Over  |  N/A | Rank if right arg is immediate |
 | ```@:```| ```u@:``` | Zip Self|  N/A |   Zip  | 99 99| Allows uneven args |
 | ```@.```| ```u@.v```|    At   |  99  |    At  | 99 99| Depth if right arg is immediate |
+| ```}.```| ```u}.``` |   Runs  |  99  |  Amend |  TODO|                    |
 | ```;.```| ```u;.y```|   Cut   |  99  |   N/A  |  N/A |                    |
 | ```$:```| ```u$:``` | Fixpoint|  99  |Repeat(n)| 0 99| d: takes left arg, not operand |
 | ```$.```| ```u$.``` |  Filter |  99  | Filter | 99 99| d: pass left arg to each check |
