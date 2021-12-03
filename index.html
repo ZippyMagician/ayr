@@ -5,7 +5,7 @@
         <script>require = null;module = null;</script>
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         <style type="text/css">
-            pre, textarea, input, code {
+            pre, input, code {
                 font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
                 font-size: large;
             }
@@ -27,8 +27,9 @@
                 white-space: pre;
             }
 
-            #txtarea, #out, #debug_output {
-                font-family: monospace;
+            textarea, #txtarea, #out, #debug_output {
+                font-family: monospace, monospace;
+                font-size: medium;
             }
 
             body {
@@ -83,15 +84,6 @@
         <button onclick="fetchLink()" style="border:1px solid; background-color:#fff">Permalink</button>
         <button onclick="toggleTemplate()" id="se-template-toggle" style="border:1px solid; background-color: #fff">Show SE Template</button>
         <input type="TextBox" id="flags" class="form-control" placeholder="Flags, no spaces or dashes"></input>
-        <div class="input-group" id='dropdowndiv'>
-            <input type="TextBox" id="selectedbox" class="form-control" value="Examples" readonly></input>
-            <div class="input-group-btn">
-                <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
-                    <span class="caret"></span>
-                </button>
-                <ul id="demolist" class="dropdown-menu"></ul>
-            </div>
-        </div>
         <p>Definitely not plagiarized directly from the Arn online interpreter</p>
         <br>
         <div class="form-group" id="txtgroup">
@@ -163,20 +155,20 @@
        </script>
 
        <script type="text/javascript">
-           code.oninput = function () {
+            code.addEventListener('input', function () {
                bytes.innerHTML = code.value.length;
                stackTemplate();
-           }
+            });
 	       
-	   code.onkeyup = function () {
+	        code.addEventListener('keyup', function () {
                bytes.innerHTML = code.value.length;
                stackTemplate();
-           }
+            });
 
-           document.addEventListener("keydown", e => {
+            document.addEventListener("keydown", e => {
                bytes.innerHTML = code.value.length;
                if(e.code === "Escape") RUNCODE(header.value + '\n' + code.value + '\n' + footer.value, ins.value, flags.value || "");
-           });
+            });
         </script>
     </body>
 </html>
