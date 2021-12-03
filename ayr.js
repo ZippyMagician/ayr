@@ -178,7 +178,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "~":mod(pon.bind(0,0,(a,p)=>p?uc(a)?narr(rn(65,+a+1),0,0,1):narr(rn(97,+a+1),0,0,1):narr(rn(1,+a+1)),1,1),pon.bind(0,1,(a,b)=>geti(b,a),0,1),0,99),
   "I.":mod(pon.bind(0,0,(a,p)=>(cid=n=>n.map(n=>argv&&argv['0']?n+1:n-1),p)?uc(a)?narr(cid(rn(65,+a+1)),0,0,1):narr(cid(rn(97,+a+1)),0,0,1):narr(cid(rn(1,+a+1))),1,1)
     ,pon.bind(0,1,(a,b,p)=>(f=>f instanceof A?(f.str=p,f):p?narr([f],0,0,1):f)(geti(b,a,1)),0,1),0,99),
-  ",":mod(pon.bind(0,0,a=>ravel(a,0),1,1),pon.bind(0,1,(a,b,p)=>narr(a.d.cl().concat(b.d.cl()),0,0,p),0,1),99,1),
+  ",":mod(pon.bind(0,0,(a,p)=>ravel(a,p),1,1),pon.bind(0,1,(a,b,p)=>narr(a.d.cl().concat(b.d.cl()),0,0,p),0,1),99,1),
   ";":mod(pon.bind(0,0,(a,p)=>{
     if(a.ds==1&&a.d.reduce((a,n)=>a&&n.ds==0,1))return carr(a,0);if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
     let m=Math.max(...a.d.map(n=>n.ds==0?1:n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(carr(n,0),[m],p).d)),[m,...a.r],a.b,p)
@@ -240,7 +240,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   ";:":mod(pon.bind(0,0,a=>new A(carr(a).rank(a.ds?a.ds-1:0).d,a.r.slice(a.ds-1),a.b,a.str),0,1),pon.bind(0,1,(b,a,p)=>{
     b=b.rank(b.ds-1);if(b.d.length!=a.d.length)err(1);let n=[];for(i=0;i<a.d.length;i++){
       if(i==0&&a.d[i]!=0)n.push([b.d[i].cl()]);else if(a.d[i]!=0)n[n.length-1].push(b.d[i].cl());else n.push([])
-    }if(n.length==1)return narr(n[0]);return narr(n.map(n=>narr(n,1,0,p)))
+    }if(n.length==1)return narr(n[0],0,0,p||b.str);return narr(n.map(n=>narr(n,1,0,p||b.str)))
   },0,1),99,[99,1]),
   "=.":mod(pon.bind(0,0,a=>a.d.length?+a.d.map(n=>eq(a.d[0],n)).reduce((a,b)=>a&&b,1):1,0,0),pon.bind(0,1,(a,b)=>a^b,1,0),99,0),
   "i.":mod(pon.bind(0,0,a=>{
@@ -270,7 +270,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,1),pon.bind(0,1,(a,b)=>{
     if(sb(b)||typeof b!='object')return(a.b=1,a);if(a.r[a.ds-1]!=b.r[0])err(2)
     let m=new Map([...Array(Math.max(...b.d)+1).keys()].map(n=>[n,[]])),s=[];a.rank(a.ds-1).d.forEach((v,i)=>b.d[i]>-1?m.get(b.d[i]).push(v):0)
-    for(let v of m.values())s.push(narr(v,1));return narr(s)
+    for(let v of m.values())s.push(narr(v,1,0,a.str));return narr(s)
   },0,0),99,[99,1]),
   "?.":mod(pon.bind(0,0,a=>Math.floor(Math.random()*a),1,1),pon.bind(0,1,(a,b)=>ayr("{{x{?:I.y}}").call(a,b),0,0),0,0),
   "?:":mod(pon.bind(0,0,a=>{
@@ -354,7 +354,8 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "$:":op(1,f=>mod(a=>{let c=[f.call(a.cl())],n;while(!eq(c[0],n=f.call(c[c.length-1].cl()))&&!eq(c[c.length-1],n))c.push(n);return narr(c)}
     ,(a,b)=>{for(let i=0;i<+a;i++)b=f.call(b);return b})),
   "$.":op(1,f=>mod(a=>{let c=0;return new A((v=>a.ds>1?v.flatMap(n=>n.d??n):v)(a.rank(a.ds-1).d.filter(v=>f.call(v.cl())&&++c)),[...a.r.slice(0,a.ds-1),c],a.b,a.str)}
-    ,(a,b)=>{let c=0;return new A((v=>b.ds>1?v.flatMap(n=>n.d??n):v)(b.rank(b.ds-1).d.filter(v=>f.call(a,v)&&++c)),[...b.r.slice(0,b.ds-1),c],b.b,b.str)}))
+    ,(a,b)=>{let c=0;return new A((v=>b.ds>1?v.flatMap(n=>n.d??n):v)(b.rank(b.ds-1).d.filter(v=>f.call(a,v)&&++c)),[...b.r.slice(0,b.ds-1),c],b.b,b.str)})),
+  "}.":op(1,f=>mod(pon.bind(0,0,a=>ayr("[K.1+\\&,|&]").call(a.rank(a.ds-1),bdrs["/"].call(f).call(2,a.rank(a.ds-1))),0,0),(_,a,b)=>err(2),99,99))
 }
 ,chnk=(a,s,str=0,b=0)=>{
   let n=[];for(let x,i=0;i<a.length;i+=s){
