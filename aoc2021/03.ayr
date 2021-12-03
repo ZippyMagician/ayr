@@ -1,8 +1,8 @@
 #!/usr/bin/env ayr
-G: =(-:&#<:+/)"&=                                                     DS. Gamma
-OGR: (}&#-&.|.}:)_1}[:((1|.)([={:&])$.`1>&|.G)$:_1|.                  DS. Oxygen Generator Rating
-CSR: (}&#-&.|.}:)[:{{1=$$y:y NL.((1|.)([~:{:&])$.`1>&|.G)y}}$:_1|.    DS. CO2 Scrubber Rating
+G: =(-:&#<:+/)"&=                             DS. Gamma
+O: _1}[:((1>&|.G)=&:{:$.1|.)$:_1|.            DS. Oxygen Generator Rating
+C: (]((1>&|.G)~:&:{:$.1|.)$:`;:|&=:])$:_1|.   DS. CO2 Scrubber Rating
 
 in: ;(_48++)"fread'./03.txt'
-(*@#.&:|) G in
-(OGR*@#.CSR) in
+*@#.&:| G in
+(O*@#.@(}&#-&.|.}:)C) in
