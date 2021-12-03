@@ -112,7 +112,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,mapd=(a,f,d)=>a instanceof A?d>0?new A(a.d.map(n=>mapd(n,f,d-1)),a.r,a.b,a.str):f(a):f(a)
 ,get=(a,b,w)=>{
-  let m=carr(b).rank(b.ds-1),i;if(!w&&carr(a).d.map((n,i)=>n<0||n>=b.r[i]).reduce((a,b)=>a||b,0))return pr(b)
+  let m=carr(b).rank(b.ds-1),i;if(!w&&carr(a).d.map((n,i)=>n<0||n>=b.r.slice(b.ds-1)[i]).reduce((a,b)=>a||b,0))return pr(b)
   if(a.ds==0||sb(a))return m.d[(sb(a)?a.d[0]:a)%m.d.length]
   else{a.d=a.d.reverse();let r=m.d[a.d[0]%m.d.length];for(n of a.d.slice(1))r=r.d[n%r.d.length];return r}
 }
