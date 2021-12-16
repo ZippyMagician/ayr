@@ -47,6 +47,7 @@ Number.prototype.call=function(...v){return +this}
 Number.prototype.bind=function(...v){return +this}
 Number.prototype.cl=function(){return this==Infinity?+this:+JSON.parse(JSON.stringify(this))}
 Number.prototype.rank=function(...v){return narr([+this]).rank(...v)}
+Number.prototype.r=[1];
 Number.prototype.ds=0
 Number.prototype.uf=0
 Array.prototype.ds=1
@@ -222,7 +223,9 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     for(let i=0;i<b.ds&&i<a.d.length;i++)
       for(let k=0;k<(a.d[i+1]||1);k++)for(let j=0;j<Math.min(b.r[i],a.d[i]);j++)c.d[j+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0;return c
   },0,1),0,99),
-  "{.":mod(pon.bind(0,0,a=>ayr(";,\\/:/").call(a),0,0),pon.bind(0,1,(a,b,p)=>{let n=a.d.cl();b.d.map(v=>n.indexOf(v)>-1?0:n.push(v));return narr(n,a.b,0,p)},0,1),1,1),
+  "{.":mod(pon.bind(0,0,a=>ayr(']$`|.@.#&[').call(a,ayr(";,\\/:/").call(a)),0,0),pon.bind(0,1,(a,b,p)=>{
+    let n=a.d.cl();b.d.map(v=>n.indexOf(v)>-1?0:n.push(v));return narr(n,a.b,0,p)
+  },0,1),1,1),
   "{:":mod(pon.bind(0,0,(a,p)=>p?narr(a.d[0].cl(),0,0,1):a.d[0].cl(),0,1),pon.bind(0,1,(b,a)=>{
     if(a.r[0]!=b.r[0])err(1);let B=b.cl().rank(b.ds-1);let n=[];for(let i=0;i<a.r[0];i++)n.push(a.d[i]>=B.d.length?err(2):B.d[a.d[i]].d[i]);return narr(n,0,0,b.str)
   },0,0),99,[2,1]),
@@ -233,7 +236,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
       for(let k=a.d[i+1]||0;k>=0;k--)for(let j=a.d[i];j<b.r[i];j++)c.d[j-a.d[i]+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0
     for(let i=0;i<a.d.length;i++)if(d[i])c.d=c.rank(i+1).d.flatMap(n=>n.d.reverse());return c}catch(_){return narr([])}
   },0,1),0,99),
-  "}:":mod(pon.bind(0,0,(a,p)=>p?narr(a.d[a.d.length-1].cl(),0,0,1):a.d[a.d.length-1].cl(),0,1),pon.bind(0,1,(a,b)=>ayr("[:+/\"&`,:~:&[=:\\]").call(a,b),0,0),99,99),
+  "}:":mod(pon.bind(0,0,(a,p)=>p?narr(a.d[a.d.length-1].cl(),0,0,1):a.d[a.d.length-1].cl(),0,1),pon.bind(0,1,(a,b)=>ayr("[:+/@1&`,:~:&[=:\\]").call(a,b),0,0),99,99),
   "|":mod(pon.bind(0,0,a=>+!a,1,0),pon.bind(0,1,(a,b)=>b % a,0,0),0,0),
   "^:":mod(pon.bind(0,0,(a,p)=>p?lc(a)?a-32:a:Math.ceil(+a),1,1),pon.bind(0,1,(a,b)=>Math.max(a,b),1,1),0,0),
   "v:":mod(pon.bind(0,0,(a,p)=>p?uc(a)?a+32:a:Math.floor(+a),1,1),pon.bind(0,1,(a,b)=>Math.min(a,b),1,1),0,0),
@@ -320,7 +323,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     for(let i=0;i<=r.d.length-l;i+=p?l:1)n.push(r.d.slice(i+1,i+l).reduce((a,v)=>f.call(a,v),r.d[i]));return narr(n)
   },0,0),1,[0,99])),
   "/.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(x=x.rank(x.ds-1),x.d.slice(1).reduce((a,v)=>f.call(a,v),x.d[0])):x,2,0)
-                  ,pon.bind(0,1,(x,y)=>ayr("]~<:&[").call(bdrs['"'].call(f).call(x),y),1,1),99,99)),
+    ,pon.bind(0,1,(x,y)=>ayr("]~<:&[").call(bdrs['"'].call(f).call(x),y),1,1),99,99)),
   "\\":op(1,f=>mod((r,x)=>x.ds?
     x.ds<=r?(p=x.d[0],new A(x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)),x.r,x.b))
    :new A(x.rank(r,1).d.flatMap(x=>(p=x.d[0],x.d.map((n,i)=>i==0?n:(p=f.call(p,n),p)))),x.r,x.b):x
@@ -328,7 +331,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     let n=[];x=carr(x,0).rank(x.ds-1);y=carr(y,0).rank(y.ds-1);for(l of x.d)for(r of y.d)n.push(f.call(l,r));return new A(n,[y.d.length,x.d.length],0,0)
   },0,0),1,99)),
   "\\.":op(1,f=>mod(pon.bind(0,0,x=>x.ds?(bd=x.rank(x.ds-1),narr(bd.d.map((n,i,o)=>f.call(narr(o.slice(0,o.length-i).cl(),0,0,n.ds==0?bd.str:n.str))),x.b)):x,1,0)
-                   ,pon.bind(0,1,(x,y)=>ayr("]~>:&[").call(bdrs['"'].call(f).call(x),y),1,1),1,99)),
+    ,pon.bind(0,1,(x,y)=>ayr("]~>:&[").call(bdrs['"'].call(f).call(x),y),1,1),1,99)),
   "@":op(0,(a,b)=>mod(l=>{
     if(b.uf)return a.call(b.call(l));else if(a.rk==null)err(1);else{let n=a.cl();n.rk[0]=b;return n.call(l)}
   },(l,r)=>{
