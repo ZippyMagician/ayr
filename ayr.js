@@ -47,7 +47,7 @@ Number.prototype.call=function(...v){return +this}
 Number.prototype.bind=function(...v){return +this}
 Number.prototype.cl=function(){return this==Infinity?+this:+JSON.parse(JSON.stringify(this))}
 Number.prototype.rank=function(...v){return narr([+this]).rank(...v)}
-Number.prototype.r=[1];
+Number.prototype.r=[1]
 Number.prototype.ds=0
 Number.prototype.uf=0
 Array.prototype.ds=1
@@ -66,7 +66,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,carr=(v,b=0)=>v instanceof A?b?(v.b=1,v):v:new A([v],1,b)
 ,narr=(a,b=0,ba=0,s=0)=>new A(ba?a.map(n=>n instanceof A?(n.b=1,n):new A([n],1,1)):a,a.length,b,s)
 ,pon=(d,f,S,p,r,a,b,e=0)=>{
-  if(a.ds==1&&!a.b&&a.r[0]==1&&!a.str)a=a.d[0];if(b!=null&&b.ds==1&&!b.b&&b.r[0]==1)b=b.d[0];let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}//Q:is this worth it?
+  if(a.ds==1&&!a.b&&a.r[0]==1&&!a.str)a=a.d[0];if(b!=null&&b.ds==1&&!b.b&&b.r[0]==1&&!b.str)b=b.d[0];let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}//Q:is this worth it?
   if(!d){
     let x=a.ds==0&&e;a=carr(a)
     if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0].cl():a.cl(),p?x?p:a.str:0));let na=a.rank(r[1]),t
@@ -186,7 +186,9 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0),pon.bind(0,1,(b,a,p)=>{
     let v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0||sb(a))a=narr([...Array(c.d.length)].map(_=>sb(a)?a.d[0]:a))
     if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
-    return(n=>ba?(n.r=[n.d.length],n.ds=1,n):n)(b.ds<2?narr(v,a.b|b.b,0,p):new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p&&b.str))
+    return(n=>ba?(n.r=[n.d.length],n.ds=1,n):n)(
+      b.ds<2?narr(v,a.b|b.b,0,p):new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p)
+    )
   },1,1),99,[99,1]),
   "#.":mod(pon.bind(0,0,a=>parseInt(a.d.join(""),2),0,0),pon.bind(0,1,(a,b)=>{
     let n=0;for(let i=0;i<b.d.length;i++)n+=b.d[i]*a**i;return n
@@ -446,7 +448,6 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }
 }
 const exec=(t,G=0)=>{
-  //console.log("E:",t)
   let fq=[],V,h,j,F=[0];for(let i=0;i<t.length;i++){
     let o=t[i];if(o.t==9&&o.v=='\n'&&fq.length){
       if(F[0]==1)F=[2,F[1],fq.cl()];else if(F[0]==2){let x;if(ptrain(F[1],0).call())x=ptrain(F[2],0).call();else x=ptrain(fq,0).call();if(x!=null)return x;F=[0]}
