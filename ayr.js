@@ -181,22 +181,8 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "I.":mod(pon.bind(0,0,(a,p)=>(cid=n=>n.map(n=>argv&&argv['0']?n+1:n-1),p)?uc(a)?narr(cid(rnc(65,+a+1)),0,0,1):narr(cid(rnc(97,+a+1)),0,0,1):narr(cid(rnc(1,+a+1))),1,1)
     ,pon.bind(0,1,(a,b,p)=>(f=>f instanceof A?(f.str=p,f):p?narr([f],0,0,1):f)(geti(b,a,1)),0,1),0,99),
   ",":mod(pon.bind(0,0,(a,p)=>ravel(a,p),1,1),pon.bind(0,1,(a,b,p)=>narr(a.d.cl().concat(b.d.cl()),0,0,p),0,1),99,1),
-  ";":mod(pon.bind(0,0,(a,p)=>{
-    if(a.ds==1&&a.d.reduce((a,n)=>a&&n.ds==0,1))return carr(a,0);if(a.ds==1)a=narr(a.d.flatMap(n=>n.ds>1?n.rank(1).d:n))
-    let m=Math.max(...a.d.map(n=>n.ds==0?1:n.d.length));return new A(a.d.flatMap(n=>(n.str&&(p=1),ext(carr(n,0),[m],p).d)),[m,...a.r],a.b,p)
-  },1,1),pon.bind(0,1,(a,b,p)=>{
-    if(b.ds<=a.ds){
-      if(b.ds==0)b=narr([b]);if(a.ds==0)a=narr([a]);if(b.r[0]==1&&b.ds==1)b=narr(rn(0,a.r[0],b.d[0]))
-      if(a.r[0]>b.d.length)b=ext(b,[a.r[0]],p);else if(b.d.length>a.r[0])
-        for(i=0;i<(a.r[1]||1);i++)a.d.splice(i*pd(a.r.slice(1))+a.r[0],0,...rn(0,b.d.length-a.r[0],pr(a,p)));a.r[0]=b.d.length
-      return new A(a.d.concat(b.d),a.ds>1?[...a.r.slice(0,a.ds-1),a.r.pop()+1]:[a.r[0],2],a.b,p)
-    }else{
-      if(b.ds==0)b=narr([b]);if(sb(a)||a.ds==0)a=narr(rn(0,b.r[0],a.ds==0?a:a.d[0]))
-      if(b.r[0]>a.d.length)b=ext(a,[b.r[0]],p);else if(a.d.length>b.r[0])
-        for(i=0;i<(b.r[1]||1);i++)b.d.splice(i*pd(b.r.slice(1))+b.r[0],0,...rn(0,a.d.length-b.r[0],pr(b,p)));b.r[0]=a.d.length
-      return new A(a.d.concat(b.d),b.ds>1?[...b.r.slice(0,b.ds-1),b.r.pop()+1]:[b.r[0],2],b.b,p)
-    }
-  },0,1),1,99),
+  ";":mod(pon.bind(0,0,a=>ayr(';/').call(a),1,1),pon.bind(0,1,(a,b)=>a.ds==b.ds?ayr(`{{sh:($x)^:"$yNL.(x,@,:@(sh{)y)$\`sh,2}}`).call(a,b)
+    :ayr(`{{sh:($x)^:@:$yNL.arr:x,@,:@(,&{{sh{\`$$y}}&.{)yNL.arr$\`sh+1,\`0#}($$x)^:$$y}}`).call(a,b),0,1),1,99),
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0),pon.bind(0,1,(b,a,p)=>{
     let v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0||sb(a))a=narr([...Array(c.d.length)].map(_=>sb(a)?a.d[0]:a))
     if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
@@ -219,6 +205,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   },0,1),pon.bind(0,1,(a,b)=>+!eq(a,b),1,0),99,0),
   ",:":mod(pon.bind(0,0,(a,p)=>narr(a.d,a.b,0,p?a.str:0),0,1),pon.bind(0,1,(a,b)=>new A(a.d.map(n=>b.has(n)),a.r.cl(),a.b),1,0),99,99),
   "{":mod(pon.bind(0,0,a=>a+1,1,1),pon.bind(0,1,(a,b)=>{
+    if(ayr("[=:$&]").call(a,b))return b//TODO: Fix >r2 takes (kill me)
     let c=new A([0],1,0,b.str);c=ext(c,a.d,b.str)
     for(let i=0;i<b.ds&&i<a.d.length;i++)
       for(let k=0;k<(a.d[i+1]||1);k++)for(let j=0;j<Math.min(b.r[i],a.d[i]);j++)c.d[j+k*pd(c.r.slice(0,i+1))]=b.d[j+k*pd(b.r.slice(0,i+1))]??0;return c
