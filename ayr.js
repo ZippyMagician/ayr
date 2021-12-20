@@ -203,7 +203,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   "~:":mod(pon.bind(0,0,(a,p)=>{
     let s=new Set(a.rank(a.ds-1).d),d=[];for(n of s.keys())d.push(n);return narr(d,0,0,p?a.str:0)
   },0,1),pon.bind(0,1,(a,b)=>+!eq(a,b),1,0),99,0),
-  ",:":mod(pon.bind(0,0,(a,p)=>narr(a.d,a.b,0,p?a.str:0),0,1),pon.bind(0,1,(a,b)=>new A(a.d.map(n=>b.has(n)),a.r.cl(),a.b),1,0),99,99),
+  ",:":mod(pon.bind(0,0,(a,p)=>narr(a.d,a.b,0,p?a.str:0),0,1),pon.bind(0,1,(a,b)=>a.str?b.str?eq(a,b):b.has(a):new A(a.d.map(n=>b.has(n)),a.r.cl(),a.b),1,0),99,99),
   "{":mod(pon.bind(0,0,a=>a+1,1,1),pon.bind(0,1,(a,b)=>{
     if(ayr("[=:$&]").call(a,b))return b//TODO: Fix >r2 takes (kill me)
     let c=new A([0],1,0,b.str);c=ext(c,a.d,b.str)
