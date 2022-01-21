@@ -507,8 +507,9 @@ Usage:
 Args:
     --debug - Debug code (for internal use)
     -0      - The one-range symbol '~' creates a range from [0, N) instead
-    -n      - Numbers are outputted in classic JS style instead of ayr style`),process.exit(0);if(argv.u)run(argv.u);else if(!argv._.length){
-console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`);env.I=argv._.length?ayr(argv._[argv._.length-1]):sta("")
+    -n      - Numbers are outputted in classic JS style instead of ayr style`),process.exit(0);if(argv.u){
+  env.I=argv._.length?ayr(argv._[argv._.length-1]):sta("");run(argv.u)
+}else if(!argv._.length){console.log(`ayr ${require('./package.json').version}: type 'exit' to exit`);env.I=argv._.length?ayr(argv._[argv._.length-1]):sta("")
 while((inp=rl.question('    '))&&inp!="exit"){
   run(inp)
   //what the fuck javascript
