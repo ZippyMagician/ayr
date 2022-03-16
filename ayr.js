@@ -17,7 +17,7 @@ A.prototype.cl=function(){return new A(this.d.map(n=>n.cl()),this.r.cl(),this.b,
 A.prototype.rank=function(r,s){
   switch(r){
     case -1:err(1)
-    case 0:return this.cl()
+    case 0:return sb(this)?this.cl():this.str?(this.d=this.d.map(n=>narr([n],1,0,1)),this.cl()):this.cl()
     case 1:return chnk(this.d,this.r[0],this.str,this.b)
     case 3:case 4:case 5:case 6:case 7:case 8:case 9:
     case 2:return(f=>(f.d=f.d.map(n=>(n.r=this.r.slice(0,this.ds-1),n.ds=this.ds-1,n)),f))(chnk(this.d,pd(this.r.slice(0,this.ds-1)),this.str,this.b))
@@ -206,7 +206,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     let s=new Set(a.rank(a.ds-1).d),d=[];for(n of s.keys())d.push(n);return narr(d,0,0,p?a.str:0)
   },0,1),pon.bind(0,1,(a,b)=>+!eq(a,b),1,0),99,0),
   ",:":mod(pon.bind(0,0,(a,p)=>narr(a.d,a.b,0,p?a.str:0),0,1),pon.bind(0,1,(a,b)=>a.str?b.str?eq(a,b):b.has(a):new A(a.d.map(n=>b.has(n)),a.r.cl(),a.b),1,0),99,99),
-  "{":mod(pon.bind(0,0,a=>a+1,1,1),pon.bind(0,1,(a,b)=>{
+  "{":mod(pon.bind(0,0,a=>a+1,1,1),pon.bind(0,1,(a,b)=>{//FIXME: 2 2 { 5 ; 6 is incorrect, yields 5 6 ; 6 0 instead of 5 0 ; 6 0
     if(ayr("[=:$&]").call(a,b))return b//TODO: Fix >r2 takes (kill me)
     let c=new A([0],1,0,b.str);c=ext(c,a.d,b.str)
     for(let i=0;i<b.ds&&i<a.d.length;i++)
@@ -388,7 +388,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   }
   return t
 }
-,grp=t=>{
+,grp=t=>{//TODO: Variable declaration inside of parens, use. Eval line by line instead of pre-parsing first?
   let tn=[],b=[],ig=0,oc=0,ib=0,i2=(x,n)=>x!=null&&x.t==2&&x.v==n;for(let i=0;i<=t.length;i++){if(ig){
     if(t[i]==null)err(5);else if(i2(t[i],'(')){b.push(t[i]);oc++}else if(i2(t[i],')')){
       if(oc==0){
