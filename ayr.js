@@ -67,24 +67,25 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,narr=(a,b=0,ba=0,s=0)=>new A(ba?a.map(n=>n instanceof A?(n.b=1,n):new A([n],1,1)):a,a.length,b,s)
 ,pon=(d,f,S,p,r,a,b,e=0)=>{
   if(a.ds==1&&!a.b&&a.r[0]==1&&!a.str)a=a.d[0];if(b!=null&&b.ds==1&&!b.b&&b.r[0]==1&&!b.str)b=b.d[0];let l;if(typeof r!='object')r=[r,r];if(S==2){S=0;l=1}//Q:is this worth it?
-  if(!d){
-    let x=a.ds==0&&e;a=carr(a)
+  const fl=(n,c=1)=>n.flatMap(x=>x.ds&&S&&c?x.d:x);if(!d){
+    if(a.str&&sb(a)&&a.d[0]instanceof A)a=a.d[0];let x=a.ds==0&&e;a=carr(a)
     if(r[1]>a.ds-1||r[1]==0&&sb(a))return(n=>p&&a.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(r[1]==0&&sb(a)?a.d[0].cl():a.cl(),p?x?p:a.str:0));let na=a.rank(r[1]),t
     return r[1]>0&&r[1]<a.ds&&S?
       new A(na.d.flatMap(n=>(f=>f instanceof A?f.ds!=n.ds?(t=na.r,f.b=1,f):(t=f.r,f.d):f)(pon(d,f,S,p&&a.str,r,n,0,1))),a.r.map((v,i)=>t[i]??v),a.b,p?a.str:0)
-     :new A(na.d.map(n=>pon(d,f,S,p&&a.str,r,n,0,1)),l&&na.ds>1?na.r.slice(1):na.r,a.b,p?a.str:0)
+     :new A(fl(na.d.map(n=>pon(d,f,S,p&&a.str,r,n,0,1)),r[1]<a.ds||r[1]==0&&a.str),l&&na.ds>1?na.r.slice(1):na.r,a.b,p?a.str:0)
   }else{
     a=carr(a),b=carr(b);if(r[0]==r[1]&&a.ds-1>=r[0]&&b.ds-1>=r[1]&&!sb(a)&&!sb(b)&&JSON.stringify(a.r)!=JSON.stringify(b.r))err(1)
     else{
-      const fl=(n,c=1)=>n.flatMap(x=>x.ds&&S&&c?x.d:x);let aln=pd(a.rank(r[0],1).r),bln=pd(b.rank(r[1],1).r),n
-      if((r[0]>a.ds-1||sb(a)&&r[0]==0)&&(r[1]>b.ds-1||sb(b)))
+      if(a.str&&sb(a)&&a.d[0]instanceof A)a=a.d[0];if(b.str&&sb(b)&&b.d[0]instanceof A)b=b.d[0];
+      let aln=pd(a.rank(r[0],1).r),bln=pd(b.rank(r[1],1).r),n
+      if((r[0]>a.ds-1||sb(a)&&r[0]==0)&&(r[1]>b.ds-1||sb(b)&&r[1]==0))
         return(n=>p&&a.str|b.str&&!(n instanceof A)?new A([n],1,0,1):n)(f(sb(a)&&r[0]==0?a.d[0].cl():a.cl(),sb(b)&&r[1]==0?b.d[0].cl():b.cl(),p?a.str|b.str:0))
       if(aln>bln)
-        return new A(fl(a.rank(r[0]).d.map(v=>pon(d,f,S,p,r,v,sb(b)?b.d[0]:b)),n=r[0]>1&&r[0]<a.ds),S&&n?a.r:a.rank(r[0]).r,a.b|b.b,p?a.str|b.str:0)
+        return new A(fl(a.rank(r[0]).d.map(v=>pon(d,f,S,p,r,v,sb(b)?b.d[0]:b)),n=r[0]>1&&r[0]<a.ds||r[0]==0&&a.str),S&&n?a.r:a.rank(r[0]).r,a.b|b.b,p?a.str|b.str:0)
       else if(bln>aln)
-        return new A(fl(b.rank(r[1]).d.map(v=>pon(d,f,S,p,r,sb(a)?a.d[0]:a,v)),n=r[1]>0&&r[1]<b.ds),S&&n?b.r:b.rank(r[1]).r,a.b|b.b,p?a.str|b.str:0)
+        return new A(fl(b.rank(r[1]).d.map(v=>pon(d,f,S,p,r,sb(a)?a.d[0]:a,v)),n=r[1]>0&&r[1]<b.ds||r[1]==0&&b.str),S&&n?b.r:b.rank(r[1]).r,a.b|b.b,p?a.str|b.str:0)
       return new A(
-        fl(a.rank(r[0]).d.map((v,i)=>pon(d,f,S,p,r,v,r[1]==0&&sb(b)?b.d[0]:b.rank(r[1]).d[i])),n=r[0]>1&&r[0]<a.ds)
+        fl(a.rank(r[0]).d.map((v,i)=>pon(d,f,S,p,r,v,r[1]==0&&sb(b)?b.d[0]:b.rank(r[1]).d[i])),n=r[0]>1&&r[0]<a.ds||r[0]==0&&a.str)
        ,S&&n?a.r:a.rank(r[0]).r,a.b|b.b,p?a.str|b.str:0)
     }
   }
