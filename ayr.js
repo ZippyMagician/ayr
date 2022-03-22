@@ -185,10 +185,10 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
   ";":mod(pon.bind(0,0,a=>ayr(';/').call(a),1,1),pon.bind(0,1,(a,b)=>a.ds==b.ds?ayr(`{{sh:($x)^:"$yNL.(x,@,:@(sh{)y)$\`sh,2}}`).call(a,b)
     :ayr(`{{sh:($x)^:@:$yNL.arr:x,@,:@(,&{{sh{\`$$y}}&.{)yNL.arr$\`sh+1,\`0#}($$x)^:$$y}}`).call(a,b),0,1),1,99),
   "#":mod(pon.bind(0,0,a=>a.r[a.ds-1],0,0),pon.bind(0,1,(b,a,p)=>{
-    let v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0||sb(a))a=narr([...Array(c.d.length)].map(_=>sb(a)?a.d[0]:a))
-    if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)))
-    return(n=>ba?(n.r=[n.d.length],n.ds=1,n):n)(
-      b.ds<2?narr(v,a.b|b.b,0,p):new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p)
+    let bC=b.cl(),v=[],ba=b.d[0].b&&sb(b),c=b.rank(b.ds-1);if(a.ds==0||sb(a))a=narr([...Array(c.d.length)].map(_=>sb(a)?a.d[0]:a))
+    if(a.d.length!=c.d.length)err(2);c.d.forEach((n,i)=>v.push(...rn(0,a.d[i],n)));return(n=>ba?(n.r=[n.d.length],n.ds=1,n):n)(
+      b.ds<2?narr(v.flatMap(n=>bC.str&&!sb(bC)&&!bC.d[0].ds?n.d[0]:n),a.b|b.b,0,p)
+      :new A(narr(v).d.flatMap(n=>n instanceof A?n.d:n),[...b.r.slice(0,b.ds-1),a.d.reduce((l,r)=>l+r,0)],0,p)
     )
   },1,1),99,[99,1]),
   "#.":mod(pon.bind(0,0,a=>parseInt(a.d.join(""),2),0,0),pon.bind(0,1,(a,b)=>{
