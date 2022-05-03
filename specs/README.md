@@ -177,7 +177,7 @@ Partial trains, of course, support constants within them too.
 |  ```;``` |   Mold     |   1  |   Laminate   | 99 99 |       |
 | ```;:``` |   Squish   |  99  |    Group     |  99 1 |0s denote new group|
 |  ```#``` |    Tally   |  99  |   Replicate  |  99 1 |       |
-| ```#.``` | Decode Binary | 0 |    Decode    |  0 0  |       |
+| ```#.``` | Decode Binary | 0 |    Decode    |  0 1  |       |
 | ```#:``` | Encode Binary | 0 |    Encode    |  1 0  |       |
 | ```{```  |  Increment |   0  |     Take     | 99 99 |       |
 | ```{:``` |     Head   |  99  |   Composite  |  2 1  |       |
