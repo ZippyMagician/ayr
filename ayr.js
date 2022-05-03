@@ -192,7 +192,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
     )
   },1,1),99,[99,1]),
   "#.":mod(pon.bind(0,0,a=>parseInt(a.d.join(""),2),0,0),pon.bind(0,1,(a,b)=>{
-    let n=0;for(let i=0;i<b.d.length;i++)n+=b.d[i]*a**i;return n
+    let n=0;for(let i=0;i<b.d.length;i++)n+=b.d[b.d.length-i-1]*a**i;return n
   },0,0),1,[0,1]),
   "#:":mod(pon.bind(0,0,a=>narr(a.toString(2).split("").map(n=>+n)),0,0),pon.bind(0,1,(a,b)=>{
     let v=[];for(n of a.d.reverse()){v.push(n==0?b:b%n);b=n==0?b|0:b/n|0};return narr(v.reverse())
