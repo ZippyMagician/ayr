@@ -2,6 +2,7 @@
 A toy array language that draws inspiration by J, APL, and K. My goal for the project is to take the best/most useful features of each of these languages while maintaining a clean and understandable language. As it is still a work in progress, any suggestions are welcome.
 
 ## Installation
+Use the command
 ```
 npm i -g ayr-lang
 ```
