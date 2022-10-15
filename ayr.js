@@ -115,7 +115,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 }
 ,mapd=(a,f,d)=>a instanceof A?d>0?new A(a.d.map(n=>mapd(n,f,d-1)),a.r,a.b,a.str):f(a):f(a)
 ,get=(a,b,w)=>{
-  let m=carr(b).rank(b.ds-1),i;if(!w&&carr(a).d.map((n,i)=>n<0||n>=b.r.slice(b.ds-1)[i]).reduce((a,b)=>a||b,0))return pr(b)
+  let m=carr(b.cl()).rank(b.ds-1);if(!w&&carr(a).d.map((n,i)=>n<0||n>=b.r.slice(b.ds-1)[i]).reduce((a,b)=>a||b,0))return pr(b)
   if(a.ds==0||sb(a))return m.d[(sb(a)?a.d[0]:a)%m.d.length]
   else{a.d=a.d.reverse();let r=m.d[a.d[0]%m.d.length];for(n of a.d.slice(1))r=r.d[n%r.d.length];return r}
 }
@@ -130,7 +130,7 @@ let envs=[];const sb=a=>a instanceof A&&a.ds==1&&a.r[0]==1
 ,ftrs=n=>{let f=[],i=1,d=0;while(i<Math.sqrt(n)|0){if(n%i==0){f.splice(d,0,i);if(i!=n/i)f.splice(-d,0,n/i);d++}i++}let t=f[f.length-1];f[f.length-1]=f[0];f[0]=t;return f}
 ,gcd=(x,y)=>{x=Math.abs(x);y=Math.abs(y);while(y)[x,y]=[y,x%y];return x}
 ,lcm=(x,y)=>x&&y?Math.abs(x*y/gcd(x,y)):0
-,geti=(a,b,w)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b,w)),a=fix(a),a.str=b.str,a):get(a,b,w)
+,geti=(a,b,w)=>a.b==1?get(a,b):a instanceof A?(a.d=a.d.map(n=>geti(n,b,w)).map(n=>b.str&&sb(n)?n.d[0]:n),a=fix(a),a.str=b.str,a):get(a,b,w)
 ,err=id=>{
   switch(id){
     case 0:if(module==null)console.log("[0] ARG ERROR");throw("[0] ARG ERROR")
