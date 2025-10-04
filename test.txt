@@ -1,0 +1,21 @@
+(1 2 3) (4 5 6) ,"0 ]5
+
+rank = (op, r, a, b) => {
+  left = chunk(a, r)
+  right = chunk(b, r)
+  
+  if left.len > 1 {
+    if right.len == 1 {
+      res = [op(l, right) foreach l in left]
+    } elif right.len == left.len {
+      res = [op(l, r) foreach (l, r) in zip(left, right)]
+    } else {
+      err(rank)
+    }
+  } else {
+    // repeat for right
+  }
+  
+  // Dechunk not necessary
+  return res
+}

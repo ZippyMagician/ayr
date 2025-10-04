@@ -1,7 +1,5 @@
-# Test files
-*.u
-*.swp
+.git/
+build/
 
-# Node.js files
 node_modules/
 package-lock.json

@@ -1,7 +1,0 @@
-#!/usr/bin/env ayr
-one: +/2</
-two: +/2</3+/ 
-
-in: =:"fread'./01.txt'
-one in
-two in

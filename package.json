@@ -1,35 +1,23 @@
 {
-  "name": "ayr-lang",
-  "version": "0.5.2",
-  "description": "A toy array language",
-  "main": "ayr.js",
+  "name": "ayr",
+  "version": "0.0.1",
+  "description": "Test branch -- ayr rewrite",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "ayr.ts",
   "scripts": {
-    "test": "node ayr.js -u \"1 2 3+4 5 6\""
+    "dev": "node --watch build/ayr.js",
+    "build": "tsc",
+	"main": "npm run build && node build/ayr.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ZippyMagician/ayr.git"
-  },
-  "keywords": [
-    "ayr",
-    "array",
-    "apl",
-    "parser",
-    "language",
-    "j",
-    "k"
-  ],
-  "author": "Joshua Barnett",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ZippyMagician/ayr/issues"
-  },
-  "homepage": "https://github.com/ZippyMagician/ayr#readme",
-  "bin": {
-    "ayr": "./ayr.js"
+  "devDependencies": {
+    "@types/lodash.clonedeep": "^4.5.9",
+    "@types/node": "^24.5.0",
+    "typescript": "^5.9.2"
   },
   "dependencies": {
-    "minimist": "^1.2.5",
-    "readline-sync": "^1.4.10"
+    "lodash.clonedeep": "^4.5.0"
   }
 }
