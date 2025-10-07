@@ -32,12 +32,12 @@ export class Value {
     }
 
     public static new_box(value: Value | Num): Value {
-        if (value instanceof Num) value = this.new_scalar(value);
+        if (value instanceof Num) value = Value.new_scalar(value);
         return new Value(Type.Box, [value], 0, [1], false);
     }
 
     public static new_string(str: string | Num[], dims: number = 1, rank?: number[]): Value {
-        let list: Num[] = typeof str === "string" ? str.split('').map(ch => Num.from(+ch)) : str;
+        let list: Num[] = typeof str === "string" ? str.split('').map(ch => Num.from(ch.charCodeAt(0))) : str;
         return new Value(Type.List, list, dims, rank ?? [list.length], true);
     }
 
@@ -47,6 +47,10 @@ export class Value {
 
     public is_single(): boolean {
         return this.type == Type.Scalar || this.dims == 0 || this.dims == 1 && this.rank[0] == 1;
+    }
+
+    public as_list(): Value[] | Num[] {
+        return clone(this.inner);
     }
 
     public ranked(dims: number = 0): Value[] {
@@ -74,7 +78,9 @@ export class Value {
                 return n instanceof Num && this.str ? String.fromCharCode(+n) : str(n)
             })[0];
         } else if (this.dims == 1) {
-            build += clone(this.inner).map(str).join(" ");
+            build += clone(this.inner).map((n: Num | Value): string => {
+                return this.str ? n instanceof Num ? String.fromCharCode(+n) : err(0, "Invalid string instant.") : str(n)
+            }).join(this.str ? "" : " ");
         } else if (this.dims == 2) {
             let elements: string[][] = this.ranked(this.dims - 1).map(n => n.inner.map(str));
             let len = 1;

@@ -28,6 +28,8 @@ export const enum TokenIdent {
     Space,
     // <tab> | <newline>
     Separator,
+
+    EOF,
 }
 
 // Wrapper around a semi-any type. Number tokens specifically are better stored as numbers, not string slices
@@ -56,6 +58,10 @@ class TokenValue {
     [Symbol.toPrimitive](hint: string) {
         return hint == "number" ? this.as_num() : this.as_str()
     }
+}
+
+export function eof(): Token {
+    return { ident: TokenIdent.EOF, value: new TokenValue(0) };
 }
 
 export type Token = {
