@@ -6,6 +6,7 @@ export function err(code: number, msg: string = ""): never {
         case 0:
             throw(`NUMERIC ERROR [0]${msg ? ": " + msg : ""}`);
         case 1:
+            throw(`SYNTAX ERROR [1]${msg ? ": " + msg : ""}`);
         case 2:
         case 3:
             throw(`NAME ERROR [3]${msg ? ": " + msg : ""}`);
@@ -33,10 +34,11 @@ export function primitive(value: number | string | number[] | Num | any[], box: 
     else if (value instanceof Num) final = Value.new_scalar(value);
     else if (typeof value == "string") final = Value.new_string(value, dims, rank ?? [value.length]);
     else {
-        final = Value.new_list(value.map((n: number | any): Num => {
+        final = Value.new_list(value.map((n: number | any): Value | Num => {
             if (typeof n == "number" || n instanceof Num || n instanceof Rational) return Num.from(n);
+            else if (n instanceof Value) return n as Value;
             err(-1, "unreachable.");
-        }), dims, rank ?? [value.length]);
+        }) as Value[] | Num[], dims, rank ?? [value.length]);
     }
     return box ? Value.new_box(final) : final;
 }

@@ -2,6 +2,7 @@ import { Rational, Num } from "./number"
 import { primitive } from "./utils"
 import { Value } from "./value"
 import { lex } from "./lex"
+import { parse_nodes } from "./parse"
 
 let list = primitive([15, 4, 6, 234, 2]);
 let mat = primitive([1, 2, 3, 4, -3, 6, new Rational(1, 3), 8, 9], false, 2, [3, 3]);
@@ -24,7 +25,7 @@ console.log(r3.toString());
 //console.log(n2.sub(n1))
 console.log(`${n3.add(n1)}`);
 
-console.log(lex(": 3r2 5 8 _3 e4 'hello!'").map(n => ({ ident: n.ident, value: n.value.as_str() })));
+console.log(parse_nodes(lex("1 2 3  e1 e2 e3 e4\n'hello'")).map(n => n[1]!.toString())); // (1 2 3), (e1 e3 e3), 'hello'
 
 // Logarithms: log(xy)  = log(x) + log(y)
 //             log(x/y) = log(x) + log(1/y) = log(x) - log(y)
