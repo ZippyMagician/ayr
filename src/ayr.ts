@@ -17,15 +17,19 @@ console.log(Value.new_box(mat).toString());
 const n1 = Num.from(new Rational(5, 20));
 const n2 = Num.from(new Rational(1, 3));
 const n3 = Num.from(4);
-console.log(n1.toString());
+//console.log(n1.toString());
 
 let r3 = n1.add(n2);
-console.log(r3.toString());
+//console.log(r3.toString());
 
 //console.log(n2.sub(n1))
-console.log(`${n3.add(n1)}`);
+//console.log(`${n3.add(n1)}`);
 
-console.log(parse_nodes(lex("1 2 3  e1 e2 e3 e4\n'hello'")).map(n => n[1]!.toString())); // (1 2 3), (e1 e3 e3), 'hello'
+console.log(parse_nodes(lex("(1 2 3 4) (5 6) 6\n1 2\n'hello'  (1 2 e5)")).map(n => n[1]!.toString())); // (1 2 3), (e1 e3 e3), 'hello'
+
+// If transformed values are same rank, success. Otherwise, box values
+// Shape is values[0].rank + [values.length] assuming success.
+// value.ranked(1).map(transform).unranked(value.dims)
 
 // Logarithms: log(xy)  = log(x) + log(y)
 //             log(x/y) = log(x) + log(1/y) = log(x) - log(y)
