@@ -9,15 +9,17 @@
   "scripts": {
     "dev": "node --watch build/ayr.js",
     "build": "tsc",
-	"main": "npm run build && node build/ayr.js",
+    "main": "npm run build && node build/ayr.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@types/lodash.clonedeep": "^4.5.9",
+    "@types/lodash.isequal": "^4.5.8",
     "@types/node": "^24.5.0",
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "lodash.clonedeep": "^4.5.0"
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.isequal": "^4.5.0"
   }
 }
