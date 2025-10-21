@@ -2,6 +2,7 @@ import { err, str } from "./utils"
 import { Rational, Num } from "./number"
 
 const clone = require('lodash.clonedeep');
+const is_equal = require('lodash.isequal');
 
 const enum Type {
     // Single Value
@@ -25,6 +26,10 @@ export class Value {
         this.dims = dims;
         this.rank = rank;
         this.str = str;
+    }
+
+    public static maybe_num(value: Value | Num): Value {
+        return value instanceof Num ? Value.new_scalar(value) : clone(value);
     }
 
     public static new_scalar(value: Num): Value {
@@ -53,6 +58,30 @@ export class Value {
         return clone(this.inner);
     }
 
+    public get_rank(): number[] {
+        return clone(this.rank);
+    }
+
+    public get_dims(): number {
+        return this.dims;
+    }
+
+    public boxed(): boolean {
+        return this.type == Type.Box;
+    }
+
+    public as_num(): Num {
+        if (!this.is_single()) err(-1, "Attempted to treat list as single numeric value.");
+        if (this.boxed()) err(2, "Cannot convert boxed value to numeric.");
+        return this.inner[0]! instanceof Num ? this.inner[0]! : this.inner[0]!.as_num();
+    }
+
+    public as_value(): Value {
+        if (!this.is_single()) err(-1, "Attempted to treat list as single value.");
+        if (this.boxed()) err(2, "Cannot operate on boxed value.");
+        return Value.maybe_num(this.inner[0]!);
+    }
+
     public ranked(dims: number = 0): Value[] {
         if (dims >= this.dims) {
             return [clone(this)];
@@ -61,7 +90,7 @@ export class Value {
         } else {
             // Dims < this.dims
             let nums = clone(this.inner);
-            let inner_rank = this.rank.toSpliced(0, dims);
+            let inner_rank = this.rank.slice(0, dims); // Note: apl-like rank would be toSpliced instead
             let chunked = inner_rank.reduce((a: number, b: number) => a * b, 1);
             let res = [];
 
@@ -69,6 +98,36 @@ export class Value {
                 res.push(Value.new_list(nums.splice(0, chunked), inner_rank.length, inner_rank));
             return res;
         }
+    }
+
+    public static unranked(original_dims: number, partial_rank: number[], values: Value[], raw_value: boolean = false): Value {
+        if (values.length == 0) return Value.new_list([]);
+
+        let box = false;
+        let is_str = values[0]!.str;
+        let cuml_rank = values[0]!.rank;
+        let boxed_inner = values[0]!.boxed()
+        let ranked_dims = values[0]!.get_dims();
+        for (let i = 1; i < values.length; i++) {
+            is_str &&= values[i]!.str;
+            boxed_inner &&= values[i]!.boxed()
+            if (!is_equal(cuml_rank, values[i]!.rank)) {
+                box = true;
+            }
+        }
+
+        if (box) return Value.new_list(values.map(Value.new_box));
+        if (values.length == 1 && ranked_dims >= original_dims) return values[0]!;
+
+        let rank = [
+            ...partial_rank, 
+            ...cuml_rank.slice(0, ranked_dims), 
+            values.length / partial_rank.reduce((a, b) => a * b, 1)
+        ];
+        if (is_str) return Value.new_string(values.map((n: Value) => n.as_list() as Num[]).flat(), original_dims, rank)
+        else if (raw_value && !boxed_inner) {
+            return Value.new_list(values.map((n: Value): Num[] => n.inner as Num[]).flat(), rank.length, rank);
+        } else return Value.new_list(values.map((n: Value): Value[] => n.inner.map(Value.maybe_num)).flat(), rank.length, rank);
     }
 
     toString(): string {

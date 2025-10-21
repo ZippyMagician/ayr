@@ -8,6 +8,7 @@ export function err(code: number, msg: string = ""): never {
         case 1:
             throw(`SYNTAX ERROR [1]${msg ? ": " + msg : ""}`);
         case 2:
+            throw(`BOX ERROR [2]${msg ? ": " + msg : ""}`);
         case 3:
             throw(`NAME ERROR [3]${msg ? ": " + msg : ""}`);
         case 4:

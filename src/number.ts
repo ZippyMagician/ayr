@@ -134,6 +134,10 @@ export class Num {
         else return Num.from(this.wrap.neg());
     }
 
+    public as_num(): Num {
+        return this;
+    }
+
     toString(): string {
         return str(this.wrap);
     }
