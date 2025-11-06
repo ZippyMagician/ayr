@@ -4,11 +4,6 @@ import { Num } from "./number"
 import { Value } from "./value"
 import { err } from "./utils"
 
-// TODO:
-//   Currently, 1 2 3 + 3 3 $ 1 2 3 4 5 6 7 8 9 throws an ERR[4] (value).
-//   In the old ayr.js, this also errors, although an ERR[1] (rank).
-//   In J, this code works.
-//   Look into expanding possibilities.
 export function sym(r: number | [number, number], fn: Module, a: Value, b?: Value): Value {
     let rank: [number, number];
     if (typeof r == "number") rank = [r, r];
@@ -28,10 +23,19 @@ export function sym(r: number | [number, number], fn: Module, a: Value, b?: Valu
 
         let left_is_mapper = left.length >= right.length;
         let [mapper, value] = left_is_mapper ? [left, right] : [right, left];
-        if (value.length !== mapper.length && value.length - 1) err(4);
+        if (value.length !== mapper.length) {
+            if (mapper.length % value.length) err(4);
+            else {
+                // The # elements might not match, but there is a conceivable/intuitive way
+                // The user may expect the values to work. In that case, make sure the program
+                // Does work as intended. e.g. 1 2 + 2 2 $ 1 2 3 4, or 5 + 1 2 3.
+                let t = Array(mapper.length)
+                for (let i = 0; i < mapper.length; i++) t[i] = clone(value[i % value.length]);
+                value = t;
+            }
+        }
 
-        mapper = value.length - 1 ? mapper.map((val, i) => fn(val, value[i]))
-                                  : mapper.map(val => fn(val, clone(value[0])));
+        mapper = mapper.map((val, i) => fn(val, value[i]));
         return left_is_mapper ? Value.unranked(a.get_dims(), left_rank, mapper, is_rawl)
                               : Value.unranked(b.get_dims(), right_rank, mapper, is_rawr);
     } else {
