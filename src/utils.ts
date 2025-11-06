@@ -12,6 +12,7 @@ export function err(code: number, msg: string = ""): never {
         case 3:
             throw(`NAME ERROR [3]${msg ? ": " + msg : ""}`);
         case 4:
+            throw(`VALUE ERROR [4]${msg ? ": " + msg : ""}`);
         case 5:
         default:
             throw(`INTERNAL ERROR [${code}]${msg ? ": " + msg : ""}`);
