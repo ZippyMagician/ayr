@@ -27,20 +27,31 @@ let r3 = n1.add(n2);
 
 console.log(parse_nodes(lex("(1 2 3 4) (5 6) 6\n1 2\n'hello'  (1 2 e5)")).map(n => n[1]!.toString())); // (1 2 3), (e1 e3 e3), 'hello'
 
-const { sym } = require("./syms");
+const { sym, mod } = require("./syms");
 // Matrix's rows are sorted in ascending order
-let transformation = sym(1, (a: Value) => Value.new_list(a.as_list().toSorted((a,b)=>+a.as_num().sub(b.as_num()))), mat);
+let transformation = sym.bind(false, 1, (a: Value) => Value.new_list(a.as_list().toSorted((a,b)=>+a.as_num().sub(b.as_num()))));
 console.log("3x3 Matrix :: Each row sorted (ascending)");
-console.log(transformation.toString());
+console.log(""+transformation(mat));
 
-let transformation2 = sym(1, (a: Value) => primitive([1,2,3,4],false,2,[2,2]), mat);
+let transformation2 = sym.bind(false, 1, (a: Value) => primitive([1,2,3,4],false,2,[2,2]));
 console.log("3x3 Matrix :: Each row replaced with 2x2 matrix");
-console.log(transformation2.toString());
+console.log(""+transformation2(mat));
 
-let transformation3 = sym(0, (a: Value) => primitive([1,2,3,4],false,2,[2,2]), mat);
+let transformation3 = sym.bind(false, 0, (a: Value) => primitive([1,2,3,4],false,2,[2,2]));
 console.log("3x3 Matrix :: Each element replaced with 2x2 matrix");
-console.log(transformation3.toString());
+console.log(""+transformation3(mat));
 // console.log(sym(0, (a: Value) => primitive(a.as_num().add(Num.from(1))), mat).toString());
+
+let addition = mod(0, (a: Value) => primitive(+a.as_num()), 0, (a: Value, b: Value): Value => {
+    return primitive(a.as_num().add(b.as_num()));
+});
+
+console.log("\n'+' Symbol test");
+console.log("Monadic: +r4 -- "+addition(Value.new_scalar(n1)));
+console.log("Dyadic: 3+r4 -- "+addition(primitive(3), Value.new_scalar(n1)));
+
+console.log("3x3 Matrix & Scalar:\n"+addition(mat, Value.new_scalar(n3)));
+console.log("3x3 Matrix & 3 list:\n"+addition(mat, primitive([1, 2, 3])));
 
 // If transformed values are same rank, success. Otherwise, box values
 // Shape is values[0].rank + [values.length] assuming success.
