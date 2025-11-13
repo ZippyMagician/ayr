@@ -8,6 +8,7 @@ let list = primitive([15, 4, 6, 234, 2]);
 let mat = primitive([1, 2, 3, 4, -3, 6, new Rational(1, 3), 8, 9], false, 2, [3, 3]);
 let d3 = primitive([1, 2, 3, 4, 5, 6, 7, 8], false, 3, [2, 2, 2]);
 let value = primitive(14);
+let uneven = primitive([1, 2, 3, 4, 5, 6], false, 2, [3, 2]);
 
 //console.log(mat.ranked(1));
 //console.log(d3.ranked(1));
@@ -52,6 +53,26 @@ console.log("Dyadic: 3+r4 -- "+addition(primitive(3), Value.new_scalar(n1)));
 
 console.log("3x3 Matrix & Scalar:\n"+addition(mat, Value.new_scalar(n3)));
 console.log("3x3 Matrix & 3 list:\n"+addition(mat, primitive([1, 2, 3])));
+
+console.log("\nTranspose test");
+
+let transpose = sym.bind(false, 2, (a: Value) => {
+    let dims = a.get_dims();
+    if (dims == 1) return a.with_rank([1, a.get_rank()[0]!]);
+    let rank = a.get_rank();
+    [rank[0], rank[1]] = [rank[1]!, rank[0]!];
+    if ((rank[0]! == 1) != (rank[1]! == 1)) {
+        return a.with_rank(rank);
+    }
+
+    let rows = a.ranked(1).map(x => x.as_list());
+    return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
+});
+
+console.log(""+list+"\nTO:");
+console.log(""+transpose(list)+"");
+console.log("\n"+uneven+"\nTO:");
+console.log(""+transpose(uneven));
 
 // If transformed values are same rank, success. Otherwise, box values
 // Shape is values[0].rank + [values.length] assuming success.
