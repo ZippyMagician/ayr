@@ -50,6 +50,11 @@ export class Value {
         return new Value(Type.List, list, dims, rank ?? [list.length], false);
     }
 
+    public static new_ls(list: string | Num[] | Value[], dims: number = 1, rank?: number[], str?: boolean): Value {
+        if (str) return Value.new_string(list as string | Num[], dims, rank);
+        else return Value.new_list(list as Num[] | Value[], dims, rank);
+    }
+
     public is_single(): boolean {
         return this.type == Type.Scalar || this.dims == 0 || this.dims == 1 && this.rank[0] == 1;
     }
@@ -60,6 +65,23 @@ export class Value {
 
     public get_rank(): number[] {
         return clone(this.rank);
+    }
+
+    public is_str(): boolean {
+        return this.str;
+    }
+
+    public with_rank(rank: number[]): Value {
+        let dims = rank.length;
+        let count = rank.reduce((a, b) => a * b, 1);
+        let inner = clone(this.inner);
+
+        if (count !== inner.length) {
+            let i = 0;
+            while (inner.length < count) inner.push(clone(inner[i++ % this.inner.length]));
+        }
+
+        return new Value(this.type, inner, dims, rank, this.str);
     }
 
     public get_dims(): number {
