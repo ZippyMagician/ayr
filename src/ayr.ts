@@ -1,9 +1,9 @@
 import { Rational, Num } from "./number"
-import { primitive } from "./utils"
+import { Module, primitive } from "./utils"
 import { Value } from "./value"
 import { lex } from "./lex"
 import { parse_nodes } from "./parse"
-import { Symbols } from "./syms"
+import { mod, Symbols } from "./syms"
 
 let list = primitive([15, 4, 6, 234, 2]);
 let mat = primitive([1, 2, 3, 4, -3, 6, new Rational(1, 3), 8, 9], false, 2, [3, 3]);
@@ -29,9 +29,16 @@ let r3 = n1.add(n2);
 
 console.log(parse_nodes(lex("(1 2 3 4) (5 6) 6\n1 2\n'hello'  (1 2 e5)")).map(n => n[1]!.toString())); // (1 2 3), (e1 e3 e3), 'hello'
 console.log(parse_nodes(lex("$ 1 2 3 4")));
-console.log(parse_nodes(lex("(2 2 $) 1 2 3 4")));
 
-const { mod } = require("./syms");
+const ayr = (prog: string) => parse_nodes(lex(prog))[0]![1]! as Module;
+
+const program = `(2 2 $) 1 2 3 4`;
+const nodes = parse_nodes(lex(program));
+console.log(program+" ::\n"+(nodes[0]![1]! as Module)(nodes[1]![1]! as Value));
+
+let test1 = ayr(`(+%-)`);
+console.log(""+test1(primitive(3), primitive(7))); // (10 % _4)
+
 // Matrix's rows are sorted in ascending order
 /*let transformation = sym.bind(false, 1, (a: Value) => Value.new_list(a.as_list().toSorted((a,b)=>+a.as_num().sub(b.as_num()))));
 console.log("3x3 Matrix :: Each row sorted (ascending)");

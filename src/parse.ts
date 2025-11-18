@@ -1,4 +1,4 @@
-import { err, Module, primitive } from "./utils"
+import { err, Module, mod_prim, primitive } from "./utils"
 import { Value } from "./value"
 import { Num } from "./number"
 import { eof, Token, TokenIdent } from "./lex"
@@ -121,8 +121,10 @@ export function parse_nodes(tokens: Token[]): Node[] {
                         list = [];
                     } else break;
                     j = k;
-                } else if (!is_instant(tokens, j)) break;
-                else list.push(clone(next));
+                } else if (!is_instant(tokens, j)) {
+                    j--;
+                    break;
+                } else list.push(clone(next));
             }
             
             // Parse list. Single string, list of numbers, list of numbers + strings, list of boxed elements
@@ -149,7 +151,7 @@ export function parse_nodes(tokens: Token[]): Node[] {
             // Left parens denote a group. A train if parser reaches this branch.
             let [ inst, group, j ] = get_group(tokens, i);
             // TODO: Some sort of pass to parse trains.
-            stream.push([NodeType.Train, a => a]);
+            stream.push([NodeType.Train, parse_train(parse_nodes(group))]);
             i = j;
         } else if (head.ident == TokenIdent.Symbol) {
             // Symbols
@@ -170,3 +172,39 @@ export function parse_nodes(tokens: Token[]): Node[] {
 
     return stream;
 }
+
+// TODO: Operators pass first
+// TODO: Support literals
+function parse_train(nodes: Node[]): Module {
+    let build: Module[] = [];
+
+    for (let i = nodes.length - 1; i >= 0; i--) {
+        let node = nodes[i]!;
+        
+        // Patterns:
+        // A f
+        //   f g
+        // f g h
+        if (node[0] == NodeType.Instant) {
+            let top = build.pop()!;
+            let left = clone(node[1]);
+            build.push(mod_prim(a => top(clone(left), a), (a, b) => top(clone(left), b)));
+        } else if (typeof node[1] == 'function') {
+            if (build.length == 2) {
+                let f = node[1];
+                let g = build.pop()!;
+                let h = build.pop()!;
+
+                build.push(mod_prim(a => g(f(clone(a)), h(clone(a))), (a, b) => g(f(clone(a), clone(b)), h(clone(a), clone(b)))));
+            } else build.push(node[1]);
+        }
+    }
+
+    if (build.length == 2) {
+        let f = build.pop()!;
+        let g = build.pop()!;
+
+        return mod_prim(a => f(g(clone(a))), (a, b) => f(clone(a), g(clone(b))));
+    } else return build[0]!;
+}
+
