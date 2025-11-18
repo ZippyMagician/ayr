@@ -91,6 +91,13 @@ console.log("-2 -1 0 1 2 :: "+mul(primitive([-2,-1,0,1,2])));
 console.log(""+mul(value, uneven));
 console.log("'Ab ' :: "+mul(primitive("Ab ")));
 
+const index = Symbols["~"]!;
+console.log("\n'~' Symbol test");
+console.log("~9 :: "+index(primitive(9)));
+console.log("1 2 3 4~3 2 1 0 :: "+index(primitive([1,2,3,4]),primitive([3,2,1,0])));
+const mat5x5 = Symbols["$"]!(primitive([5,5]),Symbols["~"]!(primitive(25)));
+console.log("(5 5$~25)~<2 3 :: "+index(mat5x5,primitive([2, 3], true)));
+
 // If transformed values are same rank, success. Otherwise, box values
 // Shape is values[0].rank + [values.length] assuming success.
 // value.ranked(1).map(transform).unranked(value.dims)
