@@ -71,8 +71,15 @@ export class Value {
         return this.str;
     }
 
+    public make_str(): Value {
+        let v = clone(this);
+        v.str = true;
+        return v;
+    }
+
     public with_rank(rank: number[]): Value {
         let dims = rank.length;
+        if (rank.some((a: number) => !Number.isInteger(a))) err(4);
         let count = rank.reduce((a, b) => a * b, 1);
         let inner = clone(this.inner);
 

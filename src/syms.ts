@@ -1,13 +1,23 @@
-const clone = require('lodash.clonedeep');
+'use strict';
+
+const clone = require("lodash.clonedeep");
 
 import { Num } from "./number"
 import { Value } from "./value"
-import { err } from "./utils"
+import { err, Module, primitive } from "./utils"
 
-export function sym(r: number | [number, number], fn: Module, a: Value, b?: Value): Value {
+const prim = primitive;
+
+interface SymEnv {
+    preserve_str?: boolean,
+}
+
+function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b?: Value): Value {
     let rank: [number, number];
     if (typeof r == "number") rank = [r, r];
     else rank = r;
+
+    this.preserve_str ??= false;
 
     if (b) {
         // Dyadic call
@@ -35,7 +45,10 @@ export function sym(r: number | [number, number], fn: Module, a: Value, b?: Valu
             }
         }
 
-        mapper = mapper.map((val, i) => fn(val, value[i]));
+        let mstr = left_is_mapper ? a.is_str() : b.is_str();
+        let vstr = left_is_mapper ? b.is_str() : a.is_str();
+        mapper = mapper.map((val, i) => fn(mstr && this.preserve_str ? val.make_str() : val, 
+                                           vstr && this.preserve_str ? value[i]!.make_str() : value[i]!));
         return left_is_mapper ? Value.unranked(a.get_dims(), left_rank, mapper, is_rawl)
                               : Value.unranked(b.get_dims(), right_rank, mapper, is_rawr);
     } else {
@@ -45,19 +58,61 @@ export function sym(r: number | [number, number], fn: Module, a: Value, b?: Valu
 
         let left_rank = a.get_rank().slice(0, Math.max(0, a.get_dims() - rank[0] - 1));
         let left = a.ranked(rank[0]);
-        left = left.map(val => fn(val));
+        left = left.map(val => fn(a.is_str() && this.preserve_str ? val.make_str() : val));
         return Value.unranked(a.get_dims(), left_rank, left, is_raw);
     }
-
-    err(-1, "TODO: syms");
 }
 
-type Module = (a: Value, b?: Value) => Value;
 
-export function mod(r: number, fn: (a: Value) => Value, r2: number | [number, number], fn2: (a: Value, b: Value) => Value): Module {
-    let monad = sym.bind(false, r, fn);
-    let dyad  = sym.bind(false, r2, fn2 as Module);
+export function mod(r: number, fn: (a: Value) => Value, r2: number | [number, number], fn2: (a: Value, b: Value) => Value, pstrm: boolean = false, pstrd: boolean = false): Module {
+    let monad = sym.bind({ preserve_str: pstrm }, r, fn);
+    let dyad  = sym.bind({ preserve_str: pstrd }, r2, fn2 as Module);
 
     return (a: Value, b?: Value): Value => b ? dyad(a, b) : monad(a);
 }
+
+interface AyrMap {
+    [key: string]: (a: Value, b?: Value) => Value
+}
+
+export const Symbols: AyrMap = {
+    "+": mod(0, a => prim(+a.as_num()), 0, (a, b) => {
+        return prim(a.as_num().add(b.as_num()));
+    }),
+    "-": mod(0, a => prim(a.as_num().neg()), 0, (a, b) => {
+        return prim(a.as_num().sub(b.as_num()));
+    }),
+    "%": mod(0, a => prim(Num.from(1).div(a.as_num())), 0, (a, b) => {
+        return prim(a.as_num().div(b.as_num()));
+    }),
+    "*": mod(0, a => {
+        if (a.is_str()) {
+            let char = String.fromCharCode(+a.as_num());
+            let lower = char.toLowerCase(), upper = char.toUpperCase();
+            return prim(lower == upper ? 0 : char == lower ? -1 : 1);
+        } else {
+            return prim(Math.sign(+a.as_num()));
+        }
+    }, 0, (a, b) => {
+        return prim(a.as_num().mul(b.as_num()));
+    }, true),
+    "^": mod(0, a => err(-1, "TODO: Monad '^'."), 0, (a, b) => err(-1, "TODO: Dyad '^'.")),
+    "=": mod(0, a => {
+        let dims = a.get_dims();
+        if (dims == 1) return a.with_rank([1, a.get_rank()[0]!]);
+        let rank = a.get_rank();
+        [rank[0], rank[1]] = [rank[1]!, rank[0]!];
+        if ((rank[0]! == 1) != (rank[1]! == 1)) {
+            return a.with_rank(rank);
+        }
+
+        let rows = a.ranked(1).map(x => x.as_list());
+        return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
+    }, 0, (a, b) => err(-1, "TODO: Dyad '='.")),
+    "$": mod(99, a => prim(a.get_rank()), 99, (a, b) => {
+        let rank = a.as_list();
+        if (rank[0] instanceof Value) err(4, "Rank must be list of literal numbers.");
+        return b.with_rank((rank as Num[]).map(a => +a));
+    }),
+};
 

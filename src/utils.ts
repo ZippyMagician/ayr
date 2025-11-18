@@ -45,3 +45,5 @@ export function primitive(value: number | string | number[] | Num | any[], box: 
     return box ? Value.new_box(final) : final;
 }
 
+export type Module = (a: Value, b?: Value) => Value;
+
