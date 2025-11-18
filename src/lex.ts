@@ -1,5 +1,6 @@
 import { err, str } from "./utils"
 import { Rational, Num } from "./number"
+import { Symbols } from "./syms"
 
 export const enum TokenIdent {
     // ^((?:_?\d*)?r_?\d+)|^(__|(?:_?\d*\.?\d*)?(?:e_?)?\d*\.?\d+|_)
@@ -102,8 +103,14 @@ export function lex(str: string): Token[] {
                 "{{": TokenIdent.LCurly, 
                 "}}": TokenIdent.RCurly,
             }[match[0]]!, match[0]);
+        // Matches symbol characters after some fiddling
+        } else if (match = RegExp(`^(${Object.keys(Symbols)
+            .sort((a, b) => b.length - a.length)
+            .map(r => r.replace(/[^A-Za-z0-9_]/g,'\\$&')).join('|')})`)
+            .exec(str)
+        ) push(TokenIdent.Symbol, match[1]);
         // The colon is used as an assignment and at the start of some trains
-        } else if (match = /^:/.exec(str)) push(TokenIdent.Colon, match[0]);
+        else if (match = /^:/.exec(str)) push(TokenIdent.Colon, match[0]);
         // Whitespace has syntactic meaning in certain situations
         else if (match = /^(\s+)/.exec(str)) push(match[0] == " " ? TokenIdent.Space : TokenIdent.Separator, match[1]!);
         // Literals (environment variables & user defined variables

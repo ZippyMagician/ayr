@@ -1,7 +1,8 @@
-import { err, primitive } from "./utils"
+import { err, Module, primitive } from "./utils"
 import { Value } from "./value"
 import { Num } from "./number"
 import { eof, Token, TokenIdent } from "./lex"
+import { Symbols } from "./syms"
 
 const clone = require('lodash.clonedeep');
 
@@ -43,6 +44,8 @@ export const enum NodeType {
     
     Literal,
 
+    Train,
+
     Block,
 
     // Line Separator
@@ -53,6 +56,8 @@ export const enum NodeType {
 export type Node =
     [ NodeType.Instant, Value ]  |
     [ NodeType.Literal, string ] |
+    [ NodeType.Symbol, Module ]  |
+    [ NodeType.Train, Module ] |
     [ NodeType.Line, "\n" ]
 
 // TODO: Figure out how to parse tokens
@@ -71,9 +76,9 @@ function eval_instant(token: Token): Value | Num {
     }
 }
 
-// TODO: Only works for instant groups
 function get_group(tokens: Token[], i: number): [ boolean, Token[], number ] {
     let parens: number = 1;
+    let instant: boolean = true;
     i++;
     let build: Token[] = [];
 
@@ -85,9 +90,13 @@ function get_group(tokens: Token[], i: number): [ boolean, Token[], number ] {
         i++;
     }
 
-    return [true, build, i];
+    // TODO: Needs to work for non-instant literals as well.
+    instant = build.length == 0 || is_instant(build, build.length - 1);
+
+    return [instant, build, i];
 }
 
+// TODO: Blocks, Literals, Operators
 export function parse_nodes(tokens: Token[]): Node[] {
     // let tokens = clone(tokens);
     let stream: Node[] = [];
@@ -110,7 +119,7 @@ export function parse_nodes(tokens: Token[]): Node[] {
                         intermediary = intermediary.concat(list.map(eval_instant));
                         intermediary.push(group_parsed);
                         list = [];
-                    } else err(-1, "TODO: Non instant groups interrupting literal chain.");
+                    } else break;
                     j = k;
                 } else if (!is_instant(tokens, j)) break;
                 else list.push(clone(next));
@@ -139,7 +148,12 @@ export function parse_nodes(tokens: Token[]): Node[] {
         } else if (head.ident == TokenIdent.LParen) {
             // Left parens denote a group. A train if parser reaches this branch.
             let [ inst, group, j ] = get_group(tokens, i);
-            err(-1, "TODO: Non instant groups.");
+            // TODO: Some sort of pass to parse trains.
+            stream.push([NodeType.Train, a => a]);
+            i = j;
+        } else if (head.ident == TokenIdent.Symbol) {
+            // Symbols
+            stream.push([NodeType.Symbol, Symbols[head.value.as_str()]!]);
             i = j;
         } else if (is_line_end(tokens, j)) {
             // Line separator (right → left, top → bottom parse order)
