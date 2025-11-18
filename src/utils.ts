@@ -30,6 +30,10 @@ export function str(item: any) {
     return s;
 }
 
+export function range(first: number, second?: number): Value {
+    return primitive([...Array(Math.max(0, second ? second - first : first)).keys()].map(n => n + first));
+}
+
 export function primitive(value: number | string | number[] | Num | any[], box: boolean = false, dims: number = 1, rank?: number[]): Value {
     let final: Value;
     if (typeof value == "number") final = Value.new_scalar(Num.from(value));

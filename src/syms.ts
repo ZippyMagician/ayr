@@ -4,7 +4,7 @@ const clone = require("lodash.clonedeep");
 
 import { Num } from "./number"
 import { Value } from "./value"
-import { err, Module, primitive } from "./utils"
+import { err, Module, primitive, range } from "./utils"
 
 const prim = primitive;
 
@@ -47,8 +47,14 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
 
         let mstr = left_is_mapper ? a.is_str() : b.is_str();
         let vstr = left_is_mapper ? b.is_str() : a.is_str();
-        mapper = mapper.map((val, i) => fn(mstr && this.preserve_str ? val.make_str() : val, 
-                                           vstr && this.preserve_str ? value[i]!.make_str() : value[i]!));
+        mapper = mapper.map((val, i) => {
+            let args: [Value, Value] = [
+                mstr && this.preserve_str ? val.make_str() : val,
+                vstr && this.preserve_str ? value[i]!.make_str() : value[i]!,
+            ];
+            if (!left_is_mapper) args = args.reverse() as [Value, Value];
+            return fn(args[0], args[1]);
+        });
         return left_is_mapper ? Value.unranked(a.get_dims(), left_rank, mapper, is_rawl)
                               : Value.unranked(b.get_dims(), right_rank, mapper, is_rawr);
     } else {
@@ -114,5 +120,20 @@ export const Symbols: AyrMap = {
         if (rank[0] instanceof Value) err(4, "Rank must be list of literal numbers.");
         return b.with_rank((rank as Num[]).map(a => +a));
     }),
+    "~": mod(0, a => {
+        let n = +a.as_num();
+        if (a.is_str() && n < 97) return range(65, n+1).make_str();
+        else if (a.is_str()) return range(97, n+1).make_str();
+        return range(1, n + 1);
+    }, [99, 0], (a, b) => {
+        let index = (b.boxed() ? Value.maybe_num(b.as_list()[0]!) : b).as_list().map(n => +n.as_num());
+
+        if (a.get_dims() < index.length) err(4, `Index ${""+index} does not exist.`);
+        let rank = a.get_rank();
+
+        let i = index.map((n, j) => n * (rank.slice(0,j).reduce((a,b)=>a+b,0)||1)).reduce((a,b)=>a+b,0);
+        let list = a.ranked(a.get_dims() - index.length);
+        return list[i] ?? err(4, `Index ${""+index} does not exist.`);
+    }, true),
 };
 
