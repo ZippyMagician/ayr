@@ -6,15 +6,15 @@ import { Symbols } from "./syms"
 
 const clone = require('lodash.clonedeep');
 
-// TODO: Literals are only instant dependent on environment
-function is_instant(tokens: Token[], i: number): boolean {
+function is_instant(tokens: Token[], i: number, inst_lits: string[] = []): boolean {
     if (i >= tokens.length) return false;
     let type: TokenIdent = tokens[i]!.ident;
-    if (type == TokenIdent.Number || type == TokenIdent.String || type == TokenIdent.Literal)
+    if (type == TokenIdent.Number || type == TokenIdent.String)
         return true;
-    if (type == TokenIdent.LParen) {
+    if (type == TokenIdent.Literal)
+        return inst_lits.includes(tokens[i]!.value.as_str());
+    if (type == TokenIdent.LParen)
         return get_group(tokens, i)[0];
-    }
 
     return false;
 }
@@ -76,7 +76,7 @@ function eval_instant(token: Token): Value | Num {
     }
 }
 
-function get_group(tokens: Token[], i: number): [ boolean, Token[], number ] {
+function get_group(tokens: Token[], i: number, inst_lits: string[] = []): [ boolean, Token[], number ] {
     let parens: number = 1;
     let instant: boolean = true;
     i++;
@@ -91,7 +91,7 @@ function get_group(tokens: Token[], i: number): [ boolean, Token[], number ] {
     }
 
     // TODO: Needs to work for non-instant literals as well.
-    instant = build.length == 0 || is_instant(build, build.length - 1);
+    instant = build.length == 0 || is_instant(build, build.length - 1, inst_lits);
 
     return [instant, build, i];
 }
@@ -100,11 +100,12 @@ function get_group(tokens: Token[], i: number): [ boolean, Token[], number ] {
 export function parse_nodes(tokens: Token[]): Node[] {
     // let tokens = clone(tokens);
     let stream: Node[] = [];
+    let inst_lits: string[] = []; // when an imm. assignment is parsed, append to this list
     let i = 0;
 
     while (i < tokens.length) {
         let [head, j] = nnw(tokens, i, false);
-        if (is_instant(tokens, j)) {
+        if (is_instant(tokens, j, inst_lits)) {
             // An instant value
             let list: Token[] = [];
             let intermediary: (Value | Num)[] = [];
@@ -113,7 +114,7 @@ export function parse_nodes(tokens: Token[]): Node[] {
             j--; // Start from head.
             while ([next, j] = nnw(tokens, ++j, false)) {
                 if (next.ident == TokenIdent.LParen) {
-                    let [ inst, group, k ] = get_group(tokens, j);
+                    let [ inst, group, k ] = get_group(tokens, j, inst_lits);
                     if (inst) {
                         let group_parsed: Value = parse_nodes(group)[0]![1]! as Value;
                         intermediary = intermediary.concat(list.map(eval_instant));
@@ -121,7 +122,7 @@ export function parse_nodes(tokens: Token[]): Node[] {
                         list = [];
                     } else break;
                     j = k;
-                } else if (!is_instant(tokens, j)) {
+                } else if (!is_instant(tokens, j, inst_lits)) {
                     j--;
                     break;
                 } else list.push(clone(next));
@@ -164,6 +165,9 @@ export function parse_nodes(tokens: Token[]): Node[] {
         } else if (head.ident == TokenIdent.Separator) {
             // Other separators are syntactically insignificant in this branch.
             i = j;
+        } else if (head.ident == TokenIdent.Literal) {
+            // Non imm. literal.
+            err(-1, "TODO: Parse non imm. literals.");
         } else {
             err(-1, "TODO");
         }
@@ -175,6 +179,7 @@ export function parse_nodes(tokens: Token[]): Node[] {
 
 // TODO: Operators pass first
 // TODO: Support literals
+// TODO: Support semi-trains (prefixed with ':')
 function parse_train(nodes: Node[]): Module {
     let build: Module[] = [];
 
