@@ -15,6 +15,11 @@ class MaybeInstant {
         this.type = type;
     }
 
+    public static new(inner: Value | Module): MaybeInstant {
+        let t = inner instanceof Value ? MaybeType.VALUE : MaybeType.MODULE;
+        return new MaybeInstant(inner, t);
+    }
+
     public static new_value(value: Value): MaybeInstant {
         return new MaybeInstant(value, MaybeType.VALUE);
     }
@@ -22,18 +27,39 @@ class MaybeInstant {
     public static new_mod(mod: Module): MaybeInstant {
         return new MaybeInstant(mod, MaybeType.MODULE);
     }
-}
 
-interface EnvMap {
-    [key: string]: MaybeInstant,
+    public is_instant(): boolean {
+        return this.type == MaybeType.VALUE;
+    }
+
+    // Call eval<Value> or eval<Module>
+    public eval<T>(): T {
+        return this.inner as T;
+    }
+
+    public as_module(): Module {
+        return this.inner instanceof Value ? ((a, b?) => this.inner as Value) : this.inner;
+    }
 }
 
 export class Env {
-    private map: EnvMap;
-    private backup: EnvMap;
+    private map: Map<string, MaybeInstant>;
+    private backup: Map<string, MaybeInstant>;
 
     constructor() {
-        this.map = {};
-        this.backup = {};
+        this.map = new Map();
+        this.backup = new Map();
+    }
+
+    public set(name: string, value: Value | Module) {
+        this.map.set(name, MaybeInstant.new(value));
+    }
+
+    public get(name: string): MaybeInstant {
+        try {
+            return this.map.get(name)!;
+        } catch (e) {
+            err(3, `Literal '${name}' is undefined.`);
+        }
     }
 }
