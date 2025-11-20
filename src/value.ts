@@ -99,6 +99,11 @@ export class Value {
         return this.type == Type.Box;
     }
 
+    public unbox(): Value {
+        if (!this.boxed()) err(2, "Cannot unbox a non-boxed value.");
+        return Value.maybe_num(this.inner[0]!);
+    }
+
     public as_num(): Num {
         if (!this.is_single()) err(-1, "Attempted to treat list as single numeric value.");
         if (this.boxed()) err(2, "Cannot convert boxed value to numeric.");

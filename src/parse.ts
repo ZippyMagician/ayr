@@ -3,16 +3,17 @@ import { Value } from "./value"
 import { Num } from "./number"
 import { eof, Token, TokenIdent } from "./lex"
 import { Symbols } from "./syms"
+import { ayr_eval } from "./eval"
 
 const clone = require('lodash.clonedeep');
 
-function is_instant(tokens: Token[], i: number, inst_lits: string[] = []): boolean {
+function is_instant(tokens: Token[], i: number, inst_lits: Set<string> = new Set()): boolean {
     if (i >= tokens.length) return false;
     let type: TokenIdent = tokens[i]!.ident;
     if (type == TokenIdent.Number || type == TokenIdent.String)
         return true;
     if (type == TokenIdent.Literal)
-        return inst_lits.includes(tokens[i]!.value.as_str());
+        return inst_lits.has(tokens[i]!.value.as_str());
     if (type == TokenIdent.LParen)
         return get_group(tokens, i)[0];
 
@@ -76,18 +77,16 @@ function eval_instant(token: Token): Value | Num {
     }
 }
 
-function get_group(tokens: Token[], i: number, inst_lits: string[] = []): [ boolean, Token[], number ] {
+function get_group(tokens: Token[], i: number, inst_lits: Set<string> = new Set()): [ boolean, Token[], number ] {
     let parens: number = 1;
     let instant: boolean = true;
-    i++;
     let build: Token[] = [];
-
     let node: Token;
-    while (([node, i] = nnw(tokens, i), node.ident != TokenIdent.EOF)) {
+
+    while (([node, i] = nnw(tokens, ++i), node.ident != TokenIdent.EOF)) {
         if (node.ident == TokenIdent.LParen) ++parens;
         else if (node.ident == TokenIdent.RParen && --parens == 0) break;
         build.push(clone(node));
-        i++;
     }
 
     // TODO: Needs to work for non-instant literals as well.
@@ -100,7 +99,7 @@ function get_group(tokens: Token[], i: number, inst_lits: string[] = []): [ bool
 export function parse_nodes(tokens: Token[]): Node[] {
     // let tokens = clone(tokens);
     let stream: Node[] = [];
-    let inst_lits: string[] = []; // when an imm. assignment is parsed, append to this list
+    let inst_lits: Set<string> = new Set(); // when an imm. assignment is parsed
     let i = 0;
 
     while (i < tokens.length) {
@@ -116,18 +115,21 @@ export function parse_nodes(tokens: Token[]): Node[] {
                 if (next.ident == TokenIdent.LParen) {
                     let [ inst, group, k ] = get_group(tokens, j, inst_lits);
                     if (inst) {
-                        let group_parsed: Value = parse_nodes(group)[0]![1]! as Value;
+                        let group_parsed: Value = ayr_eval(parse_nodes(group));
                         intermediary = intermediary.concat(list.map(eval_instant));
                         intermediary.push(group_parsed);
                         list = [];
-                    } else break;
+                    } else {
+                        j--;
+                        break;
+                    }
                     j = k;
                 } else if (!is_instant(tokens, j, inst_lits)) {
                     j--;
                     break;
                 } else list.push(clone(next));
             }
-            
+
             // Parse list. Single string, list of numbers, list of numbers + strings, list of boxed elements
             let is_string = list.length == 1 && !intermediary.length && list[0]!.ident == TokenIdent.String;
             intermediary = intermediary.concat(list.map(eval_instant));
@@ -169,7 +171,7 @@ export function parse_nodes(tokens: Token[]): Node[] {
             // Non imm. literal.
             err(-1, "TODO: Parse non imm. literals.");
         } else {
-            err(-1, "TODO");
+            err(-1, `TODO: Parse token ${JSON.stringify(head)}`);
         }
         i++;
     }
