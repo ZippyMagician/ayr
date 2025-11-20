@@ -1,5 +1,3 @@
-'use strict';
-
 const clone = require("lodash.clonedeep");
 
 import { Num } from "./number"
@@ -84,10 +82,10 @@ interface AyrMap {
 export const Symbols: AyrMap = {
     "+": mod(0, a => prim(+a.as_num()), 0, (a, b) => {
         return prim(a.as_num().add(b.as_num()));
-    }),
+    }, false, true),
     "-": mod(0, a => prim(a.as_num().neg()), 0, (a, b) => {
         return prim(a.as_num().sub(b.as_num()));
-    }),
+    }, false, true),
     "%": mod(0, a => prim(Num.from(1).div(a.as_num())), 0, (a, b) => {
         return prim(a.as_num().div(b.as_num()));
     }),
@@ -103,7 +101,7 @@ export const Symbols: AyrMap = {
         return prim(a.as_num().mul(b.as_num()));
     }, true),
     "^": mod(0, a => err(-1, "TODO: Monad '^'."), 0, (a, b) => err(-1, "TODO: Dyad '^'.")),
-    "=": mod(0, a => {
+    "=": mod(2, a => {
         let dims = a.get_dims();
         if (dims == 1) return a.with_rank([1, a.get_rank()[0]!]);
         let rank = a.get_rank();
@@ -114,7 +112,7 @@ export const Symbols: AyrMap = {
 
         let rows = a.ranked(1).map(x => x.as_list());
         return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
-    }, 0, (a, b) => err(-1, "TODO: Dyad '='.")),
+    }, 0, (a, b) => err(-1, "TODO: Dyad '='."), true),
     "$": mod(99, a => prim(a.get_rank()), 99, (a, b) => {
         let rank = a.as_list();
         if (rank[0] instanceof Value) err(4, "Rank must be list of literal numbers.");
@@ -135,5 +133,7 @@ export const Symbols: AyrMap = {
         let list = a.ranked(a.get_dims() - index.length);
         return list[i] ?? err(4, `Index ${""+index} does not exist.`);
     }, true),
+    "<": mod(99, a => Value.new_box(a), 0, (a, b) => err(-1, "TODO: Dyad '<'.")),
+    ">": mod(0, a => a.boxed() ? a.unbox() : a, 0, (a, b) => err(-1, "TODO: Dyad '>'."), true),
 };
 
