@@ -93,7 +93,9 @@ console.log("~9 :: "+ayr("~9"));
 console.log("1 2 3 4~3 2 1 0 :: "+ayr("1 2 3 4~3 2 1 0"));
 const mat5x5 = Symbols["$"]!(primitive([5,5]),Symbols["~"]!(primitive(25)));
 console.log("(5 5$~25)~<2 3 :: "+ayr("(5 5$~25)~<2 3"));
-
+// 
+// ayr(": 'hello'")
+// 
 // If transformed values are same rank, success. Otherwise, box values
 // Shape is values[0].rank + [values.length] assuming success.
 // value.ranked(1).map(transform).unranked(value.dims)

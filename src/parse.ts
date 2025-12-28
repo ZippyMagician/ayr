@@ -3,19 +3,26 @@ import { Value } from "./value"
 import { Num } from "./number"
 import { eof, Token, TokenIdent } from "./lex"
 import { Symbols } from "./syms"
-import { ayr_eval } from "./eval"
+import { ayr_partial } from "./eval"
+import { Env, MaybeInstant } from "./env"
 
 const clone = require('lodash.clonedeep');
 
-function is_instant(tokens: Token[], i: number, inst_lits: Set<string> = new Set()): boolean {
+function is_instant(tokens: Token[], i: number, env: Env): boolean {
     if (i >= tokens.length) return false;
     let type: TokenIdent = tokens[i]!.ident;
     if (type == TokenIdent.Number || type == TokenIdent.String)
         return true;
     if (type == TokenIdent.Literal)
-        return inst_lits.has(tokens[i]!.value.as_str());
+        // If the literal exists, is an instant, and is not being redefined, then return true
+        try {
+            let lit = env.get(tokens[i]!.value.as_str());
+            if (lit.is_instant()) return nnw(tokens, i + 1, false)[0]!.ident != TokenIdent.Colon;
+        } catch (e) {
+            return false;
+        }
     if (type == TokenIdent.LParen)
-        return get_group(tokens, i)[0];
+        return get_group(tokens, i, env)[0];
 
     return false;
 }
@@ -53,31 +60,29 @@ export const enum NodeType {
     Line,
 }
 
-// Operator, Symbol, Block TODO
+// TODO: Operators. Assignment handled in `parse_nodes` step.
 export type Node =
     [ NodeType.Instant, Value ]  |
     [ NodeType.Literal, string ] |
     [ NodeType.Symbol, Module ]  |
     [ NodeType.Train, Module ] |
+    [ NodeType.Block, Module ] |
     [ NodeType.Line, "\n" ]
 
-// TODO: Figure out how to parse tokens
-// Need to separate literals into arrays.
-
-function eval_instant(token: Token): Value | Num {
+function eval_instant(this: Env, token: Token): Value | Num {
     switch (token.ident) {
         case TokenIdent.Number:
             return token.value.as_num();
         case TokenIdent.String:
-        // TODO: Literal evaluated differently
-        case TokenIdent.Literal:
             return Value.new_string(token.value.as_str());
+        case TokenIdent.Literal:
+            return this.get(token.value.as_str()).eval<Value>();
         default:
             err(-1, "Unreachable.");
     }
 }
 
-function get_group(tokens: Token[], i: number, inst_lits: Set<string> = new Set()): [ boolean, Token[], number ] {
+function get_group(tokens: Token[], i: number, env: Env): [ boolean, Token[], number ] {
     let parens: number = 1;
     let instant: boolean = true;
     let build: Token[] = [];
@@ -90,21 +95,21 @@ function get_group(tokens: Token[], i: number, inst_lits: Set<string> = new Set(
     }
 
     // TODO: Needs to work for non-instant literals as well.
-    instant = build.length == 0 || is_instant(build, build.length - 1, inst_lits);
+    instant = build.length == 0 || 
+        is_instant(build, build.length - 1, env) && build[0]!.ident != TokenIdent.Colon;
 
     return [instant, build, i];
 }
 
 // TODO: Blocks, Literals, Operators
-export function parse_nodes(tokens: Token[]): Node[] {
-    // let tokens = clone(tokens);
+export function parse_nodes(tokens: Token[], env?: Env): Node[] {
+    env ??= new Env();
     let stream: Node[] = [];
-    let inst_lits: Set<string> = new Set(); // when an imm. assignment is parsed
     let i = 0;
 
     while (i < tokens.length) {
         let [head, j] = nnw(tokens, i, false);
-        if (is_instant(tokens, j, inst_lits)) {
+        if (is_instant(tokens, j, env)) {
             // An instant value
             let list: Token[] = [];
             let intermediary: (Value | Num)[] = [];
@@ -113,10 +118,10 @@ export function parse_nodes(tokens: Token[]): Node[] {
             j--; // Start from head.
             while ([next, j] = nnw(tokens, ++j, false)) {
                 if (next.ident == TokenIdent.LParen) {
-                    let [ inst, group, k ] = get_group(tokens, j, inst_lits);
+                    let [ inst, group, k ] = get_group(tokens, j, env);
                     if (inst) {
-                        let group_parsed: Value = ayr_eval(parse_nodes(group));
-                        intermediary = intermediary.concat(list.map(eval_instant));
+                        let group_parsed: Value = ayr_partial(parse_nodes(group, env), env);
+                        intermediary = intermediary.concat(list.map(eval_instant.bind(env)));
                         intermediary.push(group_parsed);
                         list = [];
                     } else {
@@ -124,7 +129,7 @@ export function parse_nodes(tokens: Token[]): Node[] {
                         break;
                     }
                     j = k;
-                } else if (!is_instant(tokens, j, inst_lits)) {
+                } else if (!is_instant(tokens, j, env)) {
                     j--;
                     break;
                 } else list.push(clone(next));
@@ -132,7 +137,7 @@ export function parse_nodes(tokens: Token[]): Node[] {
 
             // Parse list. Single string, list of numbers, list of numbers + strings, list of boxed elements
             let is_string = list.length == 1 && !intermediary.length && list[0]!.ident == TokenIdent.String;
-            intermediary = intermediary.concat(list.map(eval_instant));
+            intermediary = intermediary.concat(list.map(eval_instant.bind(env)));
             let values: Num[] | Value[] = [];
             if (intermediary.some(n => n instanceof Value)) values = intermediary.map(Value.new_box);
             else values = intermediary as Num[];
@@ -152,9 +157,11 @@ export function parse_nodes(tokens: Token[]): Node[] {
             if (is_line_end(tokens, i)) stream.push([NodeType.Line, "\n"]); // Add trailing newline
         } else if (head.ident == TokenIdent.LParen) {
             // Left parens denote a group. A train if parser reaches this branch.
-            let [ inst, group, j ] = get_group(tokens, i);
-            // TODO: Some sort of pass to parse trains.
-            stream.push([NodeType.Train, parse_train(parse_nodes(group))]);
+            let [ inst, group, j ] = get_group(tokens, i, env);
+            if (group.length && group[0]!.ident == TokenIdent.Colon) {
+                let [head, ...rest] = group;
+                stream.push([NodeType.Train, parse_train(parse_nodes(rest, env), true)]);
+            } else stream.push([NodeType.Train, parse_train(parse_nodes(group, env))]);
             i = j;
         } else if (head.ident == TokenIdent.Symbol) {
             // Symbols
@@ -169,9 +176,19 @@ export function parse_nodes(tokens: Token[]): Node[] {
             i = j;
         } else if (head.ident == TokenIdent.Literal) {
             // Non imm. literal.
-            err(-1, "TODO: Parse non imm. literals.");
+            let [maybe_colon, k] = nnw(tokens, j + 1, true);
+            if (maybe_colon.ident == TokenIdent.Colon) {
+                err(-1, "TODO: Parse literal definitions.");
+            } else err(-1, "TODO: Parse non imm. literals.");
+        } else if (head.ident == TokenIdent.Colon) {
+            // Possible if/then statement
+            if (stream.length) {
+                let [last_type, last_val] = stream[stream.length - 1]!;
+                if (last_type != NodeType.Instant) err(1, "Invalid use of the colon token.");
+                err(-1, "TODO: If/then statement definitions.");
+            } else err(1, "Invalid use of the colon token.");
         } else {
-            err(-1, `TODO: Parse token ${JSON.stringify(head)}`);
+            err(-1, `TODO: Parse token '${JSON.stringify(head)}'.`);
         }
         i++;
     }
@@ -181,8 +198,7 @@ export function parse_nodes(tokens: Token[]): Node[] {
 
 // TODO: Operators pass first
 // TODO: Support literals
-// TODO: Support semi-trains (prefixed with ':')
-function parse_train(nodes: Node[]): Module {
+function parse_train(nodes: Node[], has_colon: boolean = false): Module {
     let build: Module[] = [];
 
     for (let i = nodes.length - 1; i >= 0; i--) {
@@ -197,6 +213,15 @@ function parse_train(nodes: Node[]): Module {
             let left = clone(node[1]);
             build.push(mod_prim(a => top(clone(left), a), (a, b) => top(clone(left), b)));
         } else if (typeof node[1] == 'function') {
+            if (has_colon) {
+                if (build.length) {
+                    let g = build.pop()!;
+                    let f = node[1];
+                    build.push(mod_prim(a => f(g(a)), (a, b) => f(g(a, b))));
+                } else build.push(node[1]);
+                continue;
+            }
+            
             if (build.length == 2) {
                 let f = node[1];
                 let g = build.pop()!;

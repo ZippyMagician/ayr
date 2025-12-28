@@ -6,7 +6,7 @@ const enum MaybeType {
     MODULE = 1,
 }
 
-class MaybeInstant {
+export class MaybeInstant {
     private type: MaybeType;
     private inner: Value | Module;
 
@@ -34,7 +34,11 @@ class MaybeInstant {
 
     // Call eval<Value> or eval<Module>
     public eval<T>(): T {
-        return this.inner as T;
+        try {
+            return this.inner as T;
+        } catch (e) {
+            err(-1, `${e}`);
+        }
     }
 
     public as_module(): Module {
@@ -53,6 +57,10 @@ export class Env {
 
     public set(name: string, value: Value | Module) {
         this.map.set(name, MaybeInstant.new(value));
+    }
+
+    public has(name: string): boolean {
+        return this.map.has(name);
     }
 
     public get(name: string): MaybeInstant {

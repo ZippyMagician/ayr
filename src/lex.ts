@@ -105,8 +105,8 @@ export function lex(str: string): Token[] {
             }[match[0]]!, match[0]);
         // Matches symbol characters after some fiddling
         } else if (match = RegExp(`^(${Object.keys(Symbols)
-            .sort((a, b) => b.length - a.length)
-            .map(r => r.replace(/[^A-Za-z0-9_]/g,'\\$&')).join('|')})`)
+                .sort((a, b) => b.length - a.length)
+                .map(r => r.replace(/[^A-Za-z0-9_]/g,'\\$&')).join('|')})`)
             .exec(str)
         ) push(TokenIdent.Symbol, match[1]);
         // The colon is used as an assignment and at the start of some trains
