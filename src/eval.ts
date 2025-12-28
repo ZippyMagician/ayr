@@ -22,8 +22,7 @@ function as_mod(node: Node): Module {
 }
 
 // TODO: Currently line-by-line basic. Keep?
-export function ayr_eval(nodes: Node[]): Value {
-    let env = new Env();
+export function ayr_eval(nodes: Node[], env: Env, preserve: boolean = false): Value {
     let stack: Value[] = [];
 
     for (let i = nodes.length - 1; i >= 0; i--) {
@@ -36,6 +35,7 @@ export function ayr_eval(nodes: Node[]): Value {
                 err(-1, "TODO: Implement evaluation of literals.");
             case NodeType.Symbol:
             case NodeType.Train:
+            case NodeType.Block:
                 if (!stack.length) err(5);
                 let right = stack.pop()!;
                 if (i == 0 || !is_instant(nodes[i - 1]!, env)) stack.push(as_mod(node)(right));
@@ -43,6 +43,10 @@ export function ayr_eval(nodes: Node[]): Value {
                     let left = as_val(nodes[--i]!);
                     stack.push(as_mod(node)(left, right));
                 }
+                break;
+            case NodeType.Line:
+                // Clear stack.
+                if (!preserve) stack = [];
                 break;
             default:
                 err(-1, `TODO: Implement evaluation for node '${node}'`);
@@ -52,8 +56,14 @@ export function ayr_eval(nodes: Node[]): Value {
     return stack.pop()!;
 }
 
+// For partial execution in the parsing step.
+export function ayr_partial(nodes: Node[], env: Env): Value {
+   return ayr_eval(nodes, env, true); 
+}
+
 // TODO: Currently doesn't work fully.
 export function ayr(program: string): Value {
-    return ayr_eval(parse_nodes(lex(program)));
+    let env = new Env();
+    return ayr_eval(parse_nodes(lex(program), env), env);
 }
 
