@@ -1,9 +1,10 @@
 import { Rational, Num } from "./number"
-import { Module, primitive } from "./utils"
+import { str, Module, primitive } from "./utils"
 import { Value } from "./value"
 import { lex } from "./lex"
 import { parse_nodes } from "./parse"
 import { mod, Symbols } from "./syms"
+import { Operators } from "./ops"
 
 import { ayr } from "./eval"
 
@@ -21,11 +22,10 @@ y: z+
 puts y X
 `);
 
+console.log(str(mat) + "\n:::\n" + str((Operators["/"]![1] as (a: Module) => Module)(Symbols["+"]!)(mat)));
+
 process.exit();
 
-
-//console.log(mat.ranked(1));
-//console.log(d3.ranked(1));
 // console.log(Value.new_box(Value.new_box(Value.new_box(14))).toString());
 console.log(Value.new_box(mat).toString());
 

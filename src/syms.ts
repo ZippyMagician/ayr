@@ -75,11 +75,11 @@ export function mod(r: number, fn: (a: Value) => Value, r2: number | [number, nu
     return (a: Value, b?: Value): Value => b ? dyad(a, b) : monad(a);
 }
 
-interface AyrMap {
-    [key: string]: (a: Value, b?: Value) => Value
+interface SymbolMap {
+    [key: string]: Module
 }
 
-export const Symbols: AyrMap = {
+export const Symbols: SymbolMap = {
     "+": mod(0, a => prim(+a.as_num()), 0, (a, b) => {
         return prim(a.as_num().add(b.as_num()));
     }, false, true),

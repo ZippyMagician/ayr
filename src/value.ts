@@ -116,6 +116,7 @@ export class Value {
         return Value.maybe_num(this.inner[0]!);
     }
 
+    // Convert to specific dimension count
     public ranked(dims: number = 0): Value[] {
         if (dims >= this.dims) {
             return [clone(this)];
@@ -134,6 +135,7 @@ export class Value {
         }
     }
 
+    // Convert back to original dimension count
     public static unranked(original_dims: number, partial_rank: number[], values: Value[], raw_value: boolean = false): Value {
         if (values.length == 0) return Value.new_list([]);
 
