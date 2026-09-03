@@ -13,6 +13,16 @@ let d3 = primitive([1, 2, 3, 4, 5, 6, 7, 8], false, 3, [2, 2, 2]);
 let value = primitive(14);
 let uneven = primitive([1, 2, 3, 4, 5, 6], false, 2, [3, 2]);
 
+
+ayr(`
+X: 457
+y: :+%-
+puts y X
+`);
+
+process.exit();
+
+
 //console.log(mat.ranked(1));
 //console.log(d3.ranked(1));
 // console.log(Value.new_box(Value.new_box(Value.new_box(14))).toString());

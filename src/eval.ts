@@ -1,14 +1,19 @@
 import { Value } from "./value"
-import { err, Module, str, primitive } from "./utils"
+import { err, Module, str, mod_prim, primitive } from "./utils"
 import { Symbols } from "./syms"
 import { Node, NodeType, parse_nodes } from "./parse"
 import { lex } from "./lex"
 import { Env } from "./env"
 
-function is_instant(node: Node, env: Env): boolean {
+export function is_instant(node: Node, env: Env): boolean {
     let type = node[0]!;
     if (type == NodeType.Instant) return true;
-    if (type == NodeType.Literal) err(-1, "TODO: Evaluate if literal is an instant (./eval.ts)");
+    if (type == NodeType.Literal) try {
+        let maybe = env.get(node[1]! as string);
+        return maybe.is_instant();
+    } catch (e) {
+        err(3, `Undefined literal '${node[1]! as string}.`);
+    }
 
     return false;
 }
@@ -32,7 +37,12 @@ export function ayr_eval(nodes: Node[], env: Env, preserve: boolean = false): Va
                 stack.push(as_val(node));
                 break;
             case NodeType.Literal:
-                err(-1, "TODO: Implement evaluation of literals.");
+                let lit = env.get(node[1]! as string);
+                if (lit.is_instant()) {
+                    stack.push(lit.eval<Value>());
+                    break;
+                }
+                node = [NodeType.Block, lit.eval<Module>()];
             case NodeType.Symbol:
             case NodeType.Train:
             case NodeType.Block:
@@ -64,6 +74,17 @@ export function ayr_partial(nodes: Node[], env: Env): Value {
 // TODO: Currently doesn't work fully.
 export function ayr(program: string): Value {
     let env = new Env();
+    env.set("puts", mod_prim(a => {
+        let s = str(a);
+        process.stdout.write(s + "\n");
+        return primitive(s.length);
+    }, (a, b) => {
+        let s = str(b);
+        let i, n;
+        for (i = 0, n = +a.as_num(); i < n; i++) process.stdout.write(s);
+        console.log();
+        return primitive(n * s.length);
+    }));
     return ayr_eval(parse_nodes(lex(program), env), env);
 }
 
