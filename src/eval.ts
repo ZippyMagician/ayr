@@ -12,7 +12,8 @@ export function is_instant(node: Node, env: Env): boolean {
         let maybe = env.get(node[1]! as string);
         return maybe.is_instant();
     } catch (e) {
-        err(3, `Undefined literal '${node[1]! as string}.`);
+        return false;
+        // err(3, `Undefined literal '${node[1]! as string}.`);
     }
 
     return false;

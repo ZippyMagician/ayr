@@ -16,7 +16,7 @@ let uneven = primitive([1, 2, 3, 4, 5, 6], false, 2, [3, 2]);
 
 ayr(`
 X: 457
-y: :+%-
+y: z+
 puts y X
 `);
 
