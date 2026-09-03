@@ -1,4 +1,4 @@
-import { err, Module, mod_prim, primitive } from "./utils"
+import { err, Module, mod_prim, primitive, str } from "./utils"
 import { Value } from "./value"
 import { Num } from "./number"
 import { eof, Token, TokenIdent } from "./lex"
@@ -160,8 +160,8 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             let [inst, group, j] = get_group(tokens, i, env);
             if (group.length && group[0]!.ident == TokenIdent.Colon) {
                 let [head, ...rest] = group;
-                stream.push([NodeType.Train, parse_train(parse_nodes(rest, env), true)]);
-            } else stream.push([NodeType.Train, parse_train(parse_nodes(group, env))]);
+                stream.push([NodeType.Train, parse_train(parse_nodes(rest, env), env, true)]);
+            } else stream.push([NodeType.Train, parse_train(parse_nodes(group, env), env)]);
             i = j;
         } else if (head.ident == TokenIdent.Symbol) {
             // Symbols
@@ -195,9 +195,11 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                         def.shift();
                     }
                     let nodes = parse_nodes(def, env);
-                    if (is_node_instant(nodes[nodes.length - 1]!, env)) env.set(head.value.as_str(), ayr_partial(nodes, env));
+                    if (is_node_instant(nodes[nodes.length - 1]!, env)) 
+                        if (colon) err(1, "Invalid use of the colon token.");
+                        else env.set(head.value.as_str(), ayr_partial(nodes, env));
                     else {
-                        let train = parse_train(nodes, colon);
+                        let train = parse_train(nodes, env, colon);
                         env.set(head.value.as_str(), mod_prim(
                             a => train(a),
                             (a, b) => train(a, b),
@@ -226,8 +228,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
 }
 
 // TODO: Operators pass first
-// TODO: Support literals
-function parse_train(nodes: Node[], has_colon: boolean = false): Module {
+function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Module {
     if (nodes.length == 1) return nodes[0]![1]! as Module;
     let build: Module[] = [];
 
@@ -238,9 +239,9 @@ function parse_train(nodes: Node[], has_colon: boolean = false): Module {
         // A f
         //   f g
         // f g h
-        if (node[0] == NodeType.Instant) {
+        if (is_node_instant(node, env)) {
             let top = build.pop()!;
-            let left = clone(node[1]);
+            let left = clone(node[0] == NodeType.Instant ? node[1] as Value : env.get(node[1] as string).eval<Value>());
             build.push(mod_prim(a => top(clone(left), a), (a, b) => top(clone(left), b)));
         } else if (typeof node[1] == 'function') {
             if (has_colon) {
@@ -259,6 +260,10 @@ function parse_train(nodes: Node[], has_colon: boolean = false): Module {
 
                 build.push(mod_prim(a => g(f(clone(a)), h(clone(a))), (a, b) => g(f(clone(a), clone(b)), h(clone(a), clone(b)))));
             } else build.push(node[1]);
+        } else if (node[0] == NodeType.Literal) {
+            err(-1, "TODO: Support non imm. literals in train");
+        } else {
+            err(1, "Unexpected node in train: '" + str(node[1]!) + "'.");
         }
     }
 
