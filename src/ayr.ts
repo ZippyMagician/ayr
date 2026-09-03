@@ -23,6 +23,7 @@ puts y X
 `);
 
 console.log(ayr(`+/~10`));
+console.log(ayr(`4 (-&[%+) ~5`))
 
 process.exit();
 
