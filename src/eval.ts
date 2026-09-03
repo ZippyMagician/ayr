@@ -43,10 +43,8 @@ export function ayr_eval(nodes: Node[], env: Env, preserve: boolean = false): Va
                     stack.push(lit.eval<Value>());
                     break;
                 }
-                node = [NodeType.Block, lit.eval<Module>()];
-            case NodeType.Symbol:
-            case NodeType.Train:
-            case NodeType.Block:
+                node = [NodeType.Executable, lit.eval<Module>()];
+            case NodeType.Executable:
                 if (!stack.length) err(5);
                 let right = stack.pop()!;
                 if (i == 0 || !is_instant(nodes[i - 1]!, env)) stack.push(as_mod(node)(right));
