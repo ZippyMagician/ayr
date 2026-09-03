@@ -80,6 +80,8 @@ interface SymbolMap {
 }
 
 export const Symbols: SymbolMap = {
+    "[": mod(99, a => a, 99, (a, b) => a, true, true),
+    "]": mod(99, a => a, 99, (a, b) => b, true, true),
     "+": mod(0, a => prim(+a.as_num()), 0, (a, b) => {
         return prim(a.as_num().add(b.as_num()));
     }, false, true),
