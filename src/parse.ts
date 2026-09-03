@@ -1,10 +1,11 @@
-import { err, Module, mod_prim, primitive, str } from "./utils"
+import { err, Module, Monad, Dyad, mod_prim, primitive, str } from "./utils"
 import { Value } from "./value"
 import { Num } from "./number"
 import { eof, Token, TokenIdent } from "./lex"
 import { Symbols } from "./syms"
 import { ayr_partial, is_instant as is_node_instant } from "./eval"
 import { Env, MaybeInstant } from "./env"
+import { Operators } from "./ops"
 
 const clone = require('lodash.clonedeep');
 
@@ -161,6 +162,21 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             // Symbols
             stream.push([NodeType.Executable, Symbols[head.value.as_str()]!]);
             i = j;
+        } else if (head.ident == TokenIdent.Operator) {
+            // Operators
+            let [args, op] = Operators[head.value.as_str()]!;
+            let left = stream.pop()! || err(5, "Missing argument for operator.");
+            if (args == 1) {
+                let left_value;
+                if (is_node_instant(left, env)) left_value = MaybeInstant.new(ayr_partial([left], env));
+                else if (left[0] == NodeType.Literal) left_value = env.get(left[1] as string);
+                else if (left[0] == NodeType.Executable) left_value = MaybeInstant.new(left[1] as Module);
+                else err(1, "Invalid token preceeding the operator");
+                stream.push([NodeType.Executable, (op as Monad<Module>)(left_value.as_module())]);
+            } else {
+                err(-1, "TODO: Dyadic operators");
+            }
+            i = j;
         } else if (is_line_end(tokens, j)) {
             // Line separator (right → left, top → bottom parse order)
             stream.push([NodeType.Line, "\n"]);
@@ -189,7 +205,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                         def.shift();
                     }
                     let nodes = parse_nodes(def, env);
-                    if (is_node_instant(nodes[nodes.length - 1]!, env)) 
+                    if (is_node_instant(nodes[nodes.length - 1]!, env))
                         if (colon) err(1, "Invalid use of the colon token.");
                         else env.set(head.value.as_str(), ayr_partial(nodes, env));
                     else {

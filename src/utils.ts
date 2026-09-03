@@ -52,6 +52,9 @@ export function primitive(value: number | string | number[] | Num | any[], box: 
 
 export type Module = (a: Value, b?: Value) => Value;
 
+export type Monad<T> = (a: T) => T;
+export type Dyad<T>  = (a: T, b: T) => T;
+
 export function mod_prim(monad: (a: Value) => Value, dyad: (a: Value, b: Value) => Value): Module {
     return (a: Value, b?: Value) => b ? dyad(a, b) : monad(a);
 }
