@@ -75,7 +75,7 @@ export function lex(str: string): Token[] {
     const push = (ident: TokenIdent, value: any) => tokens.push({ ident: ident, value: new TokenValue(value) });
     let match;
 
-    // TODO: Symbols + Operators
+    // TODO: Operators
     while (str) {
         // Numbers
         if (match = /^((?:_?\d*)?r_?\d+)|^(__|(?:_?\d*\.?\d*)?(?:e_?)?\d*\.?\d+|_)/.exec(str)) {

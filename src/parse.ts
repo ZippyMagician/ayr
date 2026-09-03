@@ -44,17 +44,14 @@ function nnw(tokens: Token[], from: number, accept_separator: boolean = true): [
 }
 
 export const enum NodeType {
+    // Literal value
     Instant,
 
-    Operator,
-
-    Symbol,
-
+    // Variable
     Literal,
 
-    Train,
-
-    Block,
+    // Symbol, block, train, etc.
+    Executable,
 
     // Line Separator
     Line,
@@ -64,9 +61,7 @@ export const enum NodeType {
 export type Node =
     [NodeType.Instant, Value] |
     [NodeType.Literal, string] |
-    [NodeType.Symbol, Module] |
-    [NodeType.Train, Module] |
-    [NodeType.Block, Module] |
+    [NodeType.Executable, Module] |
     [NodeType.Line, "\n"]
 
 function eval_instant(this: Env, token: Token): Value | Num {
@@ -94,14 +89,13 @@ function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], num
         build.push(clone(node));
     }
 
-    // TODO: Needs to work for non-instant literals as well.
     instant = build.length == 0 ||
         is_instant(build, build.length - 1, env) && build[0]!.ident != TokenIdent.Colon;
 
     return [instant, build, i];
 }
 
-// TODO: Blocks, Literals, Operators
+// TODO: Blocks, Operators
 export function parse_nodes(tokens: Token[], env?: Env): Node[] {
     env ??= new Env();
     let stream: Node[] = [];
@@ -160,12 +154,12 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             let [inst, group, j] = get_group(tokens, i, env);
             if (group.length && group[0]!.ident == TokenIdent.Colon) {
                 let [head, ...rest] = group;
-                stream.push([NodeType.Train, parse_train(parse_nodes(rest, env), env, true)]);
-            } else stream.push([NodeType.Train, parse_train(parse_nodes(group, env), env)]);
+                stream.push([NodeType.Executable, parse_train(parse_nodes(rest, env), env, true)]);
+            } else stream.push([NodeType.Executable, parse_train(parse_nodes(group, env), env)]);
             i = j;
         } else if (head.ident == TokenIdent.Symbol) {
             // Symbols
-            stream.push([NodeType.Symbol, Symbols[head.value.as_str()]!]);
+            stream.push([NodeType.Executable, Symbols[head.value.as_str()]!]);
             i = j;
         } else if (is_line_end(tokens, j)) {
             // Line separator (right → left, top → bottom parse order)
@@ -227,7 +221,6 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
     return stream;
 }
 
-// TODO: Operators pass first
 function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Module {
     if (nodes.length == 1) return nodes[0]![1]! as Module;
     let build: Module[] = [];
@@ -262,7 +255,7 @@ function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Modul
             let top = build.pop()!;
             let left = clone(node[0] == NodeType.Instant ? node[1] as Value : env.get(node[1] as string).eval<Value>());
             build.push(mod_prim(a => top(clone(left), a), (_, b) => top(clone(left), b)));
-        } else if (typeof node[1] == 'function') {
+        } else if (node[0] == NodeType.Executable) {
             inner(node[1]);
         } else if (node[0] == NodeType.Literal) {
             inner(env.get(node[1]).eval<Module>());
