@@ -1,6 +1,7 @@
 import { err, str } from "./utils"
 import { Rational, Num } from "./number"
 import { Symbols } from "./syms"
+import { Operators } from "./ops"
 
 export const enum TokenIdent {
     // ^((?:_?\d*)?r_?\d+)|^(__|(?:_?\d*\.?\d*)?(?:e_?)?\d*\.?\d+|_)
@@ -109,6 +110,12 @@ export function lex(str: string): Token[] {
                 .map(r => r.replace(/[^A-Za-z0-9_]/g,'\\$&')).join('|')})`)
             .exec(str)
         ) push(TokenIdent.Symbol, match[1]);
+        // Matches operator characters, same as symbols
+        else if (match = RegExp(`^(${Object.keys(Operators)
+                .sort((a, b) => b.length - a.length)
+                .map(r => r.replace(/[^A-Za-z0-9_]/g, '\\$&')).join('|')})`)
+            .exec(str)
+        ) push(TokenIdent.Operator, match[1]);
         // The colon is used as an assignment and at the start of some trains
         else if (match = /^:/.exec(str)) push(TokenIdent.Colon, match[0]);
         // Whitespace has syntactic meaning in certain situations
