@@ -1,11 +1,11 @@
-import { err, Module, Monad, Dyad, mod_prim, primitive, str } from "./utils"
+import { err, Module, mod_prim, primitive, str } from "./utils"
 import { Value } from "./value"
 import { Num } from "./number"
 import { eof, Token, TokenIdent } from "./lex"
 import { Symbols } from "./syms"
 import { ayr_partial, is_instant as is_node_instant } from "./eval"
 import { Env, MaybeInstant } from "./env"
-import { Operators } from "./ops"
+import { Operators, OpMonad, OpDyad } from "./ops"
 
 const clone = require('lodash.clonedeep');
 
@@ -54,6 +54,9 @@ export const enum NodeType {
     // Symbol, block, train, etc.
     Executable,
 
+    // Partial dyadic operator, needs the second argument
+    PartialOperator,
+
     // Line Separator
     Line,
 }
@@ -63,6 +66,7 @@ export type Node =
     [NodeType.Instant, Value] |
     [NodeType.Literal, string] |
     [NodeType.Executable, Module] |
+    [NodeType.PartialOperator, OpMonad] |
     [NodeType.Line, "\n"]
 
 function eval_instant(this: Env, token: Token): Value | Num {
@@ -76,6 +80,16 @@ function eval_instant(this: Env, token: Token): Value | Num {
         default:
             err(-1, "Unreachable.");
     }
+}
+
+function maybe_instant(node: Node, env: Env): MaybeInstant {
+    let maybe: MaybeInstant;
+    if (node[0] == NodeType.Instant) maybe = MaybeInstant.new(node[1] as Value);
+    else if (node[0] == NodeType.Literal) maybe = env.get(node[1] as string);
+    else if (node[0] == NodeType.Executable) maybe = MaybeInstant.new(node[1] as Module);
+    else if (node[0] == NodeType.PartialOperator) err(1, "Dyadic operator missing a right operand.");
+    else err(-1, "Unreachable.");
+    return maybe;
 }
 
 function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], number] {
@@ -166,16 +180,9 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             // Operators
             let [args, op] = Operators[head.value.as_str()]!;
             let left = stream.pop()! || err(5, "Missing argument for operator.");
-            if (args == 1) {
-                let left_value;
-                if (is_node_instant(left, env)) left_value = MaybeInstant.new(ayr_partial([left], env));
-                else if (left[0] == NodeType.Literal) left_value = env.get(left[1] as string);
-                else if (left[0] == NodeType.Executable) left_value = MaybeInstant.new(left[1] as Module);
-                else err(1, "Invalid token preceeding the operator");
-                stream.push([NodeType.Executable, (op as Monad<Module>)(left_value.as_module())]);
-            } else {
-                err(-1, "TODO: Dyadic operators");
-            }
+            let left_value = maybe_instant(left, env);
+            if (args == 1) stream.push([NodeType.Executable, (op as OpMonad)(left_value)]);
+            else stream.push([NodeType.PartialOperator, (op as OpDyad).bind(false, left_value)]);
             i = j;
         } else if (is_line_end(tokens, j)) {
             // Line separator (right → left, top → bottom parse order)
@@ -188,9 +195,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             // Non imm. literal.
             let [maybe_colon, k] = nnw(tokens, j + 1, true);
             if (maybe_colon.ident == TokenIdent.Colon) {
-                let k = j + 2;
-                let def_token;
-                [def_token, k] = nnw(tokens, k, false);
+                let [def_token, k] = nnw(tokens, j + 2, false);
                 if (def_token.ident == TokenIdent.LCurly) err(-1, "TODO: Parse imm. def with {{ .. }}.");
                 else {
                     let def = [def_token];
@@ -232,6 +237,14 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             err(-1, `TODO: Parse token '${JSON.stringify(head)}'.`);
         }
         i++;
+        
+        // Pass right operand to partial operator
+        if (stream.length - 1 && stream[stream.length - 2]![0] == NodeType.PartialOperator) {
+            if (stream[stream.length - 1]![0] == NodeType.Line) err(-1, "Dyadic operator missing right operand");
+            let right = maybe_instant(stream.pop()!, env);
+            let [_, op] = stream.pop()!;
+            stream.push([NodeType.Executable, (op as OpMonad)(right)]);
+        }
     }
 
     return stream;
