@@ -1,8 +1,9 @@
 # ts-rewrite
 
  - [x] Rewrite core functionality
- - [ ] Proper literal support
- - [ ] Defining literals
+ - [x] Proper literal support
+ - [x] Defining literals
+ - [ ] Block support
  - [ ] Operator support
  - [ ] Train Mod + Semi-train support
  - [ ] Proper interface
