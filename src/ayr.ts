@@ -22,7 +22,7 @@ y: z+
 puts y X
 `);
 
-console.log(str(mat) + "\n:::\n" + str((Operators["/"]![1] as (a: Module) => Module)(Symbols["+"]!)(mat)));
+console.log(ayr(`+/~10`));
 
 process.exit();
 

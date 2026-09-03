@@ -2,7 +2,7 @@ const clone = require("lodash.clonedeep");
 
 import { Num } from "./number"
 import { Value } from "./value"
-import { err, Module, primitive, range } from "./utils"
+import { err, Module, primitive, range, Monad, Dyad } from "./utils"
 
 const prim = primitive;
 
@@ -68,7 +68,7 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
 }
 
 
-export function mod(r: number, fn: (a: Value) => Value, r2: number | [number, number], fn2: (a: Value, b: Value) => Value, pstrm: boolean = false, pstrd: boolean = false): Module {
+export function mod(r: number, fn: Monad<Value>, r2: number | [number, number], fn2: Dyad<Value>, pstrm: boolean = false, pstrd: boolean = false): Module {
     let monad = sym.bind({ preserve_str: pstrm }, r, fn);
     let dyad  = sym.bind({ preserve_str: pstrd }, r2, fn2 as Module);
 

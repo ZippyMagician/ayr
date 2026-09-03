@@ -1,11 +1,11 @@
 import { Num } from "./number"
 import { Value } from "./value"
 import { mod } from "./syms"
-import { err, Module } from "./utils"
+import { err, Module, Monad, Dyad } from "./utils"
 
 type Binder = 
-    [1, (a: Module) => Module] |
-    [2, (a: Module, b: Module) => Module];
+    [1, Monad<Module>] |
+    [2, Dyad<Module>];
 
 interface OpsMap {
     [key: string]: Binder
