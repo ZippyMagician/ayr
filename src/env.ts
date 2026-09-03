@@ -64,10 +64,7 @@ export class Env {
     }
 
     public get(name: string): MaybeInstant {
-        try {
-            return this.map.get(name)!;
-        } catch (e) {
-            err(3, `Literal '${name}' is undefined.`);
-        }
+        if (this.has(name)) return this.map.get(name)!;
+        else err(3, `Literal '${name}' is undefined.`);
     }
 }

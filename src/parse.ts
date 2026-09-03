@@ -232,6 +232,25 @@ function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Modul
     if (nodes.length == 1) return nodes[0]![1]! as Module;
     let build: Module[] = [];
 
+    function inner(func: Module) {
+        if (has_colon) {
+            if (build.length) {
+                let g = build.pop()!;
+                let f = func;
+                build.push(mod_prim(a => f(g(a)), (a, b) => f(g(a, b))));
+            } else build.push(func);
+            return;
+        }
+
+        if (build.length == 2) {
+            let f = func;
+            let g = build.pop()!;
+            let h = build.pop()!;
+
+            build.push(mod_prim(a => g(f(clone(a)), h(clone(a))), (a, b) => g(f(clone(a), clone(b)), h(clone(a), clone(b)))));
+        } else build.push(func);
+    }
+
     for (let i = nodes.length - 1; i >= 0; i--) {
         let node = nodes[i]!;
 
@@ -242,26 +261,11 @@ function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Modul
         if (is_node_instant(node, env)) {
             let top = build.pop()!;
             let left = clone(node[0] == NodeType.Instant ? node[1] as Value : env.get(node[1] as string).eval<Value>());
-            build.push(mod_prim(a => top(clone(left), a), (a, b) => top(clone(left), b)));
+            build.push(mod_prim(a => top(clone(left), a), (_, b) => top(clone(left), b)));
         } else if (typeof node[1] == 'function') {
-            if (has_colon) {
-                if (build.length) {
-                    let g = build.pop()!;
-                    let f = node[1];
-                    build.push(mod_prim(a => f(g(a)), (a, b) => f(g(a, b))));
-                } else build.push(node[1]);
-                continue;
-            }
-
-            if (build.length == 2) {
-                let f = node[1];
-                let g = build.pop()!;
-                let h = build.pop()!;
-
-                build.push(mod_prim(a => g(f(clone(a)), h(clone(a))), (a, b) => g(f(clone(a), clone(b)), h(clone(a), clone(b)))));
-            } else build.push(node[1]);
+            inner(node[1]);
         } else if (node[0] == NodeType.Literal) {
-            err(-1, "TODO: Support non imm. literals in train");
+            inner(env.get(node[1]).eval<Module>());
         } else {
             err(1, "Unexpected node in train: '" + str(node[1]!) + "'.");
         }
