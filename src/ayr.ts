@@ -22,8 +22,8 @@ y: z+
 puts y X
 `);
 
-console.log(ayr(`+/~10`));
-console.log(ayr(`4 (-&[%+) ~5`))
+console.log(ayr(`+/@2 ]3 3$~9`).toString());
+//console.log(ayr(`4 (-&[%+) ~5`).toString())
 
 process.exit();
 
