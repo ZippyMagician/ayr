@@ -2,7 +2,7 @@ const clone = require("lodash.clonedeep");
 
 import { Num } from "./number"
 import { Value } from "./value"
-import { err, Module, primitive, range, Monad, Dyad } from "./utils"
+import { err, Module, Module2, primitive, range } from "./utils"
 
 const prim = primitive;
 
@@ -10,8 +10,17 @@ interface SymEnv {
     preserve_str?: boolean,
 }
 
-function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b?: Value): Value {
+// Symbol creation.
+// r: Rank of function
+// fn: Function being run (the 'symbol')
+// a: Monadic input
+// b: Dyadic input, optional
+// OVERRIDE: Overrides symbol rank, for use by the '@' operator
+// Returns a value
+// Utilizes Value.ranked and Value.unranked to operate on some arbitrary rank
+function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b?: Value, OVERRIDE?: number | [number, number]): Value {
     let rank: [number, number];
+    if (OVERRIDE) r = OVERRIDE;
     if (typeof r == "number") rank = [r, r];
     else rank = r;
 
@@ -68,11 +77,11 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
 }
 
 
-export function mod(r: number, fn: Monad<Value>, r2: number | [number, number], fn2: Dyad<Value>, pstrm: boolean = false, pstrd: boolean = false): Module {
+export function mod(r: number, fn: Module, r2: number | [number, number], fn2: Module2, pstrm: boolean = false, pstrd: boolean = false): Module {
     let monad = sym.bind({ preserve_str: pstrm }, r, fn);
     let dyad  = sym.bind({ preserve_str: pstrd }, r2, fn2 as Module);
 
-    return (a: Value, b?: Value): Value => b ? dyad(a, b) : monad(a);
+    return (a, b?, override?) => b ? dyad(a, b, override) : monad(a, undefined, override);
 }
 
 interface SymbolMap {
@@ -80,8 +89,8 @@ interface SymbolMap {
 }
 
 export const Symbols: SymbolMap = {
-    "[": mod(99, a => a, 99, (a, b) => a, true, true),
-    "]": mod(99, a => a, 99, (a, b) => b, true, true),
+    "[": mod(99, a => a, 99, (a, _) => a, true, true),
+    "]": mod(99, a => a, 99, (_, b) => b, true, true),
     "+": mod(0, a => prim(+a.as_num()), 0, (a, b) => {
         return prim(a.as_num().add(b.as_num()));
     }, false, true),

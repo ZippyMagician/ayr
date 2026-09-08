@@ -15,9 +15,10 @@ export function err(code: number, msg: string = ""): never {
             throw(`VALUE ERROR [4]${msg ? ": " + msg : ""}`);
         case 5:
             throw(`ARG ERROR [5]${msg ? ": " + msg : ""}`);
+        case 6:
+            throw(`RANK ERROR [6]${msg ? ": " + msg : ""}`);
         default:
             throw(`INTERNAL ERROR [${code}]${msg ? ": " + msg : ""}`);
-            break;
     }
 }
 
@@ -50,11 +51,9 @@ export function primitive(value: number | string | number[] | Num | any[], box: 
     return box ? Value.new_box(final) : final;
 }
 
-export type Module = (a: Value, b?: Value) => Value;
+export type Module  = (a: Value, b?: Value, override?: number | [number, number]) => Value;
+export type Module2 = (a: Value, b:  Value, override?: number | [number, number]) => Value
 
-export type Monad<T> = (a: T) => T;
-export type Dyad<T>  = (a: T, b: T) => T;
-
-export function mod_prim(monad: Monad<Value>, dyad: Dyad<Value>): Module {
-    return (a: Value, b?: Value) => b ? dyad(a, b) : monad(a);
+export function mod_prim(monad: Module, dyad: Module2): Module {
+    return (a, b?, override?) => b ? dyad(a, b, override) : monad(a, undefined, override);
 }
