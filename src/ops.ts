@@ -34,11 +34,17 @@ export const Operators: OpsMap = {
             // When right argument is an instant, this is the rank operator
             let rank = r.eval<Value>().as_list().map(n => +n);
             let fn = l.as_module();
-
-            if (b) return fn(
-                a, b, rank.length - 1 ? rank.length == 2 ? rank as [number, number] : err(6, "Dyadic call requires either one or two itnegers as rank.") : rank[0]!
-            );
-            else return fn(a, undefined, rank.length == 1 ? rank[0]! : err(6, "Monadic call requires single integer rank."));
+            let parsed_rank = b ? rank.length - 1 ? rank.length == 2 ? rank as [number, number]
+                            : err(6, "Dyadic call requires either one or two integers as rank.")
+                            : rank[0]! : rank.length == 1 ? rank[0]!
+                            : err(6, "Monadic call requires single integer rank.");
+            // When the rank is operating on a train, the wrapping 'mod' is required to apply the rank operator.
+            // Otherwise, just returning `fn(a, b, parsed_rank)` would be sufficient.
+            return mod(
+                b ? 0 : parsed_rank as number, 
+                a => fn(a, undefined, parsed_rank), 
+                parsed_rank, (a, b) => fn(a, b, parsed_rank), true, true
+            )(a, b);
         })() : b ? l.as_module()(r.as_module()(b), a) : l.as_module()(r.as_module()(a))
     ]
 }
