@@ -84,9 +84,9 @@ function eval_instant(this: Env, token: Token): Value | Num {
 
 function maybe_instant(node: Node, env: Env): MaybeInstant {
     let maybe: MaybeInstant;
-    if (node[0] == NodeType.Instant) maybe = MaybeInstant.new(node[1] as Value);
-    else if (node[0] == NodeType.Literal) maybe = env.get(node[1] as string);
-    else if (node[0] == NodeType.Executable) maybe = MaybeInstant.new(node[1] as Module);
+    if (node[0] == NodeType.Instant) maybe = MaybeInstant.new_value(node[1]);
+    else if (node[0] == NodeType.Literal) maybe = env.get(node[1]);
+    else if (node[0] == NodeType.Executable) maybe = MaybeInstant.new_mod(node[1]);
     else if (node[0] == NodeType.PartialOperator) err(1, "Dyadic operator missing a right operand.");
     else err(-1, "Unreachable.");
     return maybe;
