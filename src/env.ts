@@ -37,7 +37,7 @@ export class MaybeInstant {
         try {
             return this.inner as T;
         } catch (e) {
-            err(-1, `${e}`);
+            err(5, `Unexpected type as argument.`);
         }
     }
 
