@@ -143,7 +143,7 @@ export class Value {
         let is_str = values[0]!.str;
         let cuml_rank = values[0]!.rank;
         let boxed_inner = values[0]!.boxed()
-        let ranked_dims = values[0]!.get_dims();
+        let ranked_dims = values[0]!.is_single() ? 0 : values[0]!.get_dims();
         for (let i = 1; i < values.length; i++) {
             is_str &&= values[i]!.str;
             boxed_inner &&= values[i]!.boxed()
