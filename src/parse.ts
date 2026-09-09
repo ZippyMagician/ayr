@@ -193,14 +193,14 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             i = j;
         } else if (head.ident == TokenIdent.Literal) {
             // Non imm. literal.
-            let [maybe_colon, k] = nnw(tokens, j + 1, true);
+            let [maybe_colon, _] = nnw(tokens, j + 1, true);
             if (maybe_colon.ident == TokenIdent.Colon) {
                 let [def_token, k] = nnw(tokens, j + 2, false);
                 if (def_token.ident == TokenIdent.LCurly) err(-1, "TODO: Parse imm. def with {{ .. }}.");
                 else {
                     let def = [def_token];
                     while ([def_token, k] = nnw(tokens, ++k, false)) {
-                        if (def_token.ident == TokenIdent.Separator) break;
+                        if (is_line_end(tokens, k)) break;
                         def.push(def_token);
                     }
                     if (!def.length) err(1, `Empty literal definition for '${head.value}.`);
@@ -229,7 +229,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
         } else if (head.ident == TokenIdent.Colon) {
             // Possible if/then statement
             if (stream.length) {
-                let [last_type, last_val] = stream[stream.length - 1]!;
+                let [last_type, _] = stream[stream.length - 1]!;
                 if (last_type != NodeType.Instant) err(1, "Invalid use of the colon token.");
                 err(-1, "TODO: If/then statement definitions.");
             } else err(1, "Invalid use of the colon token.");
@@ -239,7 +239,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
         i++;
         
         // Pass right operand to partial operator
-        if (stream.length - 1 && stream[stream.length - 2]![0] == NodeType.PartialOperator) {
+        if (stream.length > 1 && stream[stream.length - 2]![0] == NodeType.PartialOperator) {
             if (stream[stream.length - 1]![0] == NodeType.Line) err(-1, "Dyadic operator missing right operand");
             let right = maybe_instant(stream.pop()!, env);
             let [_, op] = stream.pop()!;
@@ -255,6 +255,7 @@ function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Modul
     let build: Module[] = [];
 
     function inner(func: Module) {
+        // Colon denotes no train shortcuts, simply executed right to left
         if (has_colon) {
             if (build.length) {
                 let g = build.pop()!;
