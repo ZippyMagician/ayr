@@ -124,7 +124,7 @@ export const Symbols: SymbolMap = {
         let rows = a.ranked(1).map(x => x.as_list());
         return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
     }, 0, (a, b) => err(-1, "TODO: Dyad '='."), true),
-    "$": mod(99, a => prim(a.get_rank()), 99, (a, b) => {
+    "$": mod(99, a => prim(a.get_rank()), [1, 99], (a, b) => {
         let rank = a.as_list();
         if (rank[0] instanceof Value) err(4, "Rank must be list of literal numbers.");
         return b.with_rank((rank as Num[]).map(a => +a));

@@ -88,7 +88,10 @@ export class Value {
             while (inner.length < count) inner.push(clone(inner[i++ % this.inner.length]));
         }
 
-        return new Value(this.type, inner, dims, rank, this.str);
+        return new Value(
+            dims == 0 || dims == 1 && rank[0] == 1 ? Type.Scalar : Type.List, 
+            inner, dims, rank, this.str
+        );
     }
 
     public get_dims(): number {
