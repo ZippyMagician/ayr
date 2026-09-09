@@ -104,8 +104,9 @@ function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], num
         build.push(clone(node));
     }
 
-    instant = build.length == 0 ||
-        is_instant(build, build.length - 1, env) && build[0]!.ident != TokenIdent.Colon;
+    // The group is empty, the last element is an instant / not attached to an operator, a colon does not mark the beginning.
+    instant = build.length == 0 || is_instant(build, build.length - 1, env) && 
+        build[0]!.ident != TokenIdent.Colon && (build.length < 2 || build[build.length - 2]!.ident != TokenIdent.Operator);
 
     return [instant, build, i];
 }
@@ -166,9 +167,9 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             if (is_line_end(tokens, i)) stream.push([NodeType.Line, "\n"]); // Add trailing newline
         } else if (head.ident == TokenIdent.LParen) {
             // Left parens denote a group. A train if parser reaches this branch.
-            let [inst, group, j] = get_group(tokens, i, env);
+            let [_, group, j] = get_group(tokens, i, env);
             if (group.length && group[0]!.ident == TokenIdent.Colon) {
-                let [head, ...rest] = group;
+                let [_colon, ...rest] = group;
                 stream.push([NodeType.Executable, parse_train(parse_nodes(rest, env), env, true)]);
             } else stream.push([NodeType.Executable, parse_train(parse_nodes(group, env), env)]);
             i = j;
