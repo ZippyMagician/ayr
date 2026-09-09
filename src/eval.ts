@@ -70,20 +70,8 @@ export function ayr_partial(nodes: Node[], env: Env): Value {
    return ayr_eval(nodes, env, true); 
 }
 
-// TODO: Currently doesn't work fully.
-export function ayr(program: string): Value {
-    let env = new Env();
-    env.set("puts", mod_prim(a => {
-        let s = str(a);
-        process.stdout.write(s + "\n");
-        return primitive(s.length);
-    }, (a, b) => {
-        let s = str(b);
-        let i, n;
-        for (i = 0, n = +a.as_num(); i < n; i++) process.stdout.write(s);
-        console.log();
-        return primitive(n * s.length);
-    }));
+export function ayr(program: string, env?: Env): Value {
+    env ??= new Env();
     return ayr_eval(parse_nodes(lex(program), env), env);
 }
 

@@ -1,4 +1,4 @@
-import { err, Module } from "./utils"
+import { err, Module, init_env } from "./utils"
 import { Value } from "./value"
 
 const enum MaybeType {
@@ -53,10 +53,16 @@ export class Env {
     constructor() {
         this.map = new Map();
         this.backup = new Map();
+
+        init_env(this);
     }
 
     public set(name: string, value: Value | Module) {
         this.map.set(name, MaybeInstant.new(value));
+    }
+
+    public remove(name: string) {
+        this.map.delete(name);
     }
 
     public has(name: string): boolean {

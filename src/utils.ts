@@ -1,5 +1,6 @@
 import { Rational, Num } from "./number"
 import { Value } from "./value"
+import { Env } from "./env"
 
 export function err(code: number, msg: string = ""): never {
     switch (code) {
@@ -57,3 +58,19 @@ export type Module2 = (a: Value, b:  Value, override?: number | [number, number]
 export function mod_prim(monad: Module, dyad: Module2): Module {
     return (a, b?, override?) => b ? dyad(a, b, override) : monad(a, undefined, override);
 }
+
+// Define built in literals
+export function init_env(env: Env) {
+    env.set("puts", mod_prim(a => {
+        let s = str(a);
+        process.stdout.write(s + "\n");
+        return primitive(s.length);
+    }, (a, b) => {
+        let s = str(b);
+        let i, n;
+        for (i = 0, n = +a.as_num(); i < n; i++) process.stdout.write(s);
+        console.log();
+        return primitive(n * s.length);
+    }));
+}
+
