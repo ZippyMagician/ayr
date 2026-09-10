@@ -101,10 +101,10 @@ export class Value {
         let count = rank.reduce((a, b) => a * b, 1);
         let inner = clone(this.inner);
 
-        if (count !== inner.length) {
+        if (count > inner.length) {
             let i = 0;
             while (inner.length < count) inner.push(clone(inner[i++ % this.inner.length]));
-        }
+        } else if (count < inner.length) inner = inner.slice(0, count);
 
         return new Value(
             dims == 0 || dims == 1 && rank[0] == 1 ? Type.Scalar : Type.List, 
