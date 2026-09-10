@@ -27,6 +27,9 @@ console.log(ayr(`+/@2 ]3 3$~9`).toString());
 //console.log(ayr(`4 (-&[%+) ~5`).toString())
 */
 
+let x = primitive([1, 2, 3]);
+x = primitive(x.as_list().map(Value.new_box));
+
 import * as readline from "node:readline/promises"
 
 async function cli() {
@@ -38,6 +41,7 @@ async function cli() {
     rl.on('SIGINT', () => rl.close());
 
     let env = new Env();
+    env.set("I", x);
     while (true) {
         let prompt = await rl.question("    ");
         if (prompt == "exit") break;
