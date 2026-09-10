@@ -23,12 +23,15 @@ export const Operators: OpsMap = {
         return arr.slice(1).reduce((a, b) => f.as_module()(a, b), arr[0]!);
     }, [0, 99], (a, b) => err(-1, "TODO: Dyadic '/'."), true)],
 
-    // Compose / Atop
-    "&": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) =>
-        b ? l.as_module()(r.as_module()(a, b)) : l.as_module()(r.as_module()(a))
-    ],
+    // Compose / Atop / Bind (inst. arg)
+    "&": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) => {
+        if (l.is_instant() && r.is_instant()) err(5, "Cannot bind an instant to an instant.");
+        if (l.is_instant()) return r.as_module()(l.eval<Value>(), b ?? a);
+        else if (r.is_instant()) return b ? l.as_module()(a, r.eval<Value>()) : l.as_module()(r.eval<Value>());
+        return b ? l.as_module()(r.as_module()(a, b)) : l.as_module()(r.as_module()(a))
+    }],
 
-    // Compose / Over
+    // Compose / Over / Rank (inst. arg)
     "@": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) =>
         r.is_instant() ? (() => {
             // When right argument is an instant, this is the rank operator
