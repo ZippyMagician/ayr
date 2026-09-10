@@ -28,55 +28,73 @@ export class Value {
         this.str = str;
     }
 
+    // Value.maybe_num can map over a list of Value | Num to convert it into guaranteed Values
     public static maybe_num(value: Value | Num): Value {
         return value instanceof Num ? Value.new_scalar(value) : clone(value);
     }
 
+    // A new Value that is a scalar instant
     public static new_scalar(value: Num): Value {
         return new Value(Type.Scalar, [value], 0, [1], false);
     }
 
+    // A new boxed Value
     public static new_box(value: Value | Num): Value {
         if (value instanceof Num) value = Value.new_scalar(value);
         return new Value(Type.Box, [value], 0, [1], false);
     }
 
+    // A new string
     public static new_string(str: string | Num[], dims: number = 1, rank?: number[]): Value {
         let list: Num[] = typeof str === "string" ? str.split('').map(ch => Num.from(ch.charCodeAt(0))) : str;
         return new Value(Type.List, list, dims, rank ?? [list.length], true);
     }
 
+    // A new list
     public static new_list(list: Num[] | Value[], dims: number = 1, rank?: number[]): Value {
         return new Value(Type.List, list, dims, rank ?? [list.length], false);
     }
 
+    // A generic that can create a new list of either numbers or characters
     public static new_ls(list: string | Num[] | Value[], dims: number = 1, rank?: number[], str?: boolean): Value {
         if (str) return Value.new_string(list as string | Num[], dims, rank);
         else return Value.new_list(list as Num[] | Value[], dims, rank);
     }
 
+    // Is this value a singleton immediate?
     public is_single(): boolean {
         return this.type == Type.Scalar || this.dims == 0 || this.dims == 1 && this.rank[0] == 1;
     }
 
+    // Return a clone of the internal array
     public as_list(): Value[] | Num[] {
         return clone(this.inner);
     }
 
+    // Return the rank of this Value
     public get_rank(): number[] {
         return clone(this.rank);
     }
 
+    // Is this Value a string?
     public is_str(): boolean {
         return this.str;
     }
 
+    // Return a string version of this value (clone)
     public make_str(): Value {
         let v = clone(this);
         v.str = true;
         return v;
     }
 
+    // Return in-place string version
+    public as_str(): Value {
+        this.str = true;
+        return this;
+    }
+
+    // Return a new Value from this Value's instant representation, with a new rank
     public with_rank(rank: number[]): Value {
         let dims = rank.length;
         if (rank.some((a: number) => !Number.isInteger(a))) err(4);
@@ -94,25 +112,30 @@ export class Value {
         );
     }
 
+    // Return this Value's dimensions
     public get_dims(): number {
         return this.dims;
     }
 
+    // Is this Value boxed?
     public boxed(): boolean {
         return this.type == Type.Box;
     }
 
+    // Unbox this Value
     public unbox(): Value {
         if (!this.boxed()) err(2, "Cannot unbox a non-boxed value.");
         return Value.maybe_num(this.inner[0]!);
     }
 
+    // Return the internal Num of this singleton Value
     public as_num(): Num {
         if (!this.is_single()) err(-1, "Attempted to treat list as single numeric value.");
         if (this.boxed()) err(2, "Cannot convert boxed value to numeric.");
         return this.inner[0]! instanceof Num ? this.inner[0]! : this.inner[0]!.as_num();
     }
 
+    // Return the internal Value of this singleton Value
     public as_value(): Value {
         if (!this.is_single()) err(-1, "Attempted to treat list as single value.");
         if (this.boxed()) err(2, "Cannot operate on boxed value.");
@@ -169,6 +192,7 @@ export class Value {
         } else return Value.new_list(values.map((n: Value): Value[] => n.inner.map(Value.maybe_num)).flat(), rank.length, rank);
     }
 
+    // Primitive toString for printing an instant
     toString(): string {
         let build: string = "";
         if (this.is_single()) {

@@ -2,9 +2,7 @@ const clone = require("lodash.clonedeep");
 
 import { Num } from "./number"
 import { Value } from "./value"
-import { err, Module, Module2, primitive, range } from "./utils"
-
-const prim = primitive;
+import { err, Module, Module2, primitive as prim, range } from "./utils"
 
 interface SymEnv {
     preserve_str?: boolean,
@@ -92,10 +90,12 @@ export const Symbols: SymbolMap = {
     "[": mod(99, a => a, 99, (a, _) => a, true, true),
     "]": mod(99, a => a, 99, (_, b) => b, true, true),
     "+": mod(0, a => prim(+a.as_num()), 0, (a, b) => {
-        return prim(a.as_num().add(b.as_num()));
+        let sum = prim(a.as_num().add(b.as_num()));
+        return a.is_str() || b.is_str() ? sum.as_str() : sum;
     }, false, true),
     "-": mod(0, a => prim(a.as_num().neg()), 0, (a, b) => {
-        return prim(a.as_num().sub(b.as_num()));
+        let sub = prim(a.as_num().sub(b.as_num()));
+        return a.is_str() || b.is_str() ? sub.as_str() : sub;
     }, false, true),
     "%": mod(0, a => prim(Num.from(1).div(a.as_num())), 0, (a, b) => {
         return prim(a.as_num().div(b.as_num()));
@@ -131,8 +131,8 @@ export const Symbols: SymbolMap = {
     }),
     "~": mod(0, a => {
         let n = +a.as_num();
-        if (a.is_str() && n < 97) return range(65, n+1).make_str();
-        else if (a.is_str()) return range(97, n+1).make_str();
+        if (a.is_str() && n < 97) return range(65, n+1).as_str();
+        else if (a.is_str()) return range(97, n+1).as_str();
         return range(1, n + 1);
     }, [99, 0], (a, b) => {
         let index = (b.boxed() ? Value.maybe_num(b.as_list()[0]!) : b).as_list().map(n => +n.as_num());
