@@ -144,7 +144,7 @@ export class Value {
 
     // Convert to specific dimension count
     public ranked(dims: number = 0): Value[] {
-        if (dims >= this.dims) {
+        if (this.boxed() || dims >= this.dims) {
             return [clone(this)];
         } else if (dims == 0) {
             return [...this.inner.map(n => n instanceof Num ? Value.new_scalar(n) : clone(n))]
@@ -165,7 +165,7 @@ export class Value {
     public static unranked(original_dims: number, partial_rank: number[], values: Value[], raw_value: boolean = false): Value {
         if (values.length == 0) return Value.new_list([]);
 
-        let box = false;
+        let uneven = false;
         let is_str = values[0]!.str;
         let cuml_rank = values[0]!.rank;
         let boxed_inner = values[0]!.boxed()
@@ -174,12 +174,15 @@ export class Value {
             is_str &&= values[i]!.str;
             boxed_inner &&= values[i]!.boxed()
             if (!is_equal(cuml_rank, values[i]!.rank)) {
-                box = true;
+                uneven = true;
             }
         }
 
-        if (box) return Value.new_list(values.map(Value.new_box));
-        if (values.length == 1 && ranked_dims >= original_dims) return values[0]!;
+        // In J, this would keep it unboxed by "spreading it out" into something such as a matrix
+        // TODO: Maybe I should add a flag to toggle this behavior?
+        if (uneven) return Value.new_list(values.map(Value.new_box));
+        // Single value. Originally was values.length == 1 && ranked_dims >= original_dims, I do not believe this second condition to be necessary.
+        if (values.length == 1) return values[0]!;
 
         let rank = [
             ...partial_rank, 
