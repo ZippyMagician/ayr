@@ -9,6 +9,7 @@ import { Operators, OpMonad, OpDyad } from "./ops"
 
 const clone = require('lodash.clonedeep');
 
+// Is the token an instant
 function is_instant(tokens: Token[], i: number, env: Env): boolean {
     if (i >= tokens.length) return false;
     let type: TokenIdent = tokens[i]!.ident;
@@ -28,10 +29,12 @@ function is_instant(tokens: Token[], i: number, env: Env): boolean {
     return false;
 }
 
+// Is the token ignorable whitespace (can reject or accept a separator
 function is_whitespace(type: TokenIdent, accept_separator: boolean = true): boolean {
     return type == TokenIdent.Space || accept_separator && type == TokenIdent.Separator;
 }
 
+// Is it the end of the line
 function is_line_end(tokens: Token[], i: number): boolean {
     let { ident, value } = tokens[i] ?? eof();
     return ident == TokenIdent.Separator && value.as_str() == "\n" || ident == TokenIdent.EOF;
@@ -61,7 +64,6 @@ export const enum NodeType {
     Line,
 }
 
-// TODO: Operators. Assignment handled in `parse_nodes` step.
 export type Node =
     [NodeType.Instant, Value] |
     [NodeType.Literal, string] |
@@ -69,6 +71,7 @@ export type Node =
     [NodeType.PartialOperator, OpMonad] |
     [NodeType.Line, "\n"]
 
+// Evaluate an instant token
 function eval_instant(this: Env, token: Token): Value | Num {
     switch (token.ident) {
         case TokenIdent.Number:
@@ -82,6 +85,7 @@ function eval_instant(this: Env, token: Token): Value | Num {
     }
 }
 
+// Return the Env's MaybeInstant type based on the Node
 function maybe_instant(node: Node, env: Env): MaybeInstant {
     let maybe: MaybeInstant;
     if (node[0] == NodeType.Instant) maybe = MaybeInstant.new_value(node[1]);
@@ -92,6 +96,7 @@ function maybe_instant(node: Node, env: Env): MaybeInstant {
     return maybe;
 }
 
+// Parse a group of tokens (parenthesis)
 function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], number] {
     let parens: number = 1;
     let instant: boolean = true;
@@ -111,7 +116,22 @@ function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], num
     return [instant, build, i];
 }
 
-// TODO: Blocks, Operators
+// Parse a block of tokens (curly braces)
+function get_block(tokens: Token[], i: number): [Token[], number] {
+    let curly = 1;
+    let build = [];
+    let node: Token;
+
+    while (([node, i] = nnw(tokens, ++i), node.ident != TokenIdent.EOF)) {
+        if (node.ident == TokenIdent.LCurly) ++curly;
+        else if (node.ident == TokenIdent.RCurly && --curly == 0) break;
+        build.push(clone(node));
+    }
+
+    return [build, i];
+}
+
+// Parses a list of tokens into a list of nodes
 export function parse_nodes(tokens: Token[], env?: Env): Node[] {
     env ??= new Env();
     let stream: Node[] = [];
@@ -173,6 +193,20 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                 stream.push([NodeType.Executable, parse_train(parse_nodes(rest, env), env, true)]);
             } else stream.push([NodeType.Executable, parse_train(parse_nodes(group, env), env)]);
             i = j;
+        } else if (head.ident == TokenIdent.LCurly) {
+            // Left curly denotes a block
+            let [block, j] = get_block(tokens, i);
+            if (!block.length) err(1, "A block cannot be empty.");
+            stream.push([NodeType.Executable, (a: Value, b?: Value): Value => {
+                let env_clone = clone(env);
+                if (b) {
+                    env_clone.set("x", clone(a));
+                    env_clone.set("y", clone(b));
+                } else env_clone.set("y", clone(a));
+                let nodes = parse_nodes(block, env_clone);
+                return ayr_partial(nodes, env_clone);
+            }]);
+            i = j;
         } else if (head.ident == TokenIdent.Symbol) {
             // Symbols
             stream.push([NodeType.Executable, Symbols[head.value.as_str()]!]);
@@ -196,31 +230,33 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             // Non imm. literal.
             let [maybe_colon, _] = nnw(tokens, j + 1, true);
             if (maybe_colon.ident == TokenIdent.Colon) {
-                let [def_token, k] = nnw(tokens, j + 2, false);
-                if (def_token.ident == TokenIdent.LCurly) err(-1, "TODO: Parse imm. def with {{ .. }}.");
+                let def = [];
+                let def_token;
+                let k = j + 1;
+                let seen_group = 0; // Seen parens or curly, keeps count
+
+                while ([def_token, k] = nnw(tokens, ++k, seen_group < 1)) {
+                    if (def_token.ident == TokenIdent.LCurly || def_token.ident == TokenIdent.LParen) seen_group++;
+                    else if (def_token.ident == TokenIdent.RCurly || def_token.ident == TokenIdent.RParen) seen_group--;
+                    if (seen_group < 1 && is_line_end(tokens, k)) break;
+                    def.push(def_token);
+                }
+                if (!def.length) err(1, `Empty literal definition for '${head.value}.`);
+                let colon = false;
+                if (def[0]!.ident == TokenIdent.Colon) {
+                    colon = true;
+                    def.shift();
+                }
+                let nodes = parse_nodes(def, env);
+                if (is_node_instant(nodes[nodes.length - 1]!, env))
+                    if (colon) err(1, "Invalid use of the colon token.");
+                    else env.set(head.value.as_str(), ayr_partial(nodes, env));
                 else {
-                    let def = [def_token];
-                    while ([def_token, k] = nnw(tokens, ++k, false)) {
-                        if (is_line_end(tokens, k)) break;
-                        def.push(def_token);
-                    }
-                    if (!def.length) err(1, `Empty literal definition for '${head.value}.`);
-                    let colon = false;
-                    if (def[0]!.ident == TokenIdent.Colon) {
-                        colon = true;
-                        def.shift();
-                    }
-                    let nodes = parse_nodes(def, env);
-                    if (is_node_instant(nodes[nodes.length - 1]!, env))
-                        if (colon) err(1, "Invalid use of the colon token.");
-                        else env.set(head.value.as_str(), ayr_partial(nodes, env));
-                    else {
-                        let train = parse_train(nodes, env, colon);
-                        env.set(head.value.as_str(), mod_prim(
-                            a => train(a),
-                            (a, b) => train(a, b),
-                        ));
-                    }
+                    let train = parse_train(nodes, env, colon);
+                    env.set(head.value.as_str(), mod_prim(
+                        a => train(a),
+                        (a, b) => train(a, b),
+                    ));
                 }
                 j = k;
             } else {
@@ -251,6 +287,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
     return stream;
 }
 
+// Parses a potential train (a list of nodes within parenthesis) into a single executable (Module)
 function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Module {
     if (nodes.length == 1) return nodes[0]![1]! as Module;
     let build: Module[] = [];
