@@ -3,9 +3,9 @@
  - [x] Rewrite core functionality
  - [x] Proper literal support
  - [x] Defining literals
- - [ ] Block support
- - [ ] Operator support
- - [ ] Train Mod + Semi-train support
- - [ ] Proper interface
+ - [x] Block support
+ - [x] Operator support
+ - [x] Basic CLI
+ - [ ] Proper interface (flags, run from file)
  - [ ] Finish symbol and operator porting
  - [ ] If statement support
