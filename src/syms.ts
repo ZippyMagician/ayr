@@ -30,8 +30,8 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
         let is_rawl = (temp = a.as_list(), temp.length > 0 && temp[0] instanceof Num);
         let is_rawr = (temp = b.as_list(), temp.length > 0 && temp[0] instanceof Num);
 
-        let left_rank  = a.get_rank().slice(0, Math.max(0, a.get_dims() - rank[0] - 1));
-        let right_rank = b.get_rank().slice(0, Math.max(0, b.get_dims() - rank[1] - 1));
+        let left_rank  = a.get_rank().slice(rank[0]);
+        let right_rank = b.get_rank().slice(rank[1]);
 
         let left  = a.ranked(rank[0]);
         let right = b.ranked(rank[1]);
@@ -67,7 +67,7 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
         let temp;
         let is_raw = (temp = a.as_list(), temp.length > 0 && temp[0] instanceof Num);
 
-        let left_rank = a.get_rank().slice(0, Math.max(0, a.get_dims() - rank[0] - 1));
+        let left_rank = a.get_rank().slice(rank[0]);
         let left = a.ranked(rank[0]);
         left = left.map(val => fn(a.is_str() && this.preserve_str ? val.make_str() : val));
         return Value.unranked(a.get_dims(), left_rank, left, is_raw);

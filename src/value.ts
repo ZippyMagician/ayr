@@ -26,6 +26,9 @@ export class Value {
         this.dims = dims;
         this.rank = rank;
         this.str = str;
+
+        // Remove trailing ones
+        while (this.rank[this.rank.length - 1] == 1) this.rank.pop();
     }
 
     // Value.maybe_num can map over a list of Value | Num to convert it into guaranteed Values
@@ -195,8 +198,8 @@ export class Value {
         if (values.length == 1) return values[0]!;
 
         let rank = [
+            ...cuml_rank.slice(0, ranked_dims),
             ...partial_rank, 
-            ...cuml_rank.slice(0, ranked_dims), 
             values.length / partial_rank.reduce((a, b) => a * b, 1)
         ];
         if (is_str) return Value.new_string(values.flatMap((n: Value) => n.as_list() as Num[]), original_dims, rank)
