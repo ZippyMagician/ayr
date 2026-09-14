@@ -158,7 +158,7 @@ export const Symbols: SymbolMap = {
         let rank = a.get_rank();
         let i = 0, prefix = 0;
         for (let j = 0; j < index.length; j++) {
-            i += index[j]! * (prefix | 1);
+            i += index[j]! * (prefix || 1);
             prefix += rank[j]!;
         }
 
