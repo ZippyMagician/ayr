@@ -18,10 +18,10 @@ export class Rational {
     private numer: number;
     private denom: number;
 
-    constructor(numerator: number, denominator: number) {
+    constructor(numerator: number, denominator: number, skip?: boolean = true) {
         this.numer = numerator;
         this.denom = denominator;
-        this.simplify();
+        if (skip) this.simplify();
     }
 
     private simplify(): void {
@@ -44,6 +44,10 @@ export class Rational {
             this.numer *= -1;
             this.denom *= -1;
         }
+    }
+
+    public abs(): Rational {
+        return this.numer < 0 ? this.neg() : new Rational(this.numer, this.denom, false);
     }
 
     public add(other: number | Rational): Rational {
@@ -76,7 +80,7 @@ export class Rational {
     }
 
     public neg(): Rational {
-        return new Rational(-this.numer, this.denom);
+        return new Rational(-this.numer, this.denom, false);
     }
 
     public to_number(): number {
@@ -132,6 +136,11 @@ export class Num {
     public neg(): Num {
         if (typeof this.wrap == "number") return Num.from(-this.wrap);
         else return Num.from(this.wrap.neg());
+    }
+
+    public abs(): Num {
+        if (typeof this.wrap == "number") return Num.from(Math.abs(this.wrap));
+        return Num.from(this.wrap.abs());
     }
 
     public as_num(): Num {
