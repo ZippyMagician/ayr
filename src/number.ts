@@ -147,6 +147,10 @@ export class Num {
         return this;
     }
 
+    public is_inf(): boolean {
+        return this.wrap == Infinity;
+    }
+
     toString(): string {
         return str(this.wrap);
     }
