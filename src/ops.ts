@@ -27,7 +27,7 @@ export const Operators: OpsMap = {
     "&": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) => {
         if (l.is_instant() && r.is_instant()) err(5, "Cannot bind an instant to an instant.");
         if (l.is_instant()) return r.as_module()(l.eval<Value>(), b ?? a);
-        else if (r.is_instant()) return b ? l.as_module()(a, r.eval<Value>()) : l.as_module()(r.eval<Value>());
+        else if (r.is_instant()) return l.as_module()(b ?? a, r.eval<Value>()); // b ? l.as_module()(a, r.eval<Value>()) : l.as_module()(r.eval<Value>());
         return b ? l.as_module()(r.as_module()(a, b)) : l.as_module()(r.as_module()(a))
     }],
 
