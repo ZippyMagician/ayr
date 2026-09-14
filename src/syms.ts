@@ -39,7 +39,7 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
         let left_is_mapper = left.length >= right.length;
         let [mapper, value] = left_is_mapper ? [left, right] : [right, left];
         if (value.length !== mapper.length) {
-            if (mapper.length % value.length) err(4);
+            if (mapper.length % value.length) err(4, "Operand ranks are not compatible.");
             else {
                 // The # elements might not match, but there is a conceivable/intuitive way
                 // The user may expect the values to work. In that case, make sure the program
