@@ -40,36 +40,36 @@ export function range(first: number, second?: number): Value {
 }
 
 export function pad_axis(data: Value, axis: number, size: number): Value {
-  const dims = data.get_dims();
-  const orig_rank = data.get_rank();
+    const dims = data.get_dims();
+    const orig_rank = data.get_rank();
 
-  if (dims > axis && orig_rank[axis]! > size) err(-1, "utils.ts::pad_axis");
+    if (dims > axis && orig_rank[axis]! > size) err(-1, "utils.ts::pad_axis");
 
-  const rank = dims <= axis
+    const rank = dims <= axis
     ? [...orig_rank, ...new Array(axis - dims + 1).fill(1)]
     : orig_rank;
 
-  const new_rank = rank.slice();
-  const old_axis_size = rank[axis]!;
-  new_rank[axis] = size;
+    const new_rank = rank.slice();
+    const old_axis_size = rank[axis]!;
+    new_rank[axis] = size;
 
-  const block = rank.slice(0, axis).reduce((a, b) => a * b, 1);
-  const rest = rank.slice(axis + 1).reduce((a, b) => a * b, 1);
-  const copy_count = old_axis_size * block;
-  const pad_count = (size - old_axis_size) * block;
-  const len = block * size * rest;
+    const block = rank.slice(0, axis).reduce((a, b) => a * b, 1);
+    const rest = rank.slice(axis + 1).reduce((a, b) => a * b, 1);
+    const copy_count = old_axis_size * block;
+    const pad_count = (size - old_axis_size) * block;
+    const len = block * size * rest;
 
-  const values = data.as_list();
-  const new_values = new Array(len);
+    const values = data.as_list();
+    const new_values = new Array(len);
 
-  let src = 0, dst = 0;
-  for (let r = 0; r < rest; r++) {
+    let src = 0, dst = 0;
+    for (let r = 0; r < rest; r++) {
     for (let i = 0; i < copy_count; i++) new_values[dst++] = values[src++]!;
     new_values.fill(0, dst, dst + pad_count);
     dst += pad_count;
-  }
+}
 
-  return primitive(new_values, false, new_rank.length, new_rank);
+return primitive(new_values, false, new_rank.length, new_rank);
 }
 
 export function primitive(value: number | string | number[] | Num | any[], box: boolean = false, dims: number = 1, rank?: number[]): Value {
