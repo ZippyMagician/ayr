@@ -83,7 +83,7 @@ export function mod(r: number, fn: Module, r2: number | [number, number], fn2: M
 }
 
 function mod_todo(symbol: string): Module {
-    return mod(0, _ => err(-1, `TODO: Monad ${module}.`), 0, (_, _) => err(-1, `TODO: Dyad ${symbol}.`));
+    return mod(0, _ => err(-1, `TODO: Monad ${module}.`), 0, (_a, _b) => err(-1, `TODO: Dyad ${symbol}.`));
 }
 
 interface SymbolMap {
@@ -99,7 +99,7 @@ export const Symbols: SymbolMap = {
     // TODO / GCD (0, 0)
     "+.": mod_todo("+."),
     // Double (0) / Abs Add (0, 0)
-    "+:": mod(0, a => prim(a.as_num().mul(2)), 0, (a, b) => prim(a.as_num().add(b.as_num()).abs()), true, true),
+    "+:": mod(0, a => prim(a.as_num().mul(Num.from(2))), 0, (a, b) => prim(a.as_num().add(b.as_num()).abs()), true, true),
     // Negate (0) / Subtract (0, 0)
     "-": mod(0, a => prim(a.as_num().neg()), 0, (a, b) => {
         let sub = prim(a.as_num().sub(b.as_num()));
@@ -166,5 +166,13 @@ export const Symbols: SymbolMap = {
         let list = a.ranked(a.get_dims() - index.length);
         return list[i] ?? err(4, `Index ${""+index} does not exist.`);
     }, true),
+    // Flatten [Ravel] (99) / Concatenate (1, 1)
+    ",": mod(99, a => {
+        let flat = prim(a.as_list());
+        return a.is_str() ? flat.as_str() : flat;
+    }, 1, (a, b) => {
+        let concat = prim([...a.as_list(), ...b.as_list()]);
+        return a.is_str() && b.is_str() ? concat.as_str() : concat;
+    }, true, true),
 };
 

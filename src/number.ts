@@ -18,7 +18,7 @@ export class Rational {
     private numer: number;
     private denom: number;
 
-    constructor(numerator: number, denominator: number, skip?: boolean = true) {
+    constructor(numerator: number, denominator: number, skip: boolean = true) {
         this.numer = numerator;
         this.denom = denominator;
         if (skip) this.simplify();
@@ -51,9 +51,9 @@ export class Rational {
     }
 
     public add(other: number | Rational): Rational {
-        if (typeof other == "number" && Math.abs(other) == 1)
+        if (typeof other == "number")
             return new Rational(this.numer + other * this.denom, this.denom);
-        const o = typeof other == "number" ? new Rational(other, 1) : clone(other);
+        const o = clone(other);
 
         if (this.denom == o.denom) return new Rational(this.numer + o.numer, this.denom);
         else {
