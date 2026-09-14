@@ -100,20 +100,23 @@ export const Symbols: SymbolMap = {
     "+.": mod_todo("+."),
     // Double (0) / Abs Add (0, 0)
     "+:": mod(0, a => a.map_num(n => n.mul(Num.from(2))), 0, (a, b) => a.map_num(n => n.add(b.as_num()).abs()), true, true),
-    // Negate (0) / Subtract (0, 0)
-    "-": mod(0, a => a.map_num(n => n.neg()), 0, (a, b) => {
+    // Negate | Swap case [strings] (0) / Subtract (0, 0)
+    "-": mod(0, a => {
+        if (a.is_str()) {
+            const n = +a.as_num();
+            return prim(n > 96 && n < 123 ? n - 32 : n > 64 && n < 91 ? n + 32 : n).as_str();
+        } else return a.map_num(n => n.neg());
+    }, 0, (a, b) => {
         let sub = a.map_num(n => n.sub(b.as_num()));
         return b.is_str() ? sub.as_str() : sub;
     }, false, true),
-    // Signum | Case [strings] (0) / Multiply (0, 0)
+    // Signum | Identify case [strings] (0) / Multiply (0, 0)
     "*": mod(0, a => {
         if (a.is_str()) {
             let char = String.fromCharCode(+a.as_num());
             let lower = char.toLowerCase(), upper = char.toUpperCase();
             return prim(lower == upper ? 0 : char == lower ? -1 : 1);
-        } else {
-            return prim(Math.sign(+a.as_num()));
-        }
+        } return a.map_num(n => Num.from(Math.sign(+n)));
     }, 0, (a, b) => a.map_num(n => n.mul(b.as_num())), true),
     // Reciprocal (0) / Divide (0, 0)
     "%": mod(0, a => a.map_num(n => Num.from(1).div(n)), 0, (a, b) => a.map_num(n => n.div(b.as_num()))),
@@ -123,11 +126,22 @@ export const Symbols: SymbolMap = {
     ">": mod(0, a => a.boxed() ? a.unbox() : a, 0, (a, b) => err(-1, "TODO: Dyad '>'."), true),
     // Exponent (0) / Power (0, 0)
     "^": mod_todo("^"),
-    // Shape (99) / Reshape (1, 99)
+    // Shape (99) / Reshape (1, 99) -- _, _1 are wildcards
     "$": mod(99, a => prim(a.get_rank()), [1, 99], (a, b) => {
-        let rank = a.as_list();
-        if (rank[0] instanceof Value) err(4, "Rank must be list of literal numbers.");
-        return b.with_rank((rank as Num[]).map(a => +a));
+        const list = a.as_list();
+        if (list[0] instanceof Value) err(4, "Rank must be list of literal numbers.");
+        let rank = list.map(a => +a);
+
+        const orig_rank = b.get_rank();
+        let i, prod = 1;
+        for (let j = 0; j < rank.length; j++) {
+            prod *= rank[j]! == Infinity || rank[j]! == -1 
+                ? orig_rank[j] || 1 : (orig_rank[j] || 1) / rank[j]!;
+            if (rank[j]! == Infinity || -1 == rank[j]!) i = j;
+        }
+        i && (rank[i] = prod);
+
+        return b.with_rank(rank);
     }),
     // Identity (99) / Left (99, 99)
     "[": mod(99, a => a, 99, (a, _) => a, true, true),
