@@ -92,18 +92,18 @@ interface SymbolMap {
 
 export const Symbols: SymbolMap = {
     // Abs (0) / Add (0, 0)
-    "+": mod(0, a => prim(+a.as_num()), 0, (a, b) => {
-        let sum = prim(a.as_num().add(b.as_num()));
-        return a.is_str() || b.is_str() ? sum.as_str() : sum;
+    "+": mod(0, a => a.map_num(n => n.abs()), 0, (a, b) => {
+        let sum = a.map_num(l => l.add(b.as_num()));
+        return b.is_str() ? sum.as_str() : sum;
     }, false, true),
     // TODO / GCD (0, 0)
     "+.": mod_todo("+."),
     // Double (0) / Abs Add (0, 0)
-    "+:": mod(0, a => prim(a.as_num().mul(Num.from(2))), 0, (a, b) => prim(a.as_num().add(b.as_num()).abs()), true, true),
+    "+:": mod(0, a => a.map_num(n => n.mul(Num.from(2))), 0, (a, b) => a.map_num(n => n.add(b.as_num()).abs()), true, true),
     // Negate (0) / Subtract (0, 0)
-    "-": mod(0, a => prim(a.as_num().neg()), 0, (a, b) => {
-        let sub = prim(a.as_num().sub(b.as_num()));
-        return a.is_str() || b.is_str() ? sub.as_str() : sub;
+    "-": mod(0, a => a.map_num(n => n.neg()), 0, (a, b) => {
+        let sub = a.map_num(n => n.sub(b.as_num()));
+        return b.is_str() ? sub.as_str() : sub;
     }, false, true),
     // Signum | Case [strings] (0) / Multiply (0, 0)
     "*": mod(0, a => {
@@ -114,13 +114,9 @@ export const Symbols: SymbolMap = {
         } else {
             return prim(Math.sign(+a.as_num()));
         }
-    }, 0, (a, b) => {
-        return prim(a.as_num().mul(b.as_num()));
-    }, true),
+    }, 0, (a, b) => a.map_num(n => n.mul(b.as_num())), true),
     // Reciprocal (0) / Divide (0, 0)
-    "%": mod(0, a => prim(Num.from(1).div(a.as_num())), 0, (a, b) => {
-        return prim(a.as_num().div(b.as_num()));
-    }),
+    "%": mod(0, a => a.map_num(n => Num.from(1).div(n)), 0, (a, b) => a.map_num(n => n.div(b.as_num()))),
     // Box (99) / Less Than (0, 0)
     "<": mod(99, a => Value.new_box(a), 0, (a, b) => err(-1, "TODO: Dyad '<'.")),
     // Unbox (99) / Greater Than (0, 0)
@@ -153,16 +149,21 @@ export const Symbols: SymbolMap = {
     // 1-Range (0) / Index (99, 99)
     "~": mod(0, a => {
         let n = +a.as_num();
-        if (a.is_str() && n < 97) return range(65, n+1).as_str();
-        else if (a.is_str()) return range(97, n+1).as_str();
+        if (a.is_str()) return range(n < 97 ? 65 : 97, n + 1).as_str();
         return range(1, n + 1);
     }, 99, (a, b) => {
         let index = (b.boxed() ? Value.maybe_num(b.as_list()[0]!) : b).as_list().map(n => +n.as_num());
 
         if (a.get_dims() < index.length) err(4, `Index ${""+index} does not exist.`);
         let rank = a.get_rank();
+        let i = 0, prefix = 0;
+        for (let j = 0; j < index.length; j++) {
+            i += index[j]! * (prefix | 1);
+            prefix += rank[j]!;
+        }
 
-        let i = index.map((n, j) => n * (rank.slice(0,j).reduce((a,b)=>a+b,0)||1)).reduce((a,b)=>a+b,0);
+        // FIXME: This is very impractical for very large amounts of data
+        // I probably won't fix this
         let list = a.ranked(a.get_dims() - index.length);
         return list[i] ?? err(4, `Index ${""+index} does not exist.`);
     }, true),
