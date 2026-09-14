@@ -73,7 +73,7 @@ export class Value {
 
     // Return the rank of this Value
     public get_rank(): number[] {
-        return clone(this.rank);
+        return this.rank.slice();
     }
 
     // Is this Value a string?
@@ -135,6 +135,11 @@ export class Value {
         return this.inner[0]! instanceof Num ? this.inner[0]! : this.inner[0]!.as_num();
     }
 
+    public map_num(fn: (a: Num) => Num): Value {
+        let n = this.as_num();
+        return new Value(Type.Scalar, [fn(n)], 0, [1], this.str);
+    }
+
     // Return the internal Value of this singleton Value
     public as_value(): Value {
         if (!this.is_single()) err(-1, "Attempted to treat list as single value.");
@@ -142,21 +147,26 @@ export class Value {
         return Value.maybe_num(this.inner[0]!);
     }
 
+    public map_value(fn: (a: Value) => Value): Value {
+        let v = this.as_value();
+        return new Value(Type.Scalar, [fn(v)], 0, [1], this.str);
+    }
+
     // Convert to specific dimension count
     public ranked(dims: number = 0): Value[] {
         if (this.boxed() || dims >= this.dims) {
             return [clone(this)];
         } else if (dims == 0) {
-            return [...this.inner.map(n => n instanceof Num ? Value.new_scalar(n) : clone(n))]
+            return this.inner.map(n => n instanceof Num ? Value.new_scalar(n) : clone(n));
         } else {
             // Dims < this.dims
-            let nums = clone(this.inner);
-            let inner_rank = this.rank.slice(0, dims); // Note: apl-like rank would be toSpliced instead
-            let chunked = inner_rank.reduce((a: number, b: number) => a * b, 1);
+            const inner_rank = this.rank.slice(0, dims); // Note: apl-like rank would be toSpliced instead
+            const chunked = inner_rank.reduce((a: number, b: number) => a * b, 1);
             let res = [];
 
-            while (nums.length) 
-                res.push(Value.new_list(nums.splice(0, chunked), inner_rank.length, inner_rank));
+            for (let i = 0; i < this.inner.length; i += chunked) {
+                res.push(Value.new_list(this.inner.slice(i, i + chunked), inner_rank.length, inner_rank));
+            }
             return res;
         }
     }
@@ -189,34 +199,33 @@ export class Value {
             ...cuml_rank.slice(0, ranked_dims), 
             values.length / partial_rank.reduce((a, b) => a * b, 1)
         ];
-        if (is_str) return Value.new_string(values.map((n: Value) => n.as_list() as Num[]).flat(), original_dims, rank)
+        if (is_str) return Value.new_string(values.flatMap((n: Value) => n.as_list() as Num[]), original_dims, rank)
         else if (raw_value && !boxed_inner) {
-            return Value.new_list(values.map((n: Value): Num[] => n.inner as Num[]).flat(), rank.length, rank);
-        } else return Value.new_list(values.map((n: Value): Value[] => n.inner.map(Value.maybe_num)).flat(), rank.length, rank);
+            return Value.new_list(values.flatMap((n: Value): Num[] => n.inner as Num[]), rank.length, rank);
+        } else return Value.new_list(values.flatMap((n: Value): Value[] => n.inner.map(Value.maybe_num)), rank.length, rank);
     }
 
     // Primitive toString for printing an instant
     toString(): string {
         let build: string = "";
         if (this.is_single()) {
-            build += clone(this.inner).map((n: Num | Value): string => {
-                return n instanceof Num && this.str ? String.fromCharCode(+n) : str(n)
-            })[0];
+            const n = this.inner[0]!;
+            build += n instanceof Num && this.str ? String.fromCharCode(+n) : str(n);
         } else if (this.dims == 1) {
-            build += clone(this.inner).map((n: Num | Value): string => {
+            build += this.inner.map((n: Num | Value): string => {
                 return this.str ? n instanceof Num ? String.fromCharCode(+n) : err(0, "Invalid string instant.") : str(n)
             }).join(this.str ? "" : " ");
         } else if (this.dims == 2) {
             let elements: string[][] = this.ranked(this.dims - 1).map(n => n.inner.map(str));
             let len = 1;
-            for (let element of elements.flat()) len = Math.max(len, element.length);
+            for (const line of elements) for (const element of line) len = Math.max(len, element.length);
             build += elements.map(line => line.map(element => ' '.repeat(len - element.length) + element).join(" ")).join("\n");
         } else {
             let depth = this.dims;
             let chunked = this.ranked(depth - 1);
             for (let inner of chunked) {
                 build += str(inner);
-                build += [...Array(depth - 1).fill('\n')].join('');
+                build += '\n'.repeat(depth - 1);
             }
         }
 
@@ -225,7 +234,6 @@ export class Value {
             let lines = build.split('\n');
             build = "";
             for (const [i, line] of lines.entries()) {
-                let is_line_one = i == 0;
                 // 2 * (+!i ^ 1) returns 2 when i == 0, 0 otherwise
                 build += " ".repeat(2 * (+!i ^ 1)) + line + "\n";
             }

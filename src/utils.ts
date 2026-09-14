@@ -40,28 +40,36 @@ export function range(first: number, second?: number): Value {
 }
 
 export function pad_axis(data: Value, axis: number, size: number): Value {
-    let values = data.as_list();
-    let rank = data.get_rank();
-    if (data.get_dims() > axis && rank[axis]! > size) err(-1, "utils.ts::pad_axis");
-    else if (data.get_dims() <= axis) rank = [...rank, ...new Array(axis - data.get_dims() + 1).fill(1)];
+  const dims = data.get_dims();
+  const orig_rank = data.get_rank();
 
-    let new_rank: number[] = clone(rank);
-    new_rank[axis] = size;
-    const len = new_rank.reduce((a, b) => a * b, 1);
-    let new_values = new Array(len);
+  if (dims > axis && orig_rank[axis]! > size) err(-1, "utils.ts::pad_axis");
 
-    let orig_size = rank.slice(0, axis).reduce((a, b) => a * b, 1);
-    let new_size = new_rank.slice(0, axis).reduce((a, b) => a * b, 1);
-    for (let i = 0, acc = 0, count = 0, offset = orig_size * rank[axis]!; count < len; acc++, count++) {
-        if (acc >= offset && acc < offset + (size - rank[axis]!) * new_size) {
-            new_values[count] = 0;
-            continue;
-        } else if (acc == offset + (size - rank[axis]!) * new_size) acc = 0;
+  const rank = dims <= axis
+    ? [...orig_rank, ...new Array(axis - dims + 1).fill(1)]
+    : orig_rank;
 
-        new_values[count] = values[i++]!;
-    }
+  const new_rank = rank.slice();
+  const old_axis_size = rank[axis]!;
+  new_rank[axis] = size;
 
-    return primitive(new_values, false, new_rank.length, new_rank);
+  const block = rank.slice(0, axis).reduce((a, b) => a * b, 1);
+  const rest = rank.slice(axis + 1).reduce((a, b) => a * b, 1);
+  const copy_count = old_axis_size * block;
+  const pad_count = (size - old_axis_size) * block;
+  const len = block * size * rest;
+
+  const values = data.as_list();
+  const new_values = new Array(len);
+
+  let src = 0, dst = 0;
+  for (let r = 0; r < rest; r++) {
+    for (let i = 0; i < copy_count; i++) new_values[dst++] = values[src++]!;
+    new_values.fill(0, dst, dst + pad_count);
+    dst += pad_count;
+  }
+
+  return primitive(new_values, false, new_rank.length, new_rank);
 }
 
 export function primitive(value: number | string | number[] | Num | any[], box: boolean = false, dims: number = 1, rank?: number[]): Value {
