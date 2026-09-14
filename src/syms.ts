@@ -82,24 +82,30 @@ export function mod(r: number, fn: Module, r2: number | [number, number], fn2: M
     return (a, b?, override?) => b ? dyad(a, b, override) : monad(a, undefined, override);
 }
 
+function mod_todo(symbol: string): Module {
+    return mod(0, _ => err(-1, `TODO: Monad ${module}.`), 0, (_, _) => err(-1, `TODO: Dyad ${symbol}.`));
+}
+
 interface SymbolMap {
     [key: string]: Module
 }
 
 export const Symbols: SymbolMap = {
-    "[": mod(99, a => a, 99, (a, _) => a, true, true),
-    "]": mod(99, a => a, 99, (_, b) => b, true, true),
+    // Abs (0) / Add (0, 0)
     "+": mod(0, a => prim(+a.as_num()), 0, (a, b) => {
         let sum = prim(a.as_num().add(b.as_num()));
         return a.is_str() || b.is_str() ? sum.as_str() : sum;
     }, false, true),
+    // TODO / GCD (0, 0)
+    "+.": mod_todo("+."),
+    // Double (0) / Abs Add (0, 0)
+    "+:": mod(0, a => prim(a.as_num().mul(2)), 0, (a, b) => prim(a.as_num().add(b.as_num()).abs()), true, true),
+    // Negate (0) / Subtract (0, 0)
     "-": mod(0, a => prim(a.as_num().neg()), 0, (a, b) => {
         let sub = prim(a.as_num().sub(b.as_num()));
         return a.is_str() || b.is_str() ? sub.as_str() : sub;
     }, false, true),
-    "%": mod(0, a => prim(Num.from(1).div(a.as_num())), 0, (a, b) => {
-        return prim(a.as_num().div(b.as_num()));
-    }),
+    // Signum | Case [strings] (0) / Multiply (0, 0)
     "*": mod(0, a => {
         if (a.is_str()) {
             let char = String.fromCharCode(+a.as_num());
@@ -111,7 +117,27 @@ export const Symbols: SymbolMap = {
     }, 0, (a, b) => {
         return prim(a.as_num().mul(b.as_num()));
     }, true),
-    "^": mod(0, a => err(-1, "TODO: Monad '^'."), 0, (a, b) => err(-1, "TODO: Dyad '^'.")),
+    // Reciprocal (0) / Divide (0, 0)
+    "%": mod(0, a => prim(Num.from(1).div(a.as_num())), 0, (a, b) => {
+        return prim(a.as_num().div(b.as_num()));
+    }),
+    // Box (99) / Less Than (0, 0)
+    "<": mod(99, a => Value.new_box(a), 0, (a, b) => err(-1, "TODO: Dyad '<'.")),
+    // Unbox (99) / Greater Than (0, 0)
+    ">": mod(0, a => a.boxed() ? a.unbox() : a, 0, (a, b) => err(-1, "TODO: Dyad '>'."), true),
+    // Exponent (0) / Power (0, 0)
+    "^": mod_todo("^"),
+    // Shape (99) / Reshape (1, 99)
+    "$": mod(99, a => prim(a.get_rank()), [1, 99], (a, b) => {
+        let rank = a.as_list();
+        if (rank[0] instanceof Value) err(4, "Rank must be list of literal numbers.");
+        return b.with_rank((rank as Num[]).map(a => +a));
+    }),
+    // Identity (99) / Left (99, 99)
+    "[": mod(99, a => a, 99, (a, _) => a, true, true),
+    // Identity (99) / Right (99, 99)
+    "]": mod(99, a => a, 99, (_, b) => b, true, true),
+    // Transpose (2) / Equality (0, 0)
     "=": mod(2, a => {
         let dims = a.get_dims();
         if (dims == 1) return a.with_rank([1, a.get_rank()[0]!]);
@@ -124,17 +150,13 @@ export const Symbols: SymbolMap = {
         let rows = a.ranked(1).map(x => x.as_list());
         return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
     }, 0, (a, b) => err(-1, "TODO: Dyad '='."), true),
-    "$": mod(99, a => prim(a.get_rank()), [1, 99], (a, b) => {
-        let rank = a.as_list();
-        if (rank[0] instanceof Value) err(4, "Rank must be list of literal numbers.");
-        return b.with_rank((rank as Num[]).map(a => +a));
-    }),
+    // 1-Range (0) / Index (99, 99)
     "~": mod(0, a => {
         let n = +a.as_num();
         if (a.is_str() && n < 97) return range(65, n+1).as_str();
         else if (a.is_str()) return range(97, n+1).as_str();
         return range(1, n + 1);
-    }, [99, 0], (a, b) => {
+    }, 99, (a, b) => {
         let index = (b.boxed() ? Value.maybe_num(b.as_list()[0]!) : b).as_list().map(n => +n.as_num());
 
         if (a.get_dims() < index.length) err(4, `Index ${""+index} does not exist.`);
@@ -144,7 +166,5 @@ export const Symbols: SymbolMap = {
         let list = a.ranked(a.get_dims() - index.length);
         return list[i] ?? err(4, `Index ${""+index} does not exist.`);
     }, true),
-    "<": mod(99, a => Value.new_box(a), 0, (a, b) => err(-1, "TODO: Dyad '<'.")),
-    ">": mod(0, a => a.boxed() ? a.unbox() : a, 0, (a, b) => err(-1, "TODO: Dyad '>'."), true),
 };
 
