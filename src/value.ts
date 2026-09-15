@@ -114,7 +114,7 @@ export class Value {
         } else if (count < inner.length) inner = inner.slice(0, count);
 
         return new Value(
-            dims == 0 || dims == 1 && rank[0] == 1 ? Type.Scalar : Type.List, 
+            dims == 0 || dims == 1 && rank[0] == 1 ? Type.Scalar : Type.List,
             inner, dims, rank, this.str
         );
     }
@@ -172,7 +172,7 @@ export class Value {
             let res = [];
 
             for (let i = 0; i < this.inner.length; i += chunked) {
-                res.push(Value.new_list(this.inner.slice(i, i + chunked), inner_rank.length, inner_rank));
+                res.push(Value.new_ls(this.inner.slice(i, i + chunked), inner_rank.length, inner_rank, this.str));
             }
             return res;
         }
@@ -203,7 +203,7 @@ export class Value {
 
         let rank = [
             ...cuml_rank.slice(0, ranked_dims),
-            ...partial_rank, 
+            ...partial_rank,
             values.length / partial_rank.reduce((a, b) => a * b, 1)
         ];
         if (is_str) return Value.new_string(values.flatMap((n: Value) => n.as_list() as Num[]), original_dims, rank)
@@ -220,13 +220,15 @@ export class Value {
             build += n instanceof Num && this.str ? String.fromCharCode(+n) : str(n);
         } else if (this.dims == 1) {
             build += this.inner.map((n: Num | Value): string => {
-                return this.str ? n instanceof Num ? String.fromCharCode(+n) : err(0, "Invalid string instant.") : str(n)
+                return this.str ? n instanceof Num ? String.fromCharCode(+n) : err(0, "Invalid string instant.") : str(n);
             }).join(this.str ? "" : " ");
         } else if (this.dims == 2) {
-            let elements: string[][] = this.ranked(this.dims - 1).map(n => n.inner.map(str));
+            let elements: string[][] = this.ranked(this.dims - 1).map(n => n.inner.map(v => {
+                return this.str ? v instanceof Num ? String.fromCharCode(+v) : err(0, "Invalid string instant.") : str(n);
+            }));
             let len = 1;
             for (const line of elements) for (const element of line) len = Math.max(len, element.length);
-            build += elements.map(line => line.map(element => ' '.repeat(len - element.length) + element).join(" ")).join("\n");
+            build += elements.map(line => line.map(element => ' '.repeat(len - element.length) + element).join(this.str ? "" : " ")).join("\n");
         } else {
             let depth = this.dims;
             let chunked = this.ranked(depth - 1);
