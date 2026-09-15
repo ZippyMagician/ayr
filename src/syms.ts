@@ -186,7 +186,9 @@ export const Symbols: SymbolMap = {
         let flat = prim(a.as_list());
         return a.is_str() ? flat.as_str() : flat;
     }, 1, (a, b) => {
-        let concat = prim([...a.as_list(), ...b.as_list()]);
+        let left = a.boxed() ? [a] : b.boxed() ? a.to_list().map(Value.new_box) : a.to_list();
+        let right = b.boxed() ? [b] : a.boxed() ? b.to_list().map(Value.new_box) : b.to_list();
+        let concat = prim([...left, ...right]);
         return a.is_str() && b.is_str() ? concat.as_str() : concat;
     }, true, true),
     // Mold (1) / Laminate (99, 99)
