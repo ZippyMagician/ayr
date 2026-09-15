@@ -2,7 +2,7 @@ const clone = require("lodash.clonedeep");
 
 import { Num } from "./number"
 import { Value } from "./value"
-import { err, Module, Module2, primitive as prim, range } from "./utils"
+import { err, Module, Module2, pad_rank, primitive as prim, range } from "./utils"
 
 interface SymEnv {
     preserve_str?: boolean,
@@ -54,8 +54,8 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
         let vstr = left_is_mapper ? b.is_str() : a.is_str();
         mapper = mapper.map((val, i) => {
             let args: [Value, Value] = [
-                mstr && this.preserve_str ? val.make_str() : val,
-                vstr && this.preserve_str ? value[i]!.make_str() : value[i]!,
+                mstr && this.preserve_str ? val.as_str() : val,
+                vstr && this.preserve_str ? value[i]!.as_str() : value[i]!,
             ];
             if (!left_is_mapper) args = args.reverse() as [Value, Value];
             return fn(args[0], args[1]);
@@ -188,6 +188,34 @@ export const Symbols: SymbolMap = {
     }, 1, (a, b) => {
         let concat = prim([...a.as_list(), ...b.as_list()]);
         return a.is_str() && b.is_str() ? concat.as_str() : concat;
+    }, true, true),
+    // Mold (1) / Laminate (99, 99)
+    ";": mod(1, a => {
+        let values = a.as_list();
+        if (values[0] && values[0]! instanceof Num) return a;
+        let unboxed = values.map(n => (n as Value).unbox());
+        
+        let max_rank: number[] = [];
+        for (let i = 0; i < unboxed.length; i++) {
+            for (let j = 0, rank = unboxed[i]!.get_rank(), dims = unboxed[i]!.get_dims(); j < dims; j++)
+                max_rank[j] = Math.max(max_rank[j] ?? 1, rank[j]!);
+        }
+
+        let new_values = unboxed.flatMap(value => pad_rank(value, max_rank).to_list() as Num[]);
+        return prim(new_values, false, max_rank.length + 1, [...max_rank, values.length], unboxed[0]!.is_str());
+    }, 99, (a, b) => {
+        let left_dims = a.get_dims();
+        let left_rank = a.get_rank();
+        let right_dims = b.get_dims();
+        let right_rank = b.get_rank();
+
+        let dims = Math.max(left_dims, right_dims);
+        let rank = new Array(dims).fill(1);
+        for (let i in (left_dims - right_dims ? left_rank : right_rank))
+            rank[i] = Math.max(left_rank[i] ?? 1, right_rank[i] ?? 1);
+
+        let new_values = [...pad_rank(a, rank).to_list(), ...pad_rank(b, rank).to_list()];
+        return prim(new_values, false, dims + 1, [...rank, 2], a.is_str() && b.is_str());
     }, true, true),
 };
 

@@ -74,6 +74,10 @@ export class Value {
         return clone(this.inner);
     }
 
+    public to_list(): Value[] | Num[] {
+        return this.inner;
+    }
+
     // Return the rank of this Value
     public get_rank(): number[] {
         return this.rank.slice();

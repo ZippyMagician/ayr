@@ -7,7 +7,7 @@ import { Command } from "commander"
 const program = new Command();
 
 import * as readline from "node:readline/promises"
-const pkg = require('./package.json');
+const pkg = require('../package.json');
 
 async function cli(_options: { string: string[] }) {
     console.log("ayr: type 'exit' to exit.");
@@ -24,8 +24,8 @@ async function cli(_options: { string: string[] }) {
         try {
             let output = ayr(prompt, env);
             if (output) console.log(output.toString());
-        } catch (e) {
-            console.log(e);
+        } catch (error) {
+            console.log(error);
         }
     }
 
