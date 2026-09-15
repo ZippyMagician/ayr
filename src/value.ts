@@ -64,6 +64,11 @@ export class Value {
         else return Value.new_list(list as Num[] | Value[], dims, rank);
     }
 
+    // Box this
+    public box(): Value {
+        return new Value(Type.Box, [this], 0, [1], false);
+    }
+
     // Is this value a singleton immediate?
     public is_single(): boolean {
         return this.type == Type.Scalar || this.dims == 0 || this.dims == 1 && this.rank[0] == 1;
@@ -224,11 +229,13 @@ export class Value {
             }).join(this.str ? "" : " ");
         } else if (this.dims == 2) {
             let elements: string[][] = this.ranked(this.dims - 1).map(n => n.inner.map(v => {
-                return this.str ? v instanceof Num ? String.fromCharCode(+v) : err(0, "Invalid string instant.") : str(n);
+                return this.str ? v instanceof Num ? String.fromCharCode(+v) : err(0, "Invalid string instant.") : str(v);
             }));
             let len = 1;
             for (const line of elements) for (const element of line) len = Math.max(len, element.length);
-            build += elements.map(line => line.map(element => ' '.repeat(len - element.length) + element).join(this.str ? "" : " ")).join("\n");
+            build += elements.map(line => 
+                line.map(element => ' '.repeat(len - element.length) + element).join(this.str ? "" : " ")
+            ).join("\n");
         } else {
             let depth = this.dims;
             let chunked = this.ranked(depth - 1);
