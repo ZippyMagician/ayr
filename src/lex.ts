@@ -122,7 +122,7 @@ export function lex(str: string): Token[] {
         else if (match = /^(\s+)/.exec(str)) push(match[0] == " " ? TokenIdent.Space : TokenIdent.Separator, match[1]!);
         // Literals (environment variables & user defined variables
         else if (match = /^([a-zA-Z][a-zA-Z_]*)/.exec(str)) push(TokenIdent.Literal, match[1]!);
-        else err(3);
+        else err(3, `Unrecognized token starting at: '${str.slice(0, 5)}...'.`);
 
         str = str.slice(match && match[0].length || 1);
     }
