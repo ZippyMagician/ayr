@@ -2,7 +2,6 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    "rootDir": "./src",
     "outDir": "./build",
 
     // Environment Settings
@@ -10,6 +9,7 @@
     "module": "nodenext",
     "target": "esnext",
     "types": ["lodash.clonedeep", "node"],
+    "resolveJsonModule": true,
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -35,5 +35,6 @@
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",
-  }
+  },
+  "include": ["package.json", "src/**/*"]
 }

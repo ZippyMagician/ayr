@@ -1,11 +1,31 @@
 {
-  "name": "ayr",
-  "version": "0.0.1",
-  "description": "Test branch -- ayr rewrite",
-  "license": "ISC",
-  "author": "",
+  "name": "ayr-lang",
+  "version": "0.6.0",
+  "description": "Ayr typescript rewrite | A toy array language",
+  "license": "MIT",
+  "author": "Joshua Barnett",
   "type": "commonjs",
   "main": "ayr.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZippyMagician/ayr.git"
+  },
+  "keywords": [
+    "ayr",
+    "array",
+    "apl",
+    "parser",
+    "language",
+    "j",
+    "k"
+  ],
+  "bugs": {
+    "url": "https://github.com/ZippyMagician/ayr/issues"
+  },
+  "homepage": "https://github.com/ZippyMagician/ayr#readme",
+  "bin": {
+    "ayr": "./build/ayr.js"
+  },
   "scripts": {
     "dev": "node --watch build/ayr.js",
     "build": "tsc",
@@ -19,6 +39,7 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "commander": "^15.0.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.isequal": "^4.5.0"
   }

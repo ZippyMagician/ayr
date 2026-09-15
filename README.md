@@ -6,6 +6,7 @@
  - [x] Block support
  - [x] Operator support
  - [x] Basic CLI
- - [ ] Proper interface (flags, run from file)
+ - [x] Proper interface
+ - [ ] Port flags, implement running from file
  - [ ] Finish symbol and operator porting
  - [ ] If statement support

@@ -1,39 +1,16 @@
-import { Rational, Num } from "./number"
-import { str, Module, primitive } from "./utils"
-import { Value } from "./value"
-import { lex } from "./lex"
-import { parse_nodes } from "./parse"
-import { mod, Symbols } from "./syms"
-import { Operators } from "./ops"
-
+// import { primitive } from "./utils"
+// import { Value } from "./value"
 import { ayr } from "./eval"
 import { Env } from "./env"
 
-/*let list = primitive([15, 4, 6, 234, 2]);
-let mat = primitive([1, 2, 3, 4, -3, 6, new Rational(1, 3), 8, 9], false, 2, [3, 3]);
-let d3 = primitive([1, 2, 3, 4, 5, 6, 7, 8], false, 3, [2, 2, 2]);
-let value = primitive(14);
-let uneven = primitive([1, 2, 3, 4, 5, 6], false, 2, [3, 2]);
-
-
-ayr(`
-X: 457
-z: %
-y: z+
-puts y X
-`);
-
-console.log(ayr(`+/@2 ]3 3$~9`).toString());
-//console.log(ayr(`4 (-&[%+) ~5`).toString())
-*/
-
-let x = primitive([1, 2, 3]);
-x = primitive(x.as_list().map(Value.new_box));
+import { Command } from "commander"
+const program = new Command();
 
 import * as readline from "node:readline/promises"
+const pkg = require('./package.json');
 
-async function cli() {
-    console.log("type 'exit' to exit.");
+async function cli(_options: { string: string[] }) {
+    console.log("ayr: type 'exit' to exit.");
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -41,7 +18,6 @@ async function cli() {
     rl.on('SIGINT', () => rl.close());
 
     let env = new Env();
-    env.set("I", x);
     while (true) {
         let prompt = await rl.question("    ");
         if (prompt == "exit") break;
@@ -54,7 +30,32 @@ async function cli() {
     }
 
     rl.close();
+    process.exit(0);
 }
 
-cli();
+async function run_file(file: string, options: { string: string[] }) {
+    console.log(file);
+    console.log(options);
+    process.exit(0);
+}
+
+program
+    .name('ayr')
+    .description(pkg.description)
+    .version(pkg.version);
+
+program
+    .option('-0', '0-indexed lists instead of 1');
+
+program.command('run')
+    .description('Run from a file')
+    .argument('<file>', 'file to run')
+    .option('-i, --input <string>', 'alternative to STDIN input')
+    .action(run_file);
+
+program.command('cli')
+    .description('Run the ayr CLI')
+    .action(cli);
+
+program.parse();
 
