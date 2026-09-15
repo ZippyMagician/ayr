@@ -54,7 +54,7 @@ class TokenValue {
     public as_num(): Num {
         if (this.inner instanceof Num) return this.inner as Num;
         if (typeof this.inner == "number") return Num.from(this.inner);
-        else err(-1, "implementation error.");
+        err(-1, "lex.ts::Num.as_num | Unreachable.");
     }
     
     [Symbol.toPrimitive](hint: string) {

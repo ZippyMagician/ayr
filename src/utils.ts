@@ -81,7 +81,7 @@ export function primitive(value: number | string | number[] | Num | any[], box: 
         final = Value.new_list(value.map((n: number | any): Value | Num => {
             if (typeof n == "number" || n instanceof Num || n instanceof Rational) return Num.from(n);
             else if (n instanceof Value) return n as Value;
-            err(-1, "unreachable.");
+            err(-1, "utils.ts::primitive | Unreachable.");
         }) as Value[] | Num[], dims, rank ?? [value.length]);
     }
     return box ? Value.new_box(final) : final;

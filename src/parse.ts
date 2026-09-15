@@ -81,7 +81,7 @@ function eval_instant(this: Env, token: Token): Value | Num {
         case TokenIdent.Literal:
             return this.get(token.value.as_str()).eval<Value>();
         default:
-            err(-1, "Unreachable.");
+            err(-1, "parse.ts::eval_instant | Unreachable.");
     }
 }
 
@@ -92,7 +92,7 @@ function maybe_instant(node: Node, env: Env): MaybeInstant {
     else if (node[0] == NodeType.Literal) maybe = env.get(node[1]);
     else if (node[0] == NodeType.Executable) maybe = MaybeInstant.new_mod(node[1]);
     else if (node[0] == NodeType.PartialOperator) err(1, "Dyadic operator missing a right operand.");
-    else err(-1, "Unreachable.");
+    else err(-1, "parse.ts::maybe_instant | Unreachable.");
     return maybe;
 }
 
@@ -277,7 +277,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
         
         // Pass right operand to partial operator
         if (stream.length > 1 && stream[stream.length - 2]![0] == NodeType.PartialOperator) {
-            if (stream[stream.length - 1]![0] == NodeType.Line) err(-1, "Dyadic operator missing right operand");
+            if (stream[stream.length - 1]![0] == NodeType.Line) err(1, "Dyadic operator missing right operand");
             let right = maybe_instant(stream.pop()!, env);
             let [_, op] = stream.pop()!;
             stream.push([NodeType.Executable, (op as OpMonad)(right)]);
