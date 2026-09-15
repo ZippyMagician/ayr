@@ -345,7 +345,7 @@ function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Modul
         let f = build.pop()!;
         let g = build.pop()!;
 
-        return mod_prim(a => f(g(clone(a))), (a, b) => f(clone(a), g(clone(b))));
+        return mod_prim(a => f(g(a)), (a, b) => /* f(a, g(b)) */ f(g(a, b)));
     } else return build[0]!;
 }
 
