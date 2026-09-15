@@ -68,7 +68,7 @@ export type Node =
     [NodeType.Instant, Value] |
     [NodeType.Literal, string] |
     [NodeType.Executable, Module] |
-    [NodeType.PartialOperator, OpMonad] |
+    [NodeType.PartialOperator, OpDyad, MaybeInstant] |
     [NodeType.Line, "\n"]
 
 // Evaluate an instant token
@@ -215,9 +215,18 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             // Operators
             let [args, op] = Operators[head.value.as_str()]!;
             let left = stream.pop()! || err(5, "Missing argument for operator.");
-            let left_value = maybe_instant(left, env);
-            if (args == 1) stream.push([NodeType.Executable, (op as OpMonad)(left_value)]);
-            else stream.push([NodeType.PartialOperator, (op as OpDyad).bind(false, left_value)]);
+            if (head.value.as_str() == "`" && left[0]! == NodeType.PartialOperator) {
+                // Special case, can commute operator arguments
+                stream.push([
+                    NodeType.PartialOperator, 
+                    (u: MaybeInstant, v: MaybeInstant) => (left[1] as OpDyad)(v, u), 
+                    left[2]!
+                ]);
+            } else {
+                let left_value = maybe_instant(left, env);
+                if (args == 1) stream.push([NodeType.Executable, (op as OpMonad)(left_value)]);
+                else stream.push([NodeType.PartialOperator, op as OpDyad, left_value]);
+            }
             i = j;
         } else if (is_line_end(tokens, j)) {
             // Line separator (right → left, top → bottom parse order)
@@ -279,8 +288,8 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
         if (stream.length > 1 && stream[stream.length - 2]![0] == NodeType.PartialOperator) {
             if (stream[stream.length - 1]![0] == NodeType.Line) err(1, "Dyadic operator missing right operand");
             let right = maybe_instant(stream.pop()!, env);
-            let [_, op] = stream.pop()!;
-            stream.push([NodeType.Executable, (op as OpMonad)(right)]);
+            let [_, op, left] = stream.pop()!;
+            stream.push([NodeType.Executable, (op as OpDyad)(left!, right)]);
         }
     }
 

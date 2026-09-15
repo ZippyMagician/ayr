@@ -4,6 +4,8 @@ import { mod } from "./syms"
 import { MaybeInstant } from "./env"
 import { err, Module } from "./utils"
 
+const clone = require('lodash.clonedeep');
+
 export type OpMonad = (a: MaybeInstant) => Module;
 export type OpDyad = (a: MaybeInstant, b: MaybeInstant) => Module;
 
@@ -16,6 +18,19 @@ interface OpsMap {
 }
 
 export const Operators: OpsMap = {
+    // Compose / Atop / Bind (inst. arg)
+    "&": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) => {
+        if (l.is_instant() && r.is_instant()) err(5, "Cannot bind an instant to an instant.");
+        if (l.is_instant()) return r.as_module()(l.eval<Value>(), b ?? a);
+        else if (r.is_instant()) return l.as_module()(b ?? a, r.eval<Value>()); // b ? l.as_module()(a, r.eval<Value>()) : l.as_module()(r.eval<Value>());
+        return b ? l.as_module()(r.as_module()(a, b)) : l.as_module()(r.as_module()(a))
+    }],
+
+    // Tie / Commute
+    "`": [1, (f: MaybeInstant) => ((a, b?, override?) => {
+        return b ? f.as_module()(b, a, override) : f.as_module()(clone(a), a, override);
+    }) as Module],
+    
     // Fold / N-wise fold
     "/": [1, (f: MaybeInstant) => mod(1, a => {
         if (a.is_single()) return a.as_value();
@@ -25,14 +40,6 @@ export const Operators: OpsMap = {
         for (let i = 1; i < arr.length; i++) acc = fn(acc, arr[i]!);
         return acc;
     }, [0, 99], (a, b) => err(-1, "TODO: Dyadic '/'."), true)],
-
-    // Compose / Atop / Bind (inst. arg)
-    "&": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) => {
-        if (l.is_instant() && r.is_instant()) err(5, "Cannot bind an instant to an instant.");
-        if (l.is_instant()) return r.as_module()(l.eval<Value>(), b ?? a);
-        else if (r.is_instant()) return l.as_module()(b ?? a, r.eval<Value>()); // b ? l.as_module()(a, r.eval<Value>()) : l.as_module()(r.eval<Value>());
-        return b ? l.as_module()(r.as_module()(a, b)) : l.as_module()(r.as_module()(a))
-    }],
 
     // Compose / Over / Rank (inst. arg)
     "@": [2, (l: MaybeInstant, r: MaybeInstant) => {
