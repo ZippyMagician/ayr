@@ -219,5 +219,32 @@ export const Symbols: SymbolMap = {
         let new_values = [...pad_rank(a, rank).to_list(), ...pad_rank(b, rank).to_list()];
         return prim(new_values, false, dims + 1, [...rank, 2], a.is_str() && b.is_str());
     }, true, true),
+    // Tally (99) / Replicate (99, 1)
+    "#": mod(99, a => prim(a.get_rank()[a.get_dims() - 1]!), [99, 1], (a, b) => {
+        const axis = a.get_dims() - 1;
+        let elements = a.ranked(axis);
+        let counts = b.ranked(0);
+
+        const size = Math.max(elements.length, counts.length);
+        if (elements.length != counts.length) {
+            if (elements.length % counts.length || elements.length < counts.length) err(4, "Operand ranks are not compatible.");
+            else {
+                let t = Array(size);
+                for (let i = 0; i < size; i++) t[i] = counts[i % counts.length];
+                counts = t;
+            }
+        }
+
+        const counts_sum = counts.reduce((a, b) => a + +b, 0);
+        let values: Value[] = Array(counts_sum);
+        let tally = 0;
+        for (let i = 0; i < size; i++) {
+            for (let j = 0, max = +counts[i]!; j < max; j++)
+                values[tally + j] = clone(elements[i]);
+            tally += +counts[i]!;
+        }
+        // Finagling is required, since Value.unranked assumes nothing was __fully__ removed
+        return Value.unranked(axis + 1, [], values, a.to_list()[0] instanceof Num);
+    }, false, true),
 };
 
