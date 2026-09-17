@@ -2,7 +2,7 @@ const clone = require("lodash.clonedeep");
 
 import { Num } from "./number"
 import { Value } from "./value"
-import { err, Module, Module2, pad_rank, primitive as prim, range } from "./utils"
+import { equal, err, Module, Module2, pad_rank, primitive as prim, range } from "./utils"
 
 interface SymEnv {
     preserve_str?: boolean,
@@ -159,7 +159,7 @@ export const Symbols: SymbolMap = {
 
         let rows = a.ranked(1).map(x => x.as_list());
         return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
-    }, 0, (a, b) => err(-1, "TODO: Dyad '='."), true),
+    }, 0, (a, b) => Value.new_scalar(Num.from(+equal(a, b))), true),
     // 1-Range (0) / Index (99, 99)
     "~": mod(0, a => {
         let n = +a.as_num();
@@ -220,7 +220,7 @@ export const Symbols: SymbolMap = {
         return prim(new_values, false, dims + 1, [...rank, 2], a.is_str() && b.is_str());
     }, true, true),
     // Tally (99) / Replicate (99, 1)
-    "#": mod(99, a => prim(a.get_rank()[a.get_dims() - 1]!), [99, 1], (a, b) => {
+    "#": mod(99, a => Value.new_scalar(Num.from(a.get_rank()[a.get_dims() - 1]!)), [99, 1], (a, b) => {
         const axis = a.get_dims() - 1;
         let elements = a.ranked(axis);
         let counts = b.ranked(0);
