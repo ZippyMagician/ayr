@@ -34,12 +34,34 @@ export const Operators: OpsMap = {
     // Fold / N-wise fold
     "/": [1, (f: MaybeInstant) => mod(1, a => {
         if (a.is_single()) return a.as_value();
-        let arr = a.as_list().map(Value.maybe_num);
+        const arr = a.to_list();
         const fn = f.as_module();
-        let acc = arr[0]!;
-        for (let i = 1; i < arr.length; i++) acc = fn(acc, arr[i]!);
+        let acc = Value.maybe_num(arr[0]!);
+        for (let i = 1; i < arr.length; i++) acc = fn(acc, Value.maybe_num(arr[i]!));
         return acc;
-    }, [0, 99], (a, b) => err(-1, "TODO: Dyadic '/'."), true)],
+    }, [0, 99], (a, b) => {
+        if (b.is_single()) return b.as_value();
+        let window = Math.floor(+a.as_num());
+        let unique = false;
+        if (window < 0) {
+            unique = true;
+            window = -window;
+        }
+
+        const arr = b.to_list();
+        const fn = f.as_module();
+        const jump = unique ? window : 1;
+
+        let cells = Array(Math.floor((arr.length - window) / jump));
+        let index;
+        for (let i = 0; i <= arr.length - window; i += jump) {
+            index = Math.floor(i / jump);
+            cells[index] = Value.maybe_num(arr[i]!);
+            for (let j = i + 1; j < i + window; j++) 
+                cells[index] = fn(cells[index], Value.maybe_num(clone(arr[j]!)));
+        }
+        return Value.unranked(b.get_dims(), [], cells, arr[0] instanceof Num);
+    }, true)],
 
     // Compose / Over / Rank (inst. arg)
     "@": [2, (l: MaybeInstant, r: MaybeInstant) => {
