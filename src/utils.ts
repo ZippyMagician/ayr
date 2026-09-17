@@ -20,6 +20,8 @@ export function err(code: number, msg: string = ""): never {
             throw (`ARG ERROR [5]${msg ? ": " + msg : ""}`);
         case 6:
             throw (`RANK ERROR [6]${msg ? ": " + msg : ""}`);
+        case 7:
+            throw (`DOMAIN ERROR [7]${msg ? ": " + msg : ""}`);
         default:
             throw (`INTERNAL ERROR [${code}]${msg ? ": " + msg : ""}`);
     }
@@ -37,6 +39,16 @@ export function str(item: any) {
 
 export function range(first: number, second?: number): Value {
     return primitive([...Array(Math.max(0, second ? second - first : first)).keys()].map(n => n + first));
+}
+
+export function equal(a: Value, b: Value): boolean {
+    if (a.boxed()) return b.boxed() && equal(a.unbox(), b.unbox());
+    else if (a.is_single()) return b.is_single() ? +a.as_num() == +b.as_num() : false;
+    else {
+        let right = b.to_list();
+        return JSON.stringify(a.get_rank()) == JSON.stringify(b.get_rank())
+            && a.to_list().reduce((cond, v, i) => cond && equal(Value.maybe_num(v), Value.maybe_num(right[i]!)), true);
+    }
 }
 
 export function pad_rank(data: Value, target: number[]): Value {
