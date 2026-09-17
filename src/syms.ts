@@ -30,10 +30,10 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
         let is_rawl = (temp = a.as_list(), temp.length > 0 && temp[0] instanceof Num);
         let is_rawr = (temp = b.as_list(), temp.length > 0 && temp[0] instanceof Num);
 
-        let left_rank  = a.get_rank().slice(rank[0]);
+        let left_rank = a.get_rank().slice(rank[0]);
         let right_rank = b.get_rank().slice(rank[1]);
 
-        let left  = a.ranked(rank[0]);
+        let left = a.ranked(rank[0]);
         let right = b.ranked(rank[1]);
 
         let left_is_mapper = left.length >= right.length;
@@ -61,7 +61,7 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
             return fn(args[0], args[1]);
         });
         return left_is_mapper ? Value.unranked(a.get_dims(), left_rank, mapper, is_rawl)
-                              : Value.unranked(b.get_dims(), right_rank, mapper, is_rawr);
+            : Value.unranked(b.get_dims(), right_rank, mapper, is_rawr);
     } else {
         // Monadic call
         let temp;
@@ -77,7 +77,7 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
 
 export function mod(r: number, fn: Module, r2: number | [number, number], fn2: Module2, pstrm: boolean = false, pstrd: boolean = false): Module {
     let monad = sym.bind({ preserve_str: pstrm }, r, fn);
-    let dyad  = sym.bind({ preserve_str: pstrd }, r2, fn2 as Module);
+    let dyad = sym.bind({ preserve_str: pstrd }, r2, fn2 as Module);
 
     return (a, b?, override?) => b ? dyad(a, b, override) : monad(a, undefined, override);
 }
@@ -120,6 +120,17 @@ export const Symbols: SymbolMap = {
     }, 0, (a, b) => a.map_num(n => n.mul(b.as_num())), true),
     // Reciprocal (0) / Divide (0, 0)
     "%": mod(0, a => a.map_num(n => Num.from(1).div(n)), 0, (a, b) => a.map_num(n => n.div(b.as_num()))),
+    // Not (0) / Residue (0, 0)
+    "|": mod(0, a => a.map_num(n => Num.from(+!+n)), 0, (a, b) => b.map_num(n => Num.from(+n % +a.as_num()))),
+    // Factorial (0) / Or (0, 0)
+    "!": mod(0, a => a.map_num(n => {
+        const val = +n;
+        if (val < 0) err(0, "Factorial of negative number.");
+        if (val < 2) return Num.from(1);
+        let s = 2;
+        for (let i = 3; i <= val; i++) s *= i;
+        return Num.from(s);
+    }), 0, (a, b) => a.map_num(n => Num.from(+n | +b.as_num()))),
     // Box (99) / Less Than (0, 0)
     "<": mod(99, a => Value.new_box(a), 0, (a, b) => Value.new_scalar(Num.from(+(a.as_num() < b.as_num())))),
     // Unbox (99) / Greater Than (0, 0)
@@ -135,7 +146,7 @@ export const Symbols: SymbolMap = {
         const orig_rank = b.get_rank();
         let i, prod = 1;
         for (let j = 0; j < rank.length; j++) {
-            prod *= rank[j]! == Infinity || rank[j]! == -1 
+            prod *= rank[j]! == Infinity || rank[j]! == -1
                 ? orig_rank[j] || 1 : (orig_rank[j] || 1) / rank[j]!;
             if (rank[j]! == Infinity || -1 == rank[j]!) i = j;
         }
@@ -168,7 +179,7 @@ export const Symbols: SymbolMap = {
     }, 99, (a, b) => {
         let index = (b.boxed() ? Value.maybe_num(b.as_list()[0]!) : b).as_list().map(n => +n.as_num());
 
-        if (a.get_dims() < index.length) err(4, `Index ${""+index} does not exist.`);
+        if (a.get_dims() < index.length) err(4, `Index ${"" + index} does not exist.`);
         let rank = a.get_rank();
         let i = 0, prefix = 0;
         for (let j = 0; j < index.length; j++) {
@@ -179,7 +190,7 @@ export const Symbols: SymbolMap = {
         // FIXME: This is very impractical for very large amounts of data
         // I probably won't fix this
         let list = a.ranked(a.get_dims() - index.length);
-        return list[i] ?? err(4, `Index ${""+index} does not exist.`);
+        return list[i] ?? err(4, `Index ${"" + index} does not exist.`);
     }, true),
     // Flatten [Ravel] (99) / Concatenate (1, 1)
     ",": mod(99, a => {
@@ -196,7 +207,7 @@ export const Symbols: SymbolMap = {
         let values = a.as_list();
         if (values[0] && values[0]! instanceof Num) return a;
         let unboxed = values.map(n => (n as Value).unbox());
-        
+
         let max_rank: number[] = [];
         for (let i = 0; i < unboxed.length; i++) {
             for (let j = 0, rank = unboxed[i]!.get_rank(), dims = unboxed[i]!.get_dims(); j < dims; j++)
