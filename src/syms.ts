@@ -23,6 +23,9 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
     else rank = r;
 
     this.preserve_str ??= false;
+    // Negative rank represents leading axis
+    if (rank[0] < 0) rank[0] = a.get_dims() - 1;
+    if (rank[1] < 0) rank[1] = (b ?? a).get_dims() - 1;
 
     if (b) {
         // Dyadic call
