@@ -121,9 +121,9 @@ export const Symbols: SymbolMap = {
     // Reciprocal (0) / Divide (0, 0)
     "%": mod(0, a => a.map_num(n => Num.from(1).div(n)), 0, (a, b) => a.map_num(n => n.div(b.as_num()))),
     // Box (99) / Less Than (0, 0)
-    "<": mod(99, a => Value.new_box(a), 0, (a, b) => err(-1, "TODO: Dyad '<'.")),
+    "<": mod(99, a => Value.new_box(a), 0, (a, b) => Value.new_scalar(Num.from(+(a.as_num() < b.as_num())))),
     // Unbox (99) / Greater Than (0, 0)
-    ">": mod(0, a => a.boxed() ? a.unbox() : a, 0, (a, b) => err(-1, "TODO: Dyad '>'."), true),
+    ">": mod(0, a => a.boxed() ? a.unbox() : a, 0, (a, b) => Value.new_scalar(Num.from(+(a.as_num() > b.as_num()))), true),
     // Exponent (0) / Power (0, 0)
     "^": mod_todo("^"),
     // Shape (99) / Reshape (1, 99) -- _, _1 are wildcards
