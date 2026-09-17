@@ -206,6 +206,8 @@ export class Value {
         if (uneven) return Value.new_list(values.map(Value.new_box));
         // Single value. Originally was values.length == 1 && ranked_dims >= original_dims, I do not believe this second condition to be necessary.
         if (values.length == 1) return values[0]!;
+        // List of boxes
+        if (boxed_inner) return Value.new_list(values);
 
         let rank = [
             ...cuml_rank.slice(0, ranked_dims),
