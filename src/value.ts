@@ -144,7 +144,7 @@ export class Value {
 
     // Return the internal Num of this singleton Value
     public as_num(): Num {
-        if (!this.is_single()) err(-1, "Attempted to treat list as single numeric value.");
+        if (!this.is_single()) err(4, "Instant cannot be treated as numeric scalar.");
         if (this.boxed()) err(2, "Cannot convert boxed value to numeric.");
         return this.inner[0]! instanceof Num ? this.inner[0]! : this.inner[0]!.as_num();
     }
@@ -156,7 +156,7 @@ export class Value {
 
     // Return the internal Value of this singleton Value
     public as_value(): Value {
-        if (!this.is_single()) err(-1, "Attempted to treat list as single value.");
+        if (!this.is_single()) err(-1, "Instant cannot be treated as scalar.");
         if (this.boxed()) err(2, "Cannot operate on boxed value.");
         return Value.maybe_num(this.inner[0]!);
     }
@@ -226,14 +226,14 @@ export class Value {
         let build = "";
 
         const elements = lines.length;
-        let maxX = 0, maxY = 0, y;
-        for (let box of lines) {
+        let maxX = padX ?? 0, maxY = padY ?? 0, y;
+        if (!padX || !padY) for (let box of lines) {
             y = box.split('\n');
             maxX = Math.max(maxX, y[0]!.length);
             maxY = Math.max(maxY, y.length);
         }
 
-        let tmp = lines.map(b => box_text(b, true, padX ?? maxX, padY ?? maxY).split('\n'));
+        let tmp = lines.map(b => box_text(b, true, maxX, maxY).split('\n'));
         for (let i = 0; i < maxY + 2; i++) {
             const start = i == 0, end = i == maxY + 1;
             let b = tmp[0]![i]!;
