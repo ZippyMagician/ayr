@@ -120,6 +120,7 @@ export function lex(str: string): Token[] {
         else if (match = /^:/.exec(str)) push(TokenIdent.Colon, match[0]);
         // Whitespace has syntactic meaning in certain situations
         else if (match = /^(\s+)/.exec(str)) push(match[0] == " " ? TokenIdent.Space : TokenIdent.Separator, match[1]!);
+        else if (match = /^(NL\.)/.exec(str)) push(TokenIdent.Separator, "\n");
         // Literals (environment variables & user defined variables
         else if (match = /^([a-zA-Z][a-zA-Z_]*)/.exec(str)) push(TokenIdent.Literal, match[1]!);
         else err(3, `Unrecognized token starting at: '${str.slice(0, 5)}...'.`);

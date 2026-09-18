@@ -28,8 +28,10 @@ export class Value {
         this.str = str;
 
         // Remove trailing ones
-        while (this.rank[this.rank.length - 1] == 1) this.rank.pop();
-        this.dims = this.rank.length;
+        if (this.rank.length - 1) {
+            while (this.rank[this.rank.length - 1] == 1) this.rank.pop();
+            this.dims = this.rank.length;
+        }
     }
 
     // Value.maybe_num can map over a list of Value | Num to convert it into guaranteed Values

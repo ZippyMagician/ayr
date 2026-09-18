@@ -244,10 +244,13 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                 let k = j + 1;
                 let seen_group = 0; // Seen parens or curly, keeps count
 
-                while ([def_token, k] = nnw(tokens, ++k, seen_group < 1)) {
+                while ([def_token, k] = nnw(tokens, ++k, !!seen_group)) {
                     if (def_token.ident == TokenIdent.LCurly || def_token.ident == TokenIdent.LParen) seen_group++;
-                    else if (def_token.ident == TokenIdent.RCurly || def_token.ident == TokenIdent.RParen) seen_group--;
-                    if (seen_group < 1 && is_line_end(tokens, k)) break;
+                    else if (seen_group && (def_token.ident == TokenIdent.RCurly || def_token.ident == TokenIdent.RParen)) seen_group--;
+                    if (!seen_group && is_line_end(tokens, k)) {
+                        stream.push([NodeType.Line, "\n"]);
+                        break;
+                    }
                     def.push(def_token);
                 }
                 if (!def.length) err(1, `Empty literal definition for '${head.value}.`);

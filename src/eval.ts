@@ -28,37 +28,45 @@ function as_mod(node: Node): Module {
 }
 
 // TODO: Currently line-by-line basic. Keep?
-export function ayr_eval(nodes: Node[], env: Env, preserve: boolean = false): Value {
+export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false): Value {
     let stack: Value[] = [];
 
-    for (let i = nodes.length - 1; i >= 0; i--) {
-        let node = nodes[i]!;
-        switch (node[0]!) {
-            case NodeType.Instant:
-                stack.push(as_val(node));
-                break;
-            case NodeType.Literal:
-                let lit = env.get(node[1]! as string);
-                if (lit.is_instant()) {
-                    stack.push(lit.eval<Value>());
+    let nodes_parsed = node_lines.reduce((acc, node) => {
+        if (node[0] == NodeType.Line) acc.push([]);
+        else acc[acc.length - 1]!.push(node);
+        return acc;
+    }, [[]] as Node[][]);
+    for (let line = 0; line < nodes_parsed.length; line++) {
+        const nodes = nodes_parsed[line]!;
+        for (let i = nodes.length - 1; i >= 0; i--) {
+            let node = nodes[i]!;
+            switch (node[0]!) {
+                case NodeType.Instant:
+                    stack.push(as_val(node));
                     break;
-                }
-                node = [NodeType.Executable, lit.eval<Module>()];
-            case NodeType.Executable:
-                if (!stack.length) err(5);
-                let right = stack.pop()!;
-                if (i == 0 || !is_instant(nodes[i - 1]!, env)) stack.push(as_mod(node)(right));
-                else {
-                    let left = as_val(nodes[--i]!);
-                    stack.push(as_mod(node)(left, right));
-                }
-                break;
-            case NodeType.Line:
-                // Clear stack.
-                if (!preserve) stack = [];
-                break;
-            default:
-                err(-1, `TODO: Implement evaluation for node '${node}'`);
+                case NodeType.Literal:
+                    let lit = env.get(node[1]! as string);
+                    if (lit.is_instant()) {
+                        stack.push(lit.eval<Value>());
+                        break;
+                    }
+                    node = [NodeType.Executable, lit.eval<Module>()];
+                case NodeType.Executable:
+                    if (!stack.length) err(5);
+                    let right = stack.pop()!;
+                    if (i == 0 || !is_instant(nodes[i - 1]!, env)) stack.push(as_mod(node)(right));
+                    else {
+                        let left = as_val(nodes[--i]!);
+                        stack.push(as_mod(node)(left, right));
+                    }
+                    break;
+                case NodeType.Line:
+                    // Clear stack.
+                    if (!preserve) stack = [];
+                    break;
+                default:
+                    err(-1, `TODO: Implement evaluation for node '${node}'`);
+            }
         }
     }
 
