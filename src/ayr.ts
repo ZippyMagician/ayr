@@ -4,7 +4,7 @@ import fs from "fs"
 
 import { ayr } from "./eval"
 import { Env } from "./env"
-import { primitive } from "./utils"
+import { INTERNAL, primitive } from "./utils"
 
 import { Command } from "commander"
 const program = new Command();
@@ -39,9 +39,8 @@ async function cli(_options: { string: string[] }) {
 function run_file(file: string, options: { input?: string, e: boolean, string: string }) {
     const program = fs.readFileSync(process.cwd() + "/" + file, "utf8");
 
-    let env = new Env();
-    if (options.input) env.set("I", options.e ? ayr(options.input) : primitive(options.input));
-    ayr(program.replace(/\r?\n/g, "\n").replace(/\#\!\/.+\n/, "").trim(), env);
+    if (options.input) INTERNAL.set_key("I", options.e ? ayr(options.input) : primitive(options.input));
+    ayr(program.replace(/\r?\n/g, "\n").replace(/\#\!\/.+\n/, "").trim());
     process.exit(0);
 }
 

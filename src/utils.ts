@@ -2,7 +2,53 @@ import { Rational, Num } from "./number"
 import { Value } from "./value"
 import { Env } from "./env"
 
-const clone = require('lodash.clonedeep');
+class Internals {
+    private static VALUES: string[] = ["boxes", "I"];
+
+    private boxes: string = "╓─╖╙─╜║┌┬┐├┼┤└┴┘│─";
+    private dict: { [key: string]: Value } = {};
+
+    constructor() {
+        this.dict["I"] = primitive(0);
+    }
+
+    public set_key(key: string, v: Value) {
+        if (!Internals.VALUES.includes(key)) err(3);
+        switch (key) {
+            case 'boxes': 
+                this.set_boxes_internal(v);
+                break;
+            case 'I':
+                this.dict["I"] = v;
+                break;
+        }
+    }
+
+    public get_key(key: string): Value {
+        if (!Internals.VALUES.includes(key)) err(3);
+        switch (key) {
+            case 'boxes':
+                return primitive(this.get_boxes_internal());
+            default:
+                return this.dict[key] as Value;
+        }
+    }
+
+    private set_boxes_internal(v: Value) {
+        if (!v.is_str()) err(4);
+        const s = str(v);
+        if (s.length == 18) this.boxes = s;
+        else if (s.length == 11) 
+            this.boxes = s[0] + s[10] + s[2] + s[6] + s[10] + s[8] + s[9] + s;
+        else err(4);
+    }
+
+    public get_boxes_internal(): string[18] {
+        return this.boxes;
+    }
+}
+
+export const INTERNAL: Internals = new Internals();
 
 export function err(code: number, msg: string = ""): never {
     switch (code) {
@@ -149,15 +195,19 @@ export function init_env(env: Env) {
 
 // For printing boxed values
 export function box_text(str: string, inner: boolean = false, padX: number = 0, padY: number = 0): string {
+    const charset = INTERNAL.get_boxes_internal();
+
     const spl = str.split('\n');
     const y = Math.max(spl.length, padY);
     const x = Math.max(spl[0]!.length, padX);
-    const chars = inner ? ["│", "┌", "┐", "└", "┘"] : ["║", "╓", "╖", "╙", "╜"];
+    const chars = inner 
+        ? [charset[16]!, charset[7]!, charset[17]!, charset[9]!, charset[13]!, charset[17]!, charset[15]!]
+        : [charset[6]!, charset[0]!, charset[1]!, charset[2]!, charset[3]!, charset[4]!, charset[5]!];
 
     // For centering within y
     const yoffset = Math.floor((y - spl.length) / 2);
 
-    let build = chars[1] + "─".repeat(x + 2) + chars[2] + "\n";
+    let build = chars[1] + chars[2]!.repeat(x + 2) + chars[3] + "\n";
     for (let i = 0; i < y; i++) {
         const inrange = i >= yoffset && i < yoffset + spl.length;
         const line = inrange ? spl[i - yoffset]! : "";
@@ -167,7 +217,7 @@ export function box_text(str: string, inner: boolean = false, padX: number = 0, 
         else build += chars[0] + " ".repeat(offset) + line + " ".repeat(offset);
         build += chars[0] + "\n";
     }
-    build += chars[3] + "─".repeat(x + 2) + chars[4];
+    build += chars[4] + chars[5]!.repeat(x + 2) + chars[6];
 
     return build;
 }
