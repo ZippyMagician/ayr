@@ -1,4 +1,4 @@
-import { err, Module, mod_prim, primitive, str } from "./utils"
+import { err, INTERNAL, Module, mod_prim, primitive, str } from "./utils"
 import { Value } from "./value"
 import { Num } from "./number"
 import { eof, Token, TokenIdent } from "./lex"
@@ -235,7 +235,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
         } else if (head.ident == TokenIdent.Separator) {
             // Other separators are syntactically insignificant in this branch.
             i = j;
-        } else if (head.ident == TokenIdent.Literal) {
+        } else if (head.ident == TokenIdent.Literal || head.ident == TokenIdent.InternalLit) {
             // Non imm. literal.
             let [maybe_colon, _] = nnw(tokens, j + 1, true);
             if (maybe_colon.ident == TokenIdent.Colon) {
@@ -262,17 +262,20 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                 let nodes = parse_nodes(def, env);
                 if (is_node_instant(nodes[nodes.length - 1]!, env))
                     if (colon) err(1, "Invalid use of the colon token.");
-                    else env.set(head.value.as_str(), ayr_partial(nodes, env));
-                else {
+                    else if (head.ident == TokenIdent.Literal) env.set(head.value.as_str(), ayr_partial(nodes, env));
+                    else INTERNAL.set_key(head.value.as_str(), ayr_partial(nodes, env));
+                else if (head.ident == TokenIdent.Literal) {
                     let train = parse_train(nodes, env, colon);
                     env.set(head.value.as_str(), mod_prim(
                         a => train(a),
                         (a, b) => train(a, b),
                     ));
-                }
+                } else err(-1, "TODO: Non imm. defs for internal literals.");
                 j = k;
-            } else {
+            } else if (head.ident == TokenIdent.Literal) {
                 stream.push([NodeType.Literal, head.value.as_str()]);
+            } else {
+                stream.push([NodeType.Instant, INTERNAL.get_key(head.value.as_str())]);
             }
             i = j;
         } else if (head.ident == TokenIdent.Colon) {

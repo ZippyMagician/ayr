@@ -1,5 +1,5 @@
-import { box_text, err, str } from "./utils"
-import { Rational, Num } from "./number"
+import { box_text, err, INTERNAL, str } from "./utils"
+import { Num } from "./number"
 
 const clone = require('lodash.clonedeep');
 const is_equal = require('lodash.isequal');
@@ -222,7 +222,7 @@ export class Value {
     }
 
     // Box elements of list neatly (for printing)
-    private inner_box(lines: string[], padX?: number, padY?: number): string {
+    private inner_box(lines: string[], charset: string, padX?: number, padY?: number): string {
         let build = "";
 
         const elements = lines.length;
@@ -238,7 +238,7 @@ export class Value {
             const start = i == 0, end = i == maxY + 1;
             let b = tmp[0]![i]!;
             for (let j = 1; j < elements; j++) {
-                if (start || end) b = b.substring(0, b.length - 1) + (start ? "┬" : "┴");
+                if (start || end) b = b.substring(0, b.length - 1) + (start ? charset[8] : charset[14]);
                 b += tmp[j]![i]!.substring(1);
             }
             build += b + "\n";
@@ -255,13 +255,15 @@ export class Value {
 
     // Primitive toString for printing an instant
     toString(_: number = 10, no_box: boolean = false): string {
+        const charset = INTERNAL.get_boxes_internal();
+
         let build: string = "";
         const inner_boxed = this.inner[0]! instanceof Value && this.inner[0]!.boxed();
         if (this.is_single()) {
             build += this.inner_stringify(this.inner[0]!);
         } else if (this.dims == 1) {
             let tmp = this.inner.map(n => this.inner_stringify(n, inner_boxed));
-            if (inner_boxed) build = this.inner_box(tmp);
+            if (inner_boxed) build = this.inner_box(tmp, charset);
             else build = tmp.join(this.str ? "" : " ");
         } else if (this.dims == 2) {
             let elements: string[][] = this.ranked(this.dims - 1).map(n => n.inner.map(v => this.inner_stringify(v, inner_boxed)));
@@ -282,13 +284,18 @@ export class Value {
                 }
 
                 // Build the list of joined boxes
-                elements = elements.map(line => this.inner_box(line, x, y).trimEnd().split('\n'));
-                const border_map: Record<string, string> = { "┘": "┤", "└": "├", "┴": "┼" };
+                elements = elements.map(line => this.inner_box(line, charset, x, y).trimEnd().split('\n'));
+                const border_map: Record<string, string> = { 
+                    [charset[15]!]: charset[12]!, 
+                    [charset[13]!]: charset[10]!, 
+                    [charset[14]!]: charset[11]!,
+                };
+                const match = new RegExp(Object.keys(border_map).map(n => `\\${n}`).join('|'), "g");
                 for (let i = 0; i < elements.length - 1; i++) {
                     if (i == 0) build += elements[0]![0] + "\n";
                     for (let j = 1; j < elements[i]!.length - 1; j++)
                         build += elements[i]![j]! + "\n";
-                    build += elements[i]![elements[i]!.length - 1]!.replace(/└|┴|┘/g, m => border_map[m]!) + "\n";
+                    build += elements[i]![elements[i]!.length - 1]!.replace(match, m => border_map[m]!) + "\n";
                 }
                 const last = elements[elements.length - 1]!;
                 for (let i = elements.length > 1 ? 1 : 0; i < last.length; i++)
