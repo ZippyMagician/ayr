@@ -247,23 +247,24 @@ export class Value {
         return build;
     }
 
+    private inner_stringify(n: Num | Value, boxed: boolean = false): string {
+        if (!this.str) return str(n, boxed);
+        if (n instanceof Num) return String.fromCharCode(+n);
+        err(0, "Invalid string instant.");
+    }
+
     // Primitive toString for printing an instant
     toString(_: number = 10, no_box: boolean = false): string {
         let build: string = "";
         const inner_boxed = this.inner[0]! instanceof Value && this.inner[0]!.boxed();
         if (this.is_single()) {
-            const n = this.inner[0]!;
-            build += n instanceof Num && this.str ? String.fromCharCode(+n) : str(n);
+            build += this.inner_stringify(this.inner[0]!);
         } else if (this.dims == 1) {
-            let tmp = this.inner.map((n: Num | Value): string => {
-                return this.str ? n instanceof Num ? String.fromCharCode(+n) : err(0, "Invalid string instant.") : str(n, inner_boxed);
-            });
+            let tmp = this.inner.map(n => this.inner_stringify(n, inner_boxed));
             if (inner_boxed) build = this.inner_box(tmp);
             else build = tmp.join(this.str ? "" : " ");
         } else if (this.dims == 2) {
-            let elements: string[][] = this.ranked(this.dims - 1).map(n => n.inner.map(v => {
-                return this.str ? v instanceof Num ? String.fromCharCode(+v) : err(0, "Invalid string instant.") : str(v, inner_boxed);
-            }));
+            let elements: string[][] = this.ranked(this.dims - 1).map(n => n.inner.map(v => this.inner_stringify(v, inner_boxed)));
             if (!inner_boxed) {
                 let len = 1;
                 for (const line of elements) for (const element of line) len = Math.max(len, element.length);
@@ -282,12 +283,12 @@ export class Value {
 
                 // Build the list of joined boxes
                 elements = elements.map(line => this.inner_box(line, x, y).trimEnd().split('\n'));
+                const border_map: Record<string, string> = { "┘": "┤", "└": "├", "┴": "┼" };
                 for (let i = 0; i < elements.length - 1; i++) {
                     if (i == 0) build += elements[0]![0] + "\n";
-                    for (let j = 1; j < elements[i]!.length; j++)
-                        build += elements[i]![j]!.replace(/└|┴|┘/g, m => {
-                            return m[0] == "┘" ? "┤" : m[0] == "└" ? "├" : "┼";
-                        }) + "\n";
+                    for (let j = 1; j < elements[i]!.length - 1; j++)
+                        build += elements[i]![j]! + "\n";
+                    build += elements[i]![elements[i]!.length - 1]!.replace(/└|┴|┘/g, m => border_map[m]!) + "\n";
                 }
                 const last = elements[elements.length - 1]!;
                 for (let i = elements.length > 1 ? 1 : 0; i < last.length; i++)
