@@ -31,8 +31,8 @@ export function sta(item: string): Value {
     return Value.new_string(item);
 }
 
-export function str(item: any) {
-    let s = item.toString();
+export function str(item: any, no_box: boolean = false) {
+    let s = item.toString(10, no_box);
     if (typeof item === "number") return s.replace(/\-|Infinity/g, "_");
     return s;
 }
@@ -126,4 +126,27 @@ export function init_env(env: Env) {
         return primitive(n * s.length);
     }));
 }
+
+// For printing boxed values
+export function box_text(str: string, inner: boolean = false, padX: number = 0, padY: number = 0): string {
+    // ║ ╓ ─ ╖ ╙ ╜
+    const spl = str.split('\n');
+    const y = Math.max(spl.length, padY);
+    const x = Math.max(spl[0]!.length, padX);
+    const chars = inner ? ["│", "┌", "┐", "└", "┘"] : ["║", "╓", "╖", "╙", "╜"];
+
+    let build = chars[1] + "─".repeat(x + 2) + chars[2] + "\n";
+    // build += "║" + " ".repeat(x + 2) + "║\n";
+    for (let i = 0; i < y; i++) {
+        const offset = (x - spl[i]!.length + 2) / 2;
+        if (offset != (offset | 0)) build += chars[0] + " ".repeat(Math.floor(offset)) + spl[i] + " ".repeat(Math.ceil(offset));
+        else build += chars[0] + " ".repeat(offset) + spl[i] + " ".repeat(offset);
+        build += chars[0] + "\n";
+    }
+    // build += "║" + " ".repeat(x + 2) + "║\n";
+    build += chars[3] + "─".repeat(x + 2) + chars[4];
+
+    return build;
+}
+
 
