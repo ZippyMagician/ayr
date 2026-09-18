@@ -37,6 +37,26 @@ export function str(item: any, no_box: boolean = false) {
     return s;
 }
 
+// lt | eq | gt
+export function ord(left: Value, right: Value): number {
+    if (left.is_str() && right.is_str()) return ('' + left).localeCompare('' + right);
+    else if (left.is_single() && right.is_single()) return Math.sign(+left.as_num() - +right.as_num());
+    else if (left.boxed() && right.boxed()) return ord(left.unbox(), right.unbox());
+    else if (equal(left, right)) return 0;
+    else {
+        if (left.get_dims() != right.get_dims()) return Math.sign(left.get_dims() - right.get_dims());
+        for (let i = 0, l = left.get_rank(), r = right.get_rank(); i < left.get_dims(); i++) {
+            if (l[i]! != r[i]!) return Math.sign(l[i]! - r[i]!);
+        }
+        let l = left.to_list(), r = right.to_list();
+        for (let i = 0; i < l.length; i++) {
+            let o = ord(Value.maybe_num(l[i]!), Value.maybe_num(r[i]!));
+            if (o) return o;
+        }
+        return 0;
+    }
+}
+
 export function range(first: number, second?: number): Value {
     return primitive([...Array(Math.max(0, second ? second - first : first)).keys()].map(n => n + first));
 }
