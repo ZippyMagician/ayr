@@ -73,7 +73,7 @@ export const Operators: OpsMap = {
         if (!r.is_instant()) {
             // Compose / Over
             const lm = l.as_module(), rm = r.as_module();
-            return (a: Value, b?: Value) => b ? lm(rm(b), a) : lm(rm(a));
+            return (a: Value, b?: Value) => b ? lm(rm(a), rm(b)) : lm(rm(a));
         }
         // Rank
         const rank = r.eval<Value>().as_list().map(n => +n);
