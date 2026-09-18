@@ -7,6 +7,7 @@
  - [x] Operator support
  - [x] Basic CLI
  - [x] Proper interface
- - [ ] Port flags, implement running from file
+ - [x] Implement running from file
+ - [ ] Port flags
  - [ ] Finish symbol and operator porting
  - [ ] If statement support

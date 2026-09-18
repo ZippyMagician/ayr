@@ -1,7 +1,10 @@
 // import { primitive } from "./utils"
 // import { Value } from "./value"
+import fs from "fs"
+
 import { ayr } from "./eval"
 import { Env } from "./env"
+import { primitive } from "./utils"
 
 import { Command } from "commander"
 const program = new Command();
@@ -33,9 +36,12 @@ async function cli(_options: { string: string[] }) {
     process.exit(0);
 }
 
-async function run_file(file: string, options: { string: string[] }) {
-    console.log(file);
-    console.log(options);
+function run_file(file: string, options: { input?: string, e: boolean, string: string }) {
+    const program = fs.readFileSync(process.cwd() + "/" + file, "utf8");
+
+    let env = new Env();
+    if (options.input) env.set("I", options.e ? ayr(options.input) : primitive(options.input));
+    ayr(program.replace(/\r?\n/g, "\n").replace(/\#\!\/.+\n/, "").trim(), env);
     process.exit(0);
 }
 
@@ -51,6 +57,7 @@ program.command('run')
     .description('Run from a file')
     .argument('<file>', 'file to run')
     .option('-i, --input <string>', 'alternative to STDIN input')
+    .option('-e', 'should input be evaluated', false)
     .action(run_file);
 
 program.command('cli')

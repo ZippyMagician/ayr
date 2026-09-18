@@ -119,7 +119,8 @@ export function lex(str: string): Token[] {
         // The colon is used as an assignment and at the start of some trains
         else if (match = /^:/.exec(str)) push(TokenIdent.Colon, match[0]);
         // Whitespace has syntactic meaning in certain situations
-        else if (match = /^(\s+)/.exec(str)) push(match[0] == " " ? TokenIdent.Space : TokenIdent.Separator, match[1]!);
+        else if (match = /^(\s+)/.exec(str)) 
+            push(match[0] == " " ? TokenIdent.Space : TokenIdent.Separator, match[1]!.replace(/\n{2,}/, "\n"));
         else if (match = /^(NL\.)/.exec(str)) push(TokenIdent.Separator, "\n");
         // Literals (environment variables & user defined variables
         else if (match = /^([a-zA-Z][a-zA-Z_]*)/.exec(str)) push(TokenIdent.Literal, match[1]!);
