@@ -58,7 +58,7 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
         mapper = mapper.map((val, i) => {
             let args: [Value, Value] = [
                 mstr && this.preserve_str ? val.as_str() : val,
-                vstr && this.preserve_str ? value[i]!.as_str() : value[i]!,
+                vstr && this.preserve_str ? value[i]!.as_str() : value[i] ?? left_is_mapper ? b : a,
             ];
             if (!left_is_mapper) args = args.reverse() as [Value, Value];
             return fn(args[0], args[1]);
