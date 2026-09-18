@@ -235,7 +235,8 @@ export const Symbols: SymbolMap = {
     }, true, true),
     // Tally (99) / Replicate (99, 1)
     "#": mod(99, a => Value.new_scalar(Num.from(a.get_rank()[a.get_dims() - 1]!)), [99, 1], (a, b) => {
-        const axis = a.get_dims() - 1;
+        if (b.boxed()) err(2, "Boxed replication count.");
+        const axis = Math.max(0, a.get_dims() - 1);
         let elements = a.ranked(axis);
         let counts = b.ranked(0);
 
