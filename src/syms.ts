@@ -2,7 +2,7 @@ const clone = require("lodash.clonedeep");
 
 import { Num } from "./number"
 import { Value } from "./value"
-import { equal, err, Module, Module2, pad_rank, primitive as prim, range } from "./utils"
+import { equal, err, Module, Module2, ord, pad_rank, primitive as prim, range } from "./utils"
 
 interface SymEnv {
     preserve_str?: boolean,
@@ -135,9 +135,9 @@ export const Symbols: SymbolMap = {
         return Num.from(s);
     }), 0, (a, b) => a.map_num(n => Num.from(+n | +b.as_num()))),
     // Box (99) / Less Than (0, 0)
-    "<": mod(99, a => Value.new_box(a), 0, (a, b) => Value.new_scalar(Num.from(+(a.as_num() < b.as_num())))),
+    "<": mod(99, a => Value.new_box(a), 0, (a, b) => prim(+(ord(a, b) == -1))),
     // Unbox (99) / Greater Than (0, 0)
-    ">": mod(0, a => a.boxed() ? a.unbox() : a, 0, (a, b) => Value.new_scalar(Num.from(+(a.as_num() > b.as_num()))), true),
+    ">": mod(0, a => a.boxed() ? a.unbox() : a, 0, (a, b) => prim(+(ord(a, b) == 1)), true),
     // Exponent (0) / Power (0, 0)
     "^": mod_todo("^"),
     // Shape (99) / Reshape (1, 99) -- _, _1 are wildcards
