@@ -1,4 +1,4 @@
-import { err, str } from "./utils"
+import { box_text, err, str } from "./utils"
 import { Rational, Num } from "./number"
 
 const clone = require('lodash.clonedeep');
@@ -114,13 +114,12 @@ export class Value {
         let dims = rank.length;
         if (rank.some((a: number) => !Number.isInteger(a))) err(4);
         let count = rank.reduce((a, b) => a * b, 1);
-        let inner = clone(this.inner);
+        let inner = this.boxed() ? [clone(this)] : clone(this.inner);
 
         if (count > inner.length) {
             let i = 0;
             while (inner.length < count) inner.push(clone(inner[i++ % this.inner.length]));
         } else if (count < inner.length) inner = inner.slice(0, count);
-
         return new Value(
             dims == 0 || dims == 1 && rank[0] == 1 ? Type.Scalar : Type.List,
             inner, dims, rank, this.str
@@ -217,30 +216,83 @@ export class Value {
             values.length / partial_rank.reduce((a, b) => a * b, 1)
         ];
         if (is_str) return Value.new_string(values.flatMap((n: Value) => n.as_list() as Num[]), original_dims, rank)
-        else if (raw_value && !boxed_inner) {
+        else if (raw_value) {
             return Value.new_list(values.flatMap((n: Value): Num[] => n.inner as Num[]), rank.length, rank);
         } else return Value.new_list(values.flatMap((n: Value): Value[] => n.inner.map(Value.maybe_num)), rank.length, rank);
     }
 
+    // Box elements of list neatly (for printing)
+    private inner_box(lines: string[], padX?: number, padY?: number): string {
+        let build = "";
+
+        const elements = lines.length;
+        let maxX = 0, maxY = 0, y;
+        for (let box of lines) {
+            y = box.split('\n');
+            maxX = Math.max(maxX, y[0]!.length);
+            maxY = Math.max(maxY, y.length);
+        }
+
+        let tmp = lines.map(b => box_text(b, true, padX ?? maxX, padY ?? maxY).split('\n'));
+        for (let i = 0; i < maxY + 2; i++) {
+            const start = i == 0, end = i == maxY + 1;
+            let b = tmp[0]![i]!;
+            for (let j = 1; j < elements; j++) {
+                if (start || end) b = b.substring(0, b.length - 1) + (start ? "┬" : "┴");
+                b += tmp[j]![i]!.substring(1);
+            }
+            build += b + "\n";
+        }
+
+        return build;
+    }
+
     // Primitive toString for printing an instant
-    toString(): string {
+    toString(_: number = 10, no_box: boolean = false): string {
         let build: string = "";
+        const inner_boxed = this.inner[0]! instanceof Value && this.inner[0]!.boxed();
         if (this.is_single()) {
             const n = this.inner[0]!;
             build += n instanceof Num && this.str ? String.fromCharCode(+n) : str(n);
         } else if (this.dims == 1) {
-            build += this.inner.map((n: Num | Value): string => {
-                return this.str ? n instanceof Num ? String.fromCharCode(+n) : err(0, "Invalid string instant.") : str(n);
-            }).join(this.str ? "" : " ");
+            let tmp = this.inner.map((n: Num | Value): string => {
+                return this.str ? n instanceof Num ? String.fromCharCode(+n) : err(0, "Invalid string instant.") : str(n, inner_boxed);
+            });
+            if (inner_boxed) build = this.inner_box(tmp);
+            else build = tmp.join(this.str ? "" : " ");
         } else if (this.dims == 2) {
             let elements: string[][] = this.ranked(this.dims - 1).map(n => n.inner.map(v => {
-                return this.str ? v instanceof Num ? String.fromCharCode(+v) : err(0, "Invalid string instant.") : str(v);
+                return this.str ? v instanceof Num ? String.fromCharCode(+v) : err(0, "Invalid string instant.") : str(v, inner_boxed);
             }));
-            let len = 1;
-            for (const line of elements) for (const element of line) len = Math.max(len, element.length);
-            build += elements.map(line => 
-                line.map(element => ' '.repeat(len - element.length) + element).join(this.str ? "" : " ")
-            ).join("\n");
+            if (!inner_boxed) {
+                let len = 1;
+                for (const line of elements) for (const element of line) len = Math.max(len, element.length);
+                build += elements.map(line =>
+                    line.map(element => ' '.repeat(len - element.length) + element).join(this.str ? "" : " ")
+                ).join("\n");
+            } else {
+                let x = 0, y = 0;
+                for (const line of elements) {
+                    for (const element of line) {
+                        const sp = element.split('\n');
+                        x = Math.max(x, sp[0]!.length);
+                        y = Math.max(y, sp.length);
+                    }
+                }
+
+                // Build the list of joined boxes
+                elements = elements.map(line => this.inner_box(line, x, y).trimEnd().split('\n'));
+                for (let i = 0; i < elements.length - 1; i++) {
+                    if (i == 0) build += elements[0]![0] + "\n";
+                    for (let j = 1; j < elements[i]!.length; j++)
+                        build += elements[i]![j]!.replace(/└|┴|┘/g, m => {
+                            return m[0] == "┘" ? "┤" : m[0] == "└" ? "├" : "┼";
+                        }) + "\n";
+                }
+                const last = elements[elements.length - 1]!;
+                for (let i = elements.length > 1 ? 1 : 0; i < last.length; i++)
+                    build += elements[elements.length - 1]![i]! + "\n";
+            }
         } else {
             let depth = this.dims;
             let chunked = this.ranked(depth - 1);
@@ -250,16 +302,8 @@ export class Value {
             }
         }
 
-        // Box the value
-        if (this.type == Type.Box) {
-            let lines = build.split('\n');
-            build = "";
-            for (const [i, line] of lines.entries()) {
-                // 2 * (+!i ^ 1) returns 2 when i == 0, 0 otherwise
-                build += " ".repeat(2 * (+!i ^ 1)) + line + "\n";
-            }
-            build = "[ " + build.trimEnd() + " ]";
-        }
+        if (!no_box && this.boxed()) build = box_text(build.trimEnd());
+
         return !this.str ? build.trimEnd() : build;
     }
 }
