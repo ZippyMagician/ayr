@@ -149,21 +149,24 @@ export function init_env(env: Env) {
 
 // For printing boxed values
 export function box_text(str: string, inner: boolean = false, padX: number = 0, padY: number = 0): string {
-    // ║ ╓ ─ ╖ ╙ ╜
     const spl = str.split('\n');
     const y = Math.max(spl.length, padY);
     const x = Math.max(spl[0]!.length, padX);
     const chars = inner ? ["│", "┌", "┐", "└", "┘"] : ["║", "╓", "╖", "╙", "╜"];
 
+    // For centering within y
+    const yoffset = Math.floor((y - spl.length) / 2);
+
     let build = chars[1] + "─".repeat(x + 2) + chars[2] + "\n";
-    // build += "║" + " ".repeat(x + 2) + "║\n";
     for (let i = 0; i < y; i++) {
-        const offset = (x - spl[i]!.length + 2) / 2;
-        if (offset != (offset | 0)) build += chars[0] + " ".repeat(Math.floor(offset)) + spl[i] + " ".repeat(Math.ceil(offset));
-        else build += chars[0] + " ".repeat(offset) + spl[i] + " ".repeat(offset);
+        const inrange = i >= yoffset && i < yoffset + spl.length;
+        const line = inrange ? spl[i - yoffset]! : "";
+        // Center within the x
+        const offset = (x - line.length + 2) / 2;
+        if (offset != (offset | 0)) build += chars[0] + " ".repeat(Math.floor(offset)) + line + " ".repeat(Math.ceil(offset));
+        else build += chars[0] + " ".repeat(offset) + line + " ".repeat(offset);
         build += chars[0] + "\n";
     }
-    // build += "║" + " ".repeat(x + 2) + "║\n";
     build += chars[3] + "─".repeat(x + 2) + chars[4];
 
     return build;
