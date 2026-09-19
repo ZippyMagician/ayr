@@ -10,4 +10,4 @@
  - [x] Implement running from file
  - [ ] Port flags
  - [ ] Finish symbol and operator porting
- - [ ] If statement support
+ - [x] If statement support
