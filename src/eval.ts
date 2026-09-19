@@ -32,12 +32,22 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
     let stack: Value[] = [];
 
     let nodes_parsed = node_lines.reduce((acc, node) => {
-        if (node[0] == NodeType.Line) acc.push([]);
-        else acc[acc.length - 1]!.push(node);
+        if (node[0] == NodeType.Line) {
+            acc[acc.length - 1]!.push(node);
+            acc.push([]);
+        } else acc[acc.length - 1]!.push(node);
         return acc;
     }, [[]] as Node[][]);
+    let lineskip = 0;
     for (let line = 0; line < nodes_parsed.length; line++) {
         const nodes = nodes_parsed[line]!;
+
+        // If statements
+        if (nodes[0] && nodes[0]![0] == NodeType.IfStatement) {
+            let top: Node = nodes.shift()!;
+            if (!+(top[1] as ((_: Env) => Value))(env).as_num()) continue;
+            else lineskip++;
+        }
         for (let i = nodes.length - 1; i >= 0; i--) {
             let node = nodes[i]!;
             switch (node[0]!) {
@@ -53,6 +63,8 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
                     node = [NodeType.Executable, lit.eval<Module>()];
                 case NodeType.Executable:
                     if (!stack.length) err(5);
+                case NodeType.LazyExecutable:
+                    if (!stack.length) break;
                     let right = stack.pop()!;
                     if (i == 0 || !is_instant(nodes[i - 1]!, env)) stack.push(as_mod(node)(right));
                     else {
@@ -62,8 +74,13 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
                     break;
                 case NodeType.Line:
                     // Clear stack.
-                    if (!preserve) stack = [];
+                    if (lineskip > 0) {
+                        lineskip--;
+                        line++;
+                    } // else if (!preserve) stack = [];
                     break;
+                case NodeType.IfStatement:
+                    err(-1, "eval.ts::ayr_eval | Unreachable.");
                 default:
                     err(-1, `TODO: Implement evaluation for node '${node}'`);
             }

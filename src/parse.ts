@@ -54,11 +54,20 @@ export const enum NodeType {
     // Variable
     Literal,
 
+    // Internal variable
+    LitInternal,
+
     // Symbol, block, train, etc.
     Executable,
 
+    // Doesn't need to be run
+    LazyExecutable,
+
     // Partial dyadic operator, needs the second argument
     PartialOperator,
+
+    // If statement
+    IfStatement,
 
     // Line Separator
     Line,
@@ -67,9 +76,12 @@ export const enum NodeType {
 export type Node =
     [NodeType.Instant, Value] |
     [NodeType.Literal, string] |
+    [NodeType.LitInternal, string] |
     [NodeType.Executable, Module] |
+    [NodeType.LazyExecutable, Module] |
     [NodeType.PartialOperator, OpDyad, MaybeInstant] |
-    [NodeType.Line, "\n"]
+    [NodeType.IfStatement, (env: Env) => Value] |
+    [NodeType.Line]
 
 // Evaluate an instant token
 function eval_instant(this: Env, token: Token): Value | Num {
@@ -110,7 +122,7 @@ function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], num
     }
 
     // The group is empty, the last element is an instant / not attached to an operator, a colon does not mark the beginning.
-    instant = build.length == 0 || is_instant(build, build.length - 1, env) && 
+    instant = build.length == 0 || is_instant(build, build.length - 1, env) &&
         build[0]!.ident != TokenIdent.Colon && (build.length < 2 || build[build.length - 2]!.ident != TokenIdent.Operator);
 
     return [instant, build, i];
@@ -184,7 +196,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             ]);
 
             i = j;
-            if (is_line_end(tokens, i)) stream.push([NodeType.Line, "\n"]); // Add trailing newline
+            if (is_line_end(tokens, i)) stream.push([NodeType.Line]); // Add trailing newline
         } else if (head.ident == TokenIdent.LParen) {
             // Left parens denote a group. A train if parser reaches this branch.
             let [_, group, j] = get_group(tokens, i, env);
@@ -218,8 +230,8 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             if (head.value.as_str() == "`" && left[0]! == NodeType.PartialOperator) {
                 // Special case, can commute operator arguments
                 stream.push([
-                    NodeType.PartialOperator, 
-                    (u: MaybeInstant, v: MaybeInstant) => (left[1] as OpDyad)(v, u), 
+                    NodeType.PartialOperator,
+                    (u: MaybeInstant, v: MaybeInstant) => (left[1] as OpDyad)(v, u),
                     left[2]!
                 ]);
             } else {
@@ -230,7 +242,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             i = j;
         } else if (is_line_end(tokens, j)) {
             // Line separator (right → left, top → bottom parse order)
-            stream.push([NodeType.Line, "\n"]);
+            stream.push([NodeType.Line]);
             i = j;
         } else if (head.ident == TokenIdent.Separator) {
             // Other separators are syntactically insignificant in this branch.
@@ -243,12 +255,12 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                 let def_token;
                 let k = j + 1;
                 let seen_group = 0; // Seen parens or curly, keeps count
+                const name = head.value.as_str();
 
                 while ([def_token, k] = nnw(tokens, ++k, !!seen_group)) {
                     if (def_token.ident == TokenIdent.LCurly || def_token.ident == TokenIdent.LParen) seen_group++;
                     else if (seen_group && (def_token.ident == TokenIdent.RCurly || def_token.ident == TokenIdent.RParen)) seen_group--;
                     if (!seen_group && is_line_end(tokens, k)) {
-                        stream.push([NodeType.Line, "\n"]);
                         break;
                     }
                     def.push(def_token);
@@ -260,16 +272,22 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                     def.shift();
                 }
                 let nodes = parse_nodes(def, env);
-                if (is_node_instant(nodes[nodes.length - 1]!, env))
+                if (is_node_instant(nodes[nodes.length - 1]!, env)) {
                     if (colon) err(1, "Invalid use of the colon token.");
-                    else if (head.ident == TokenIdent.Literal) env.set(head.value.as_str(), ayr_partial(nodes, env));
-                    else INTERNAL.set_key(head.value.as_str(), ayr_partial(nodes, env));
-                else if (head.ident == TokenIdent.Literal) {
+                    else if (head.ident == TokenIdent.Literal) {
+                        env.set(name, ayr_partial(nodes, env));
+                        stream.push([NodeType.Literal, name]);
+                    } else {
+                        INTERNAL.set_key(name, ayr_partial(nodes, env));
+                        stream.push([NodeType.LitInternal, name]);
+                    }
+                } else if (head.ident == TokenIdent.Literal) {
                     let train = parse_train(nodes, env, colon);
-                    env.set(head.value.as_str(), mod_prim(
+                    env.set(name, mod_prim(
                         a => train(a),
                         (a, b) => train(a, b),
                     ));
+                    stream.push([NodeType.LazyExecutable, env.get(name).as_module()]);
                 } else err(-1, "TODO: Non imm. defs for internal literals.");
                 j = k;
             } else if (head.ident == TokenIdent.Literal) {
@@ -281,15 +299,21 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
         } else if (head.ident == TokenIdent.Colon) {
             // Possible if/then statement
             if (stream.length) {
-                let [last_type, _] = stream[stream.length - 1]!;
-                if (last_type != NodeType.Instant) err(1, "Invalid use of the colon token.");
-                err(-1, "TODO: If/then statement definitions.");
+                let [type, v] = stream.pop()!;
+                stream.push([
+                    NodeType.IfStatement,
+                    (type == NodeType.Instant
+                        ? ((_: Env) => v as Value)
+                        : ((env: Env) => env.get(v as string).eval<Value>())
+                    ),
+                ]);
             } else err(1, "Invalid use of the colon token.");
+            i = j;
         } else {
             err(-1, `TODO: Parse token '${JSON.stringify(head)}'.`);
         }
         i++;
-        
+
         // Pass right operand to partial operator
         if (stream.length > 1 && stream[stream.length - 2]![0] == NodeType.PartialOperator) {
             if (stream[stream.length - 1]![0] == NodeType.Line) err(1, "Dyadic operator missing right operand");

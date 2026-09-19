@@ -3,7 +3,7 @@ import { Value } from "./value"
 import { Env } from "./env"
 
 class Internals {
-    private static VALUES: string[] = ["boxes", "I"];
+    private static VALUES: string[] = ["BOXC", "I"];
 
     private boxes: string = "╓─╖╙─╜║┌┬┐├┼┤└┴┘│─";
     private dict: { [key: string]: Value } = {};
@@ -15,7 +15,7 @@ class Internals {
     public set_key(key: string, v: Value) {
         if (!Internals.VALUES.includes(key)) err(3);
         switch (key) {
-            case 'boxes': 
+            case 'BOXC': 
                 this.set_boxes_internal(v);
                 break;
             case 'I':
@@ -27,7 +27,7 @@ class Internals {
     public get_key(key: string): Value {
         if (!Internals.VALUES.includes(key)) err(3);
         switch (key) {
-            case 'boxes':
+            case 'BOXC':
                 return primitive(this.get_boxes_internal());
             default:
                 return this.dict[key] as Value;
