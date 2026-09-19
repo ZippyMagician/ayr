@@ -149,8 +149,8 @@ export const Symbols: SymbolMap = {
             99, a => Value.maybe_num(a.to_list()[0] ?? err(4, "Take first of empty list.")), 
             0, (a, b) => prim(+(ord(a, b) == 1)), true
     ),
-    // Exponent (0) / Power (0, 0)
-    "^": mod_todo("^"),
+    // Exp (0) / And (0, 0)
+    "^": mod(0, a => a.map_num(n => Num.from(Math.E ** +n)), 0, (a, b) => a.map_num(n => Num.from(+n & +b.as_num()))),
     // Shape (99) / Reshape (1, 99) -- _, _1 are wildcards
     "$": mod(99, a => prim(a.get_rank()), [1, 99], (a, b) => {
         const list = a.as_list();
