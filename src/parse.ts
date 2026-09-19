@@ -44,7 +44,7 @@ function is_line_end(tokens: Token[], i: number): boolean {
 function nnw(tokens: Token[], from: number, accept_separator: boolean = true): [Token, number] {
     let i = from;
     while (i < tokens.length && is_whitespace(tokens[i]!.ident, accept_separator)) i++;
-    return i == tokens.length ? [eof(), i] : [tokens[i]!, i];
+    return i >= tokens.length ? [eof(), i] : [tokens[i]!, i];
 }
 
 export const enum NodeType {
@@ -115,7 +115,7 @@ function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], num
     let build: Token[] = [];
     let node: Token;
 
-    while (([node, i] = nnw(tokens, ++i), node.ident != TokenIdent.EOF)) {
+    while (([node, i] = nnw(tokens, ++i, false), node.ident != TokenIdent.EOF)) {
         if (node.ident == TokenIdent.LParen) ++parens;
         else if (node.ident == TokenIdent.RParen && --parens == 0) break;
         build.push(clone(node));
@@ -134,10 +134,10 @@ function get_block(tokens: Token[], i: number): [Token[], number] {
     let build = [];
     let node: Token;
 
-    while (([node, i] = nnw(tokens, ++i), node.ident != TokenIdent.EOF)) {
+    while (([node, i] = nnw(tokens, ++i, false), node.ident != TokenIdent.EOF)) {
         if (node.ident == TokenIdent.LCurly) ++curly;
         else if (node.ident == TokenIdent.RCurly && --curly == 0) break;
-        build.push(clone(node));
+        build.push(node);
     }
 
     return [build, i];
@@ -212,9 +212,9 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             stream.push([NodeType.Executable, (a: Value, b?: Value): Value => {
                 let env_clone = clone(env);
                 if (b) {
-                    env_clone.set("x", clone(a));
-                    env_clone.set("y", clone(b));
-                } else env_clone.set("y", clone(a));
+                    env_clone.set("x", a);
+                    env_clone.set("y", b);
+                } else env_clone.set("y", a);
                 let nodes = parse_nodes(block, env_clone);
                 return ayr_partial(nodes, env_clone);
             }]);
@@ -257,12 +257,10 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                 let seen_group = 0; // Seen parens or curly, keeps count
                 const name = head.value.as_str();
 
-                while ([def_token, k] = nnw(tokens, ++k, !!seen_group)) {
+                while ([def_token, k] = nnw(tokens, ++k, false)) {
                     if (def_token.ident == TokenIdent.LCurly || def_token.ident == TokenIdent.LParen) seen_group++;
                     else if (seen_group && (def_token.ident == TokenIdent.RCurly || def_token.ident == TokenIdent.RParen)) seen_group--;
-                    if (!seen_group && is_line_end(tokens, k)) {
-                        break;
-                    }
+                    if (!seen_group && is_line_end(tokens, k)) break;
                     def.push(def_token);
                 }
                 if (!def.length) err(1, `Empty literal definition for '${head.value}.`);
