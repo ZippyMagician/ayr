@@ -1,5 +1,6 @@
 const clone = require("lodash.clonedeep");
 
+import { ayrfn } from "./eval"
 import { Num } from "./number"
 import { Value } from "./value"
 import { equal, err, Module, Module2, ord, pad_rank, primitive as prim, range } from "./utils"
@@ -89,6 +90,13 @@ function mod_todo(symbol: string): Module {
     return mod(0, _ => err(-1, `TODO: Monad ${module}.`), 0, (_a, _b) => err(-1, `TODO: Dyad ${symbol}.`));
 }
 
+// Implemented with ayr code
+function mod_ayr(monad: string, dyad: string) {
+    const m = ayrfn(monad);
+    const d = ayrfn(dyad);
+    return (a: Value, b?: Value, override?: number | [number, number]) => b ? m(a, undefined, override) : d(a, b, override);
+}
+
 interface SymbolMap {
     [key: string]: Module
 }
@@ -137,7 +145,10 @@ export const Symbols: SymbolMap = {
     // Box (99) / Less Than (0, 0)
     "<": mod(99, a => Value.new_box(a), 0, (a, b) => prim(+(ord(a, b) == -1))),
     // Unbox (99) / Greater Than (0, 0)
-    ">": mod(0, a => a.boxed() ? a.unbox() : a, 0, (a, b) => prim(+(ord(a, b) == 1)), true),
+    ">": mod(
+            99, a => Value.maybe_num(a.to_list()[0] ?? err(4, "Take first of empty list.")), 
+            0, (a, b) => prim(+(ord(a, b) == 1)), true
+    ),
     // Exponent (0) / Power (0, 0)
     "^": mod_todo("^"),
     // Shape (99) / Reshape (1, 99) -- _, _1 are wildcards

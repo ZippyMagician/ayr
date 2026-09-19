@@ -90,6 +90,11 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
     return stack.pop()!;
 }
 
+// Function
+export function ayrfn(code: string): Module {
+    return parse_nodes(lex(code), new Env())[0]![1] as Module;
+}
+
 // For partial execution in the parsing step.
 export function ayr_partial(nodes: Node[], env: Env): Value {
    return ayr_eval(nodes, env, true); 
