@@ -172,6 +172,32 @@ export const Symbols: SymbolMap = {
     "[": mod(99, a => a, 99, (a, _) => a, true, true),
     // Identity (99) / Right (99, 99)
     "]": mod(99, a => a, 99, (_, b) => b, true, true),
+    // Dedup sieve (99) / Group (99, 1)
+    "?": mod(99, a => {
+        let s: Value[] = [];
+        const spl = a.ranked(a.get_dims() - 1);
+        let ret = Array(spl.length);
+        for (let i = 0; i < spl.length; i++) {
+            if (s.some(v => equal(v, spl[i]!))) ret[i] = 0;
+            else {
+                s.push(spl[i]!);
+                ret[i] = 1;
+            }
+        }
+        return prim(ret);
+    }, [99, 1], (a, b) => {
+        if (b.boxed()) return Value.new_box(a);
+        if (a.get_rank()[a.get_dims() - 1]! != b.get_rank()[0]!) err(4);
+        const bucket = b.to_list().map(n => +(n as Num));
+        let map: Map<number, Value[]> = new Map([...Array(Math.max(...bucket) + 1).keys()].map(key => [key, []]));
+        let sieved = [], leading = a.ranked(a.get_dims() - 1);
+        for (let i = 0; i < leading.length; i++) if (bucket[i]! > -1) map.get(bucket[i]!)!.push(leading[i]!);
+        for (let val of map.values())
+            sieved.push(
+                Value.new_box(Value.unranked(a.get_dims() - 1, a.get_rank().slice(0, a.get_dims() - 1), val))
+            );
+        return prim(sieved);
+    }),
     // Transpose (2) / Equality (0, 0)
     "=": mod(2, a => {
         let dims = a.get_dims();
