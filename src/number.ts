@@ -53,7 +53,7 @@ export class Rational {
     public add(other: number | Rational): Rational {
         if (typeof other == "number")
             return new Rational(this.numer + other * this.denom, this.denom);
-        const o = clone(other);
+        const o = other;
 
         if (this.denom == o.denom) return new Rational(this.numer + o.numer, this.denom);
         else {
@@ -70,17 +70,21 @@ export class Rational {
     }
 
     public mul(other: number | Rational): Rational {
-        const o = typeof other == "number" ? new Rational(other, 1) : clone(other);
+        const o = typeof other == "number" ? new Rational(other, 1) : other;
         return new Rational(this.numer * o.numer, this.denom * o.denom);
     }
 
     public div(other: number | Rational): Rational {
-        const o = typeof other == "number" ? new Rational(other, 1) : clone(other);
+        const o = typeof other == "number" ? new Rational(other, 1) : other;
         return new Rational(this.numer * o.denom, this.denom * o.numer);
     }
 
     public neg(): Rational {
         return new Rational(-this.numer, this.denom, false);
+    }
+
+    public recip(): Rational {
+        return new Rational(this.denom, this.numer);
     }
 
     public to_number(): number {
@@ -117,8 +121,17 @@ export class Num {
         else return Num.from(this.wrap + other.wrap);
     }
 
+    public addi(other: number): Num {
+        if (typeof this.wrap != "number") return Num.from(this.wrap.add(1));
+        else return Num.from(this.wrap + other);
+    }
+
     public sub(other: Num): Num {
         return this.add(other.neg());
+    }
+
+    public subi(other: number): Num {
+        return this.addi(-other);
     }
 
     public mul(other: Num): Num {
@@ -127,10 +140,20 @@ export class Num {
         else return Num.from(this.wrap * other.wrap);
     }
 
+    public muli(other: number): Num {
+        if (typeof this.wrap != "number") return Num.from(this.wrap.mul(other));
+        else return Num.from(this.wrap + other);
+    }
+
     public div(other: Num): Num {
         if (typeof this.wrap != "number") return Num.from(this.wrap.div(other.wrap));
         else if (typeof other.wrap != "number") return Num.from(new Rational(1, this.wrap).div(other.wrap));
         else return Num.from(this.wrap / other.wrap);
+    }
+
+    public divi(other: number): Num {
+        if (typeof this.wrap != "number") return Num.from(this.wrap.div(other));
+        else return Num.from(this.wrap / other);
     }
 
     public neg(): Num {
@@ -141,6 +164,11 @@ export class Num {
     public abs(): Num {
         if (typeof this.wrap == "number") return Num.from(Math.abs(this.wrap));
         return Num.from(this.wrap.abs());
+    }
+
+    public recip(): Num {
+        if (typeof this.wrap == "number") return Num.from(new Rational(1, this.wrap));
+        return Num.from(this.wrap.recip());
     }
 
     public as_num(): Num {

@@ -110,7 +110,7 @@ export const Symbols: SymbolMap = {
     // TODO / GCD (0, 0)
     "+.": mod_todo("+."),
     // Double (0) / Abs Add (0, 0)
-    "+:": mod(0, a => a.map_num(n => n.mul(Num.from(2))), 0, (a, b) => a.map_num(n => n.add(b.as_num()).abs()), true, true),
+    "+:": mod(0, a => a.map_num(n => n.muli(2)), 0, (a, b) => a.map_num(n => n.add(b.as_num()).abs()), true, true),
     // Negate | Swap case [strings] (0) / Subtract (0, 0)
     "-": mod(0, a => {
         if (a.is_str()) {
@@ -130,7 +130,7 @@ export const Symbols: SymbolMap = {
         } return a.map_num(n => Num.from(Math.sign(+n)));
     }, 0, (a, b) => a.map_num(n => n.mul(b.as_num())), true),
     // Reciprocal (0) / Divide (0, 0)
-    "%": mod(0, a => a.map_num(n => Num.from(1).div(n)), 0, (a, b) => a.map_num(n => n.div(b.as_num()))),
+    "%": mod(0, a => a.map_num(n => n.recip()), 0, (a, b) => a.map_num(n => n.div(b.as_num()))),
     // Not (0) / Residue (0, 0)
     "|": mod(0, a => a.map_num(n => Num.from(+!+n)), 0, (a, b) => b.map_num(n => Num.from(+n % +a.as_num()))),
     // Factorial (0) / Or (0, 0)
@@ -146,8 +146,8 @@ export const Symbols: SymbolMap = {
     "<": mod(99, a => Value.new_box(a), 0, (a, b) => prim(+(ord(a, b) == -1))),
     // Unbox (99) / Greater Than (0, 0)
     ">": mod(
-            99, a => Value.maybe_num(a.to_list()[0] ?? err(4, "Take first of empty list.")), 
-            0, (a, b) => prim(+(ord(a, b) == 1)), true
+        99, a => Value.maybe_num(a.to_list()[0] ?? err(4, "Take first of empty list.")),
+        0, (a, b) => prim(+(ord(a, b) == 1)), true
     ),
     // Exp (0) / And (0, 0)
     "^": mod(0, a => a.map_num(n => Num.from(Math.E ** +n)), 0, (a, b) => a.map_num(n => Num.from(+n & +b.as_num()))),
@@ -298,5 +298,51 @@ export const Symbols: SymbolMap = {
         // Finagling is required, since Value.unranked assumes nothing was __fully__ removed
         return Value.unranked(axis + 1, [], values, a.to_list()[0] instanceof Num);
     }, false, true),
+    // Increment (0) / Take (1, 99)
+    "{": mod(0, a => a.map_num(n => n.addi(1)), [1, 99], (a, b) => {
+        const lrk = a.to_list().map(n => +n);
+        const rrk = b.get_rank();
+        const values = b.to_list();
+
+        const rstrides = strides(rrk);
+        const ls = lrk.length;
+        const rs = rrk.length;
+        const min = Math.min(ls, rs);
+
+        const lsz = lrk.reduce((a, b) => a * b, 1);
+        const fill = b.is_str() ? 32 : 0;
+        let bucket: (Value | Num)[] = Array(lsz);
+
+        for (let i = 0; i < lsz; i++) {
+            let idx = Array(ls).fill(0);
+            for (let k = i, j = 0; j < ls; j++) {
+                idx[j] = k % lrk[j]!;
+                k = Math.floor(k / lrk[j]!);
+            }
+
+            let oldi = 0;
+            let valid = true;
+            for (let j = 0; j < min; j++) {
+                if (idx[j]! >= rrk[j]!) { valid = false; break; }
+                oldi += rstrides[j]! * idx[j]!;
+            }
+            for (let j = min; j < ls; j++)
+                if (idx[j] != 0) { valid = false; break; }
+
+            bucket[i] = valid ? values[oldi]! : Num.from(fill);
+        }
+
+        return prim(bucket, false, ls, lrk, b.is_str());
+    }, true, true),
 };
+
+function strides(n: number[]): number[] {
+    let s = Array(n.length);
+    let acc = 1;
+    for (let i = 0; i < n.length; i++) {
+        s[i] = acc;
+        acc *= n[i]!;
+    }
+    return s;
+}
 
