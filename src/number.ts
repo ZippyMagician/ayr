@@ -31,7 +31,7 @@ export class Rational {
         if (absn == absd) {
             this.numer = Math.sign(this.numer);
             this.denom = Math.sign(this.denom);
-        } else if (absn == 1 || absd == 1) {}
+        } else if (absn == 1 || absd == 1) { }
         else {
             const f = gcd(absn, absd);
             if (f == 1) return;
@@ -60,7 +60,7 @@ export class Rational {
             const m = lcm(this.denom, o.denom);
             const a = m / this.denom;
             const b = m / o.denom;
-            
+
             return new Rational(this.numer * a + o.numer * b, this.denom * a);
         }
     }
@@ -77,6 +77,10 @@ export class Rational {
     public div(other: number | Rational): Rational {
         const o = typeof other == "number" ? new Rational(other, 1) : other;
         return new Rational(this.numer * o.denom, this.denom * o.numer);
+    }
+
+    public pow(other: number | Rational): Rational {
+        return new Rational(this.numer ** +other, this.denom ** +other);
     }
 
     public neg(): Rational {
@@ -142,7 +146,7 @@ export class Num {
 
     public muli(other: number): Num {
         if (typeof this.wrap != "number") return Num.from(this.wrap.mul(other));
-        else return Num.from(this.wrap + other);
+        else return Num.from(this.wrap * other);
     }
 
     public div(other: Num): Num {
@@ -154,6 +158,16 @@ export class Num {
     public divi(other: number): Num {
         if (typeof this.wrap != "number") return Num.from(this.wrap.div(other));
         else return Num.from(this.wrap / other);
+    }
+
+    public pow(other: Num): Num {
+        if (typeof this.wrap != "number") return Num.from(this.wrap.pow(other.wrap));
+        else return Num.from(this.wrap ** +other.wrap);
+    }
+
+    public powi(other: number): Num {
+        if (typeof this.wrap != "number") return Num.from(this.wrap.pow(other));
+        else return Num.from(this.wrap ** other);
     }
 
     public neg(): Num {

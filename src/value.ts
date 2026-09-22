@@ -188,6 +188,7 @@ export class Value {
     // Convert back to original dimension count
     public static unranked(original_dims: number, partial_rank: number[], values: Value[], raw_value: boolean = false): Value {
         if (values.length == 0) return Value.new_list([]);
+        if (partial_rank.some(n => n == 0)) partial_rank = [];
 
         let uneven = false;
         let is_str = values[0]!.str;
