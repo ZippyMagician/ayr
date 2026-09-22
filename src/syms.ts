@@ -308,6 +308,7 @@ export const Symbols: SymbolMap = {
         return Value.new_scalar(n);
     }),
     // Encode Binary (0), Encode Base | Encode Mixed Radix (1, 0)
+    // Monadic could be {{(|0=@99]y):(x,`2|y)v 0!`y%2NL.x}}@1 0&`.E
     "#:": mod(0, a => prim((+a).toString(2).split('').map(n => +n)), [1, 0], (a, b) => {
         let atoms = [];
         let radices = a.to_list().map(n => +n);
