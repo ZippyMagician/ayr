@@ -226,18 +226,22 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             let [block, j] = get_block(tokens, i);
             if (!block.length) err(1, "A block cannot be empty.");
 
-            stream.push([NodeType.Executable, mod(99, a => {
-                let env_clone = clone(env);
-                env_clone.set("y", a);
-                let n = parse_nodes(block, env_clone);
-                return ayr_partial(n, env_clone);
+            const block_mod = (e: Env) => mod(99, a => {
+                e.set("y", a);
+                let n = parse_nodes(block, e);
+                return ayr_partial(n, e);
             }, 99, (a, b) => {
+                e.set("x", a);
+                e.set("y", b);
+                let n = parse_nodes(block, e);
+                return ayr_partial(n, e);
+            }, true, true);
+            stream.push([NodeType.Executable, ((a, b?, override?) => {
                 let env_clone = clone(env);
-                env_clone.set("x", a);
-                env_clone.set("y", b);
-                let n = parse_nodes(block, env_clone);
-                return ayr_partial(n, env_clone);
-            }, true, true)]);
+                let bl = block_mod(env_clone);
+                env_clone.set("v", bl);
+                return bl(a, b, override);
+            }) as Module]);
             i = j;
         } else if (head.ident == TokenIdent.Symbol) {
             // Symbols
