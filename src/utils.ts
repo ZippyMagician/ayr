@@ -2,14 +2,38 @@ import { Rational, Num } from "./number"
 import { Value } from "./value"
 import { Env } from "./env"
 
+export function err(code: number, msg: string = ""): never {
+    switch (code) {
+        case 0:
+            throw (`NUMERIC ERROR [0]${msg ? ": " + msg : ""}`);
+        case 1:
+            throw (`SYNTAX ERROR [1]${msg ? ": " + msg : ""}`);
+        case 2:
+            throw (`BOX ERROR [2]${msg ? ": " + msg : ""}`);
+        case 3:
+            throw (`NAME ERROR [3]${msg ? ": " + msg : ""}`);
+        case 4:
+            throw (`VALUE ERROR [4]${msg ? ": " + msg : ""}`);
+        case 5:
+            throw (`ARG ERROR [5]${msg ? ": " + msg : ""}`);
+        case 6:
+            throw (`RANK ERROR [6]${msg ? ": " + msg : ""}`);
+        case 7:
+            throw (`DOMAIN ERROR [7]${msg ? ": " + msg : ""}`);
+        default:
+            throw (`INTERNAL ERROR [${code}]${msg ? ": " + msg : ""}`);
+    }
+}
+
 class Internals {
-    private static VALUES: string[] = ["BOXC", "I"];
+    private static VALUES: string[] = ["BOXC", "I", "E"];
 
     private boxes: string = "╓─╖╙─╜║┌┬┐├┼┤└┴┘│─";
     private dict: { [key: string]: Value } = {};
 
     constructor() {
-        this.dict["I"] = primitive(0);
+        this.dict["I"] = primitive(0); // STDIN, defaults to 0
+        this.dict["E"] = primitive([]); // Empty list intrinsic, shorthand for 0#0 or 0$0
     }
 
     public set_key(key: string, v: Value) {
@@ -18,9 +42,8 @@ class Internals {
             case 'BOXC': 
                 this.set_boxes_internal(v);
                 break;
-            case 'I':
-                this.dict["I"] = v;
-                break;
+            default:
+                this.dict[key] = v;
         }
     }
 
@@ -50,28 +73,6 @@ class Internals {
 
 export const INTERNAL: Internals = new Internals();
 
-export function err(code: number, msg: string = ""): never {
-    switch (code) {
-        case 0:
-            throw (`NUMERIC ERROR [0]${msg ? ": " + msg : ""}`);
-        case 1:
-            throw (`SYNTAX ERROR [1]${msg ? ": " + msg : ""}`);
-        case 2:
-            throw (`BOX ERROR [2]${msg ? ": " + msg : ""}`);
-        case 3:
-            throw (`NAME ERROR [3]${msg ? ": " + msg : ""}`);
-        case 4:
-            throw (`VALUE ERROR [4]${msg ? ": " + msg : ""}`);
-        case 5:
-            throw (`ARG ERROR [5]${msg ? ": " + msg : ""}`);
-        case 6:
-            throw (`RANK ERROR [6]${msg ? ": " + msg : ""}`);
-        case 7:
-            throw (`DOMAIN ERROR [7]${msg ? ": " + msg : ""}`);
-        default:
-            throw (`INTERNAL ERROR [${code}]${msg ? ": " + msg : ""}`);
-    }
-}
 
 export function sta(item: string): Value {
     return Value.new_string(item);
