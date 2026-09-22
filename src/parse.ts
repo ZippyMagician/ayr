@@ -281,7 +281,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                 let seen_group = 0; // Seen parens or curly, keeps count
                 const name = head.value.as_str();
 
-                while ([def_token, k] = nnw(tokens, ++k, false)) {
+                while (([def_token, k] = nnw(tokens, ++k, false), def_token.ident != TokenIdent.EOF)) {
                     if (def_token.ident == TokenIdent.LCurly || def_token.ident == TokenIdent.LParen) seen_group++;
                     else if (seen_group && (def_token.ident == TokenIdent.RCurly || def_token.ident == TokenIdent.RParen)) seen_group--;
                     if (!seen_group && is_line_end(tokens, k)) break;
