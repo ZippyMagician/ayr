@@ -240,7 +240,6 @@ export const Symbols: SymbolMap = {
         let left = a.boxed() ? [a] : b.boxed() ? a.to_list().map(Value.new_box) : a.to_list();
         let right = b.boxed() ? [b] : a.boxed() ? b.to_list().map(Value.new_box) : b.to_list();
         let concat = prim([...left, ...right]);
-        console.log(a + ", " + b + " = " + concat);
         return a.is_str() && b.is_str() ? concat.as_str() : concat;
     }, true, true),
     // Mold (1) / Laminate (99, 99)
