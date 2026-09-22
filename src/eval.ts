@@ -6,15 +6,16 @@ import { lex } from "./lex"
 import { Env } from "./env"
 
 export function is_instant(node: Node, env: Env): boolean {
-    let type = node[0]!;
+    let type = node[0];
     if (type == NodeType.Instant) return true;
-    if (type == NodeType.Literal) try {
+    else if (type == NodeType.Literal) try {
         let maybe = env.get(node[1]! as string);
         return maybe.is_instant();
     } catch (e) {
         return false;
         // err(3, `Undefined literal '${node[1]! as string}.`);
-    }
+    } else if (type == NodeType.LitInternal) return true; // TODO: Internals currently only support instants
+    else if (type == NodeType.LazyLit) return is_instant(node[1] as Node, env);
 
     return false;
 }
@@ -54,8 +55,11 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
                 case NodeType.Instant:
                     stack.push(as_val(node));
                     break;
+                case NodeType.LazyLit:
+                    if (i == 0) break;
+                    node = node[1] as Node;
                 case NodeType.Literal:
-                    let lit = env.get(node[1]! as string);
+                    let lit = env.get(node[1] as string);
                     if (lit.is_instant()) {
                         stack.push(lit.eval<Value>());
                         break;
@@ -97,7 +101,7 @@ export function ayrfn(code: string): Module {
 
 // For partial execution in the parsing step.
 export function ayr_partial(nodes: Node[], env: Env): Value {
-   return ayr_eval(nodes, env, true); 
+   return ayr_eval(nodes, env, true) ?? primitive([]); 
 }
 
 export function ayr(program: string, env?: Env): Value {

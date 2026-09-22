@@ -41,7 +41,7 @@ export const Operators: OpsMap = {
         if (a.is_single()) return a.as_value();
         const arr = a.to_list();
         const fn = f.as_module();
-        let acc = Value.maybe_num(arr[0]!);
+        let acc = Value.maybe_num(arr[0]!).as_str(a.is_str());
         for (let i = 1; i < arr.length; i++) acc = fn(acc, Value.maybe_num(arr[i]!));
         return acc;
     }, [0, 99], (a, b) => {
@@ -61,9 +61,9 @@ export const Operators: OpsMap = {
         let index;
         for (let i = 0; i <= arr.length - window; i += jump) {
             index = Math.floor(i / jump);
-            cells[index] = Value.maybe_num(arr[i]!);
+            cells[index] = Value.maybe_num(arr[i]!).as_str(b.is_str());
             for (let j = i + 1; j < i + window; j++) 
-                cells[index] = fn(cells[index], Value.maybe_num(clone(arr[j]!)));
+                cells[index] = fn(cells[index], Value.maybe_num(clone(arr[j]!)).as_str(b.is_str()));
         }
         return Value.unranked(b.get_dims(), [], cells, arr[0] instanceof Num);
     }, true)],

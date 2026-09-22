@@ -23,6 +23,14 @@ function is_instant(tokens: Token[], i: number, env: Env): boolean {
         } catch (e) {
             return false;
         }
+    // Currently all internals are stored as instants
+    if (type == TokenIdent.InternalLit)
+        try {
+            //let lit = INTERNAL.get_key(tokens[i]!.value.as_str());
+            return nnw(tokens, i + 1, false)[0]!.ident != TokenIdent.Colon;
+        } catch (e) {
+            return false;
+        }
     if (type == TokenIdent.LParen)
         return get_group(tokens, i, env)[0];
 
@@ -57,6 +65,9 @@ export const enum NodeType {
     // Internal variable
     LitInternal,
 
+    // Lazy literal
+    LazyLit,
+
     // Symbol, block, train, etc.
     Executable,
 
@@ -77,6 +88,7 @@ export type Node =
     [NodeType.Instant, Value] |
     [NodeType.Literal, string] |
     [NodeType.LitInternal, string] |
+    [NodeType.LazyLit, Node] |
     [NodeType.Executable, Module] |
     [NodeType.LazyExecutable, Module] |
     [NodeType.PartialOperator, OpDyad, MaybeInstant] |
@@ -92,6 +104,8 @@ function eval_instant(this: Env, token: Token): Value | Num {
             return Value.new_string(token.value.as_str());
         case TokenIdent.Literal:
             return this.get(token.value.as_str()).eval<Value>();
+        case TokenIdent.InternalLit:
+            return INTERNAL.get_key(token.value.as_str());
         default:
             err(-1, "parse.ts::eval_instant | Unreachable.");
     }
@@ -103,6 +117,8 @@ function maybe_instant(node: Node, env: Env): MaybeInstant {
     if (node[0] == NodeType.Instant) maybe = MaybeInstant.new_value(node[1]);
     else if (node[0] == NodeType.Literal) maybe = env.get(node[1]);
     else if (node[0] == NodeType.Executable) maybe = MaybeInstant.new_mod(node[1]);
+    else if (node[0] == NodeType.LitInternal) maybe = MaybeInstant.new_value(INTERNAL.get_key(node[1]));
+    else if (node[0] == NodeType.LazyLit) return maybe_instant(node[1], env);
     else if (node[0] == NodeType.PartialOperator) err(1, "Dyadic operator missing a right operand.");
     else err(-1, "parse.ts::maybe_instant | Unreachable.");
     return maybe;
@@ -188,10 +204,10 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             // A 1 elem list of a Value should not be boxed. A single number is a scalar.
             stream.push([
                 NodeType.Instant,
-                is_string ? (values[0]! as Value).as_list()[0]! as Value :
+                is_string ? (values[0]! as Value).to_list()[0] as Value :
                     values.some(n => n instanceof Num) ? primitive(
-                        values.length == 1 ? values[0]! as Num : values
-                    ) : values.length == 1 ? (values[0]! as Value).as_list()[0]! as Value :
+                        values.length == 1 ? values[0] as Num : values
+                    ) : values.length == 1 ? Value.maybe_num((values[0] as Value).to_list()[0] ?? primitive([])) :
                         primitive(values)
             ]);
 
@@ -274,10 +290,10 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                     if (colon) err(1, "Invalid use of the colon token.");
                     else if (head.ident == TokenIdent.Literal) {
                         env.set(name, ayr_partial(nodes, env));
-                        stream.push([NodeType.Literal, name]);
+                        stream.push([NodeType.LazyLit, [NodeType.Literal, name]]);
                     } else {
                         INTERNAL.set_key(name, ayr_partial(nodes, env));
-                        stream.push([NodeType.LitInternal, name]);
+                        stream.push([NodeType.LazyLit, [NodeType.LitInternal, name]]);
                     }
                 } else if (head.ident == TokenIdent.Literal) {
                     let train = parse_train(nodes, env, colon);
@@ -364,6 +380,11 @@ function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Modul
             inner(node[1]);
         } else if (node[0] == NodeType.Literal) {
             inner(env.get(node[1]).eval<Module>());
+        } else if (node[0] == NodeType.LitInternal) {
+            err(-1, "TODO: Once Internals can be Modules, update this.");
+        } else if (node[0] == NodeType.LazyLit) {
+            node = node[1];
+            if (node[0] == NodeType.Literal) inner(env.get(node[1]).eval<Module>());
         } else {
             err(1, "Unexpected node in train: '" + str(node[1]!) + "'.");
         }
