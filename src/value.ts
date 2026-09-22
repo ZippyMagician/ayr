@@ -36,7 +36,7 @@ export class Value {
 
     // Value.maybe_num can map over a list of Value | Num to convert it into guaranteed Values
     public static maybe_num(value: Value | Num): Value {
-        return value instanceof Num ? Value.new_scalar(value) : clone(value);
+        return value instanceof Num ? Value.new_scalar(value) : value;
     }
 
     // A new Value that is a scalar instant
@@ -104,8 +104,8 @@ export class Value {
     }
 
     // Return in-place string version
-    public as_str(): Value {
-        this.str = true;
+    public as_str(cond: boolean = true): Value {
+        this.str = cond;
         return this;
     }
 
@@ -169,9 +169,9 @@ export class Value {
     // Convert to specific dimension count
     public ranked(dims: number = 0): Value[] {
         if (this.boxed() || dims >= this.dims) {
-            return [clone(this)];
+            return [this];
         } else if (dims == 0) {
-            return this.inner.map(n => n instanceof Num ? Value.new_scalar(n) : clone(n));
+            return this.inner.map(n => n instanceof Num ? Value.new_scalar(n) : n);
         } else {
             // Dims < this.dims
             const inner_rank = this.rank.slice(0, dims); // Note: apl-like rank would be toSpliced instead
