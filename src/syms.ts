@@ -298,6 +298,28 @@ export const Symbols: SymbolMap = {
         // Finagling is required, since Value.unranked assumes nothing was __fully__ removed
         return Value.unranked(axis + 1, [], values, a.to_list()[0] instanceof Num);
     }, false, true),
+    // Decode Binary (1), Decode (0, 1)
+    "#.": mod(1, a => Symbols["#."]!(prim(2), a), [0, 1], (a, b) => {
+        let n = Num.from(0);
+        let atoms = b.to_list().map(n => n.as_num());
+        let base = +a.as_num();
+        for (let i = 0; i < atoms.length; i++)
+            n = n.add(atoms[atoms.length - i - 1]!.muli(base ** i));
+        return Value.new_scalar(n);
+    }),
+    // Encode Binary (0), Encode Base | Encode Mixed Radix (1, 0)
+    "#:": mod(0, a => prim((+a).toString(2).split('').map(n => +n)), [1, 0], (a, b) => {
+        let atoms = [];
+        let radices = a.to_list().map(n => +n);
+        let num = +b;
+        for (let i = radices.length - 1; i >= 0; i--, num |= 0) {
+            const n = radices[i]!;
+            atoms.push(n == 0 ? num : num % n);
+            num = n == 0 ? num : num / n;
+        }
+        // atoms.toReversed(); // This was in the original program, but it is inconsistent to decode
+        return prim(atoms);
+    }),
     // Increment (0) / Take (1, 99)
     "{": mod(0, a => a.map_num(n => n.addi(1)), [1, 99], (a, b) => {
         const lrk = a.to_list().map(n => +n);
