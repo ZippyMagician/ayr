@@ -211,26 +211,27 @@ export const Symbols: SymbolMap = {
         let rows = a.ranked(1).map(x => x.as_list());
         return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
     }, 0, (a, b) => Value.new_scalar(Num.from(+equal(a, b))), true),
-    // 1-Range (0) / Index (99, 99)
+    // 1-Range (0) / Index (99, 0)
     "~": mod(0, a => {
         let n = +a.as_num();
         if (a.is_str()) return range(n < 97 ? 65 : 97, n + 1).as_str();
         return range(1, n + 1);
-    }, 99, (a, b) => {
-        let index = (b.boxed() ? Value.maybe_num(b.as_list()[0]!) : b).as_list().map(n => +n.as_num());
+    }, [99, 0], (a, b) => {
+        if (!b.boxed()) return a.ranked(a.get_dims() - 1)[+b]!;
+        let index = Value.maybe_num(b.as_list()[0]!).to_list().map(n => +n);
 
-        if (a.get_dims() < index.length) err(4, `Index ${"" + index} does not exist.`);
+        if (a.get_dims() < index.length) err(4, `Index does not exist.`);
         let rank = a.get_rank();
-        let i = 0, prefix = 0;
+        let i = 0, prefix = 1;
         for (let j = 0; j < index.length; j++) {
-            i += index[j]! * (prefix || 1);
-            prefix += rank[j]!;
+            i += index[j]! * prefix;
+            prefix *= rank[rank.length - j - 1]!;
         }
 
         // FIXME: This is very impractical for very large amounts of data
         // I probably won't fix this
         let list = a.ranked(a.get_dims() - index.length);
-        return list[i] ?? err(4, `Index ${"" + index} does not exist.`);
+        return list[i] ?? err(4, `Index does not exist.`);
     }, true),
     // Flatten [Ravel] (99) / Concatenate (1, 1)
     ",": mod(99, a => {
@@ -308,7 +309,7 @@ export const Symbols: SymbolMap = {
         return Value.new_scalar(n);
     }),
     // Encode Binary (0), Encode Base | Encode Mixed Radix (1, 0)
-    // Monadic could be {{(|0=@99]y):(x,`2|y)v 0!`y%2NL.x}}@1 0&`.E
+    // Monadic could be {{(y):(x,`2|y)v 0!`y%2NL.x}}@1 0&`.E
     "#:": mod(0, a => prim((+a).toString(2).split('').map(n => +n)), [1, 0], (a, b) => {
         let radices = a.to_list().map(n => +n);
         let atoms = Array(radices.length);
