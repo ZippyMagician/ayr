@@ -304,6 +304,16 @@ export const Symbols: SymbolMap = {
         const rrk = b.get_rank();
         const values = b.to_list();
 
+        // Single row
+        if (lrk.length == 1) {
+            let sz = lrk[0]!;
+            let count = rrk[0] || 0;
+            return prim([
+                ...values.slice(0, Math.min(count, sz)), 
+                ...Array(Math.max(0, sz - count)).fill(Num.from(b.is_str() ? 32 : 0))
+            ], false, 1, [sz], b.is_str());
+        }
+
         const rstrides = strides(rrk);
         const ls = lrk.length;
         const rs = rrk.length;
@@ -333,6 +343,20 @@ export const Symbols: SymbolMap = {
         }
 
         return prim(bucket, false, ls, lrk, b.is_str());
+    }, true, true),
+    // Decrement (0) / Drop (1, 99)
+    "}": mod(0, a => a.map_num(n => n.subi(1)), [1, 99], (a, b) => {
+        if (a.get_rank()[0]! > b.get_dims()) err(4);
+        const leading: number = +a.to_list()[0]!;
+        const resta = a.to_list().slice(1);
+
+        let split = b.ranked(b.get_dims() - 1);
+        if (leading < 0) split = split.slice(0, split.length + leading);
+        else split = split.slice(leading);
+
+        let rebuilt = Value.unranked(b.get_dims(), b.get_rank().slice(0, b.get_dims() - 1), split);
+        if (resta.length) return Symbols["}"]!(prim(resta), rebuilt);
+        else return rebuilt;
     }, true, true),
 };
 
