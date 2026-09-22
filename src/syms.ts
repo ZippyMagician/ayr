@@ -310,15 +310,14 @@ export const Symbols: SymbolMap = {
     // Encode Binary (0), Encode Base | Encode Mixed Radix (1, 0)
     // Monadic could be {{(|0=@99]y):(x,`2|y)v 0!`y%2NL.x}}@1 0&`.E
     "#:": mod(0, a => prim((+a).toString(2).split('').map(n => +n)), [1, 0], (a, b) => {
-        let atoms = [];
         let radices = a.to_list().map(n => +n);
+        let atoms = Array(radices.length);
         let num = +b;
         for (let i = radices.length - 1; i >= 0; i--, num |= 0) {
             const n = radices[i]!;
-            atoms.push(n == 0 ? num : num % n);
+            atoms[i] = n == 0 ? num : num % n;
             num = n == 0 ? num : num / n;
         }
-        // atoms.toReversed(); // This was in the original program, but it is inconsistent to decode
         return prim(atoms);
     }),
     // Increment (0) / Take (1, 99)
