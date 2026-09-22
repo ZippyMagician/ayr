@@ -2,7 +2,7 @@ import { err, INTERNAL, Module, mod_prim, primitive, str } from "./utils"
 import { Value } from "./value"
 import { Num } from "./number"
 import { eof, Token, TokenIdent } from "./lex"
-import { Symbols } from "./syms"
+import { mod, Symbols } from "./syms"
 import { ayr_partial, is_instant as is_node_instant } from "./eval"
 import { Env, MaybeInstant } from "./env"
 import { Operators, OpMonad, OpDyad } from "./ops"
@@ -225,15 +225,19 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             // Left curly denotes a block
             let [block, j] = get_block(tokens, i);
             if (!block.length) err(1, "A block cannot be empty.");
-            stream.push([NodeType.Executable, (a: Value, b?: Value): Value => {
+
+            stream.push([NodeType.Executable, mod(99, a => {
                 let env_clone = clone(env);
-                if (b) {
-                    env_clone.set("x", a);
-                    env_clone.set("y", b);
-                } else env_clone.set("y", a);
-                let nodes = parse_nodes(block, env_clone);
-                return ayr_partial(nodes, env_clone);
-            }]);
+                env_clone.set("y", a);
+                let n = parse_nodes(block, env_clone);
+                return ayr_partial(n, env_clone);
+            }, 99, (a, b) => {
+                let env_clone = clone(env);
+                env_clone.set("x", a);
+                env_clone.set("y", b);
+                let n = parse_nodes(block, env_clone);
+                return ayr_partial(n, env_clone);
+            }, true, true)]);
             i = j;
         } else if (head.ident == TokenIdent.Symbol) {
             // Symbols
@@ -303,6 +307,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                     ));
                     stream.push([NodeType.LazyExecutable, env.get(name).as_module()]);
                 } else err(-1, "TODO: Non imm. defs for internal literals.");
+                stream.push([NodeType.Line]);
                 j = k;
             } else if (head.ident == TokenIdent.Literal) {
                 stream.push([NodeType.Literal, head.value.as_str()]);

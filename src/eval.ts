@@ -84,6 +84,7 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
                     } // else if (!preserve) stack = [];
                     break;
                 case NodeType.IfStatement:
+                    console.log(nodes, stack);
                     err(-1, "eval.ts::ayr_eval | Unreachable.");
                 default:
                     err(-1, `TODO: Implement evaluation for node '${node}'`);
