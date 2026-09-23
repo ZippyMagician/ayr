@@ -304,7 +304,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                         stream.push([NodeType.LazyLit, [NodeType.LitInternal, name]]);
                     }
                 } else if (head.ident == TokenIdent.Literal) {
-                    let train = parse_train(nodes, env, colon);
+                    let train = parse_train(nodes, env, colon) ?? err(7);
                     env.set(name, mod_prim(
                         a => train(a),
                         (a, b) => train(a, b),
@@ -351,7 +351,9 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
 
 // Parses a potential train (a list of nodes within parenthesis) into a single executable (Module)
 function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Module {
-    if (nodes.length == 1) return nodes[0]![1]! as Module;
+    if (nodes.length == 1 && 
+        (nodes[0]![0] == NodeType.Executable || nodes[0]![0] == NodeType.LazyExecutable)
+    ) return nodes[0]![1]! as Module;
     let build: Module[] = [];
 
     function inner(func: Module) {
