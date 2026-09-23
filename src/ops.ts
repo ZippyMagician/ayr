@@ -18,11 +18,12 @@ interface OpsMap {
 }
 
 export const Operators: OpsMap = {
-    // Each / Each
+    // Each
     "\"": [1, (f: MaybeInstant) => {
         const fn = f.as_module();
         return mod(-1, a => fn(a), -1, (a, b) => fn(a, b), true, true);
     }],
+
     // Compose / Atop / Bind (inst. arg)
     "&": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) => {
         if (l.is_instant() && r.is_instant()) err(5, "Cannot bind an instant to an instant.");
@@ -30,6 +31,11 @@ export const Operators: OpsMap = {
         else if (r.is_instant()) return l.as_module()(b ?? a, r.eval<Value>()); // b ? l.as_module()(a, r.eval<Value>()) : l.as_module()(r.eval<Value>());
         return b ? l.as_module()(r.as_module()(a, b)) : l.as_module()(r.as_module()(a))
     }],
+
+    // Hook
+    "&:": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) =>
+        b ? l.as_module()(a, r.as_module()(b)) : l.as_module()(clone(a), r.as_module()(a))
+    ],
 
     // Tie / Commute
     "`": [1, (f: MaybeInstant) => ((a, b?, override?) => {
