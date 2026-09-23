@@ -46,7 +46,8 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
         // If statements
         if (nodes[0] && nodes[0]![0] == NodeType.IfStatement) {
             let top: Node = nodes.shift()!;
-            if (!+(top[1] as ((_: Env) => Value))(env).as_num()) continue;
+            let l = (top[1] as ((_: Env) => Value))(env).to_list();
+            if (l.length && !+l[0]!.as_num()) continue;
             else lineskip++;
         }
         for (let i = nodes.length - 1; i >= 0; i--) {
