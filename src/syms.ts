@@ -238,10 +238,19 @@ export const Symbols: SymbolMap = {
         let flat = prim(a.as_list());
         return a.is_str() ? flat.as_str() : flat;
     }, 1, (a, b) => {
-        let left = a.boxed() ? [a] : b.boxed() ? a.to_list().map(Value.new_box) : a.to_list();
-        let right = b.boxed() ? [b] : a.boxed() ? b.to_list().map(Value.new_box) : b.to_list();
-        let concat = prim([...left, ...right]);
-        return a.is_str() && b.is_str() ? concat.as_str() : concat;
+        let values = [
+            ...a.boxed() ? [a] : b.boxed() ? a.to_list().map(Value.new_box) : a.to_list(),
+            ...b.boxed() ? [b] : a.boxed() ? b.to_list().map(Value.new_box) : b.to_list(),
+        ];
+        let ib = false;
+        for (let i = 0; i < values.length; i++) 
+            if (values[i] instanceof Value && (values[i] as Value).boxed()) {
+                ib = true; break;
+            }
+        if (ib) for (let i = 0; i < values.length; i++) 
+            if (values[i] instanceof Num || !(values[i] as Value).boxed())
+                values[i] = Value.new_box(values[i]!);
+        return prim(values).as_str(a.is_str() && b.is_str());
     }, true, true),
     // Mold (1) / Laminate (99, 99)
     ";": mod(1, a => {
