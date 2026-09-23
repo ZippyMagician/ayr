@@ -264,8 +264,8 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                 else stream.push([NodeType.PartialOperator, op as OpDyad, left_value]);
             }
             i = j;
-        } else if (is_line_end(tokens, j)) {
-            // Line separator (right → left, top → bottom parse order)
+        } else if (is_line_end(tokens, j) || head.ident == TokenIdent.RParen) {
+            // Line separator (right → left, top → bottom parse order). Unmatched right parenthesis also work
             stream.push([NodeType.Line]);
             i = j;
         } else if (head.ident == TokenIdent.Separator) {
@@ -333,7 +333,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             } else err(1, "Invalid use of the colon token.");
             i = j;
         } else {
-            err(-1, `TODO: Parse token '${JSON.stringify(head)}'.`);
+            err(-1, `TODO: Parse token '${head.value.as_str()}'.`);
         }
         i++;
 
