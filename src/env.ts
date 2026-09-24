@@ -42,7 +42,7 @@ export class MaybeInstant {
     }
 
     public as_module(): Module {
-        return this.inner instanceof Value ? ((a, b?) => this.inner as Value) : this.inner;
+        return this.inner instanceof Value ? ((_a, _b?) => this.inner as Value) : this.inner;
     }
 }
 
