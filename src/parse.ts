@@ -336,6 +336,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             // Possible if/then statement
             if (stream.length) {
                 let [type, v] = stream.pop()!;
+                if (!is_node_instant([type, v] as Node, env)) err(1, "Invalid use of the colon token.");
                 stream.push([
                     NodeType.IfStatement,
                     (type == NodeType.Instant
