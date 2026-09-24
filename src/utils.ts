@@ -26,14 +26,18 @@ export function err(code: number, msg: string = ""): never {
 }
 
 class Internals {
-    private static VALUES: string[] = ["BOXC", "I", "E"];
+    private static VALUES: string[] = ["BOXC", "RANGE", "I", "E", "A", "C", "V"];
 
     private boxes: string = "╓─╖╙─╜║┌┬┐├┼┤└┴┘│─";
+    private range: number = 1;
     private dict: { [key: string]: Value } = {};
 
     constructor() {
         this.dict["I"] = primitive(0); // STDIN, defaults to 0
         this.dict["E"] = primitive([]); // Empty list intrinsic, shorthand for 0#0 or 0$0
+        this.dict["A"] = primitive("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        this.dict["C"] = primitive("BCDFGHJKLMNPQRSTVWXYZ");
+        this.dict["V"] = primitive("AEIOU");
     }
 
     public set_key(key: string, v: Value) {
@@ -42,6 +46,8 @@ class Internals {
             case 'BOXC': 
                 this.set_boxes_internal(v);
                 break;
+            case 'RANGE':
+                this.range = +v;
             default:
                 this.dict[key] = v;
         }
@@ -51,7 +57,9 @@ class Internals {
         if (!Internals.VALUES.includes(key)) err(3);
         switch (key) {
             case 'BOXC':
-                return primitive(this.get_boxes_internal());
+                return primitive(this.boxes);
+            case 'RANGE':
+                return primitive(this.range);
             default:
                 return this.dict[key] as Value;
         }
@@ -68,6 +76,10 @@ class Internals {
 
     public get_boxes_internal(): string[18] {
         return this.boxes;
+    }
+
+    public get_range(): number {
+        return this.range;
     }
 }
 
