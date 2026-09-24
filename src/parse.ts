@@ -55,6 +55,18 @@ function nnw(tokens: Token[], from: number, accept_separator: boolean = true): [
     return i >= tokens.length ? [eof(), i] : [tokens[i]!, i];
 }
 
+// Previous No Whitespace
+function pnws(tokens: Token[], from: number, accept_separator: boolean = true, env: Env): [Token, number] {
+    let i = from;
+    while (i >= 0 && is_whitespace(tokens[i]!.ident, accept_separator)) i--;
+    let start = tokens[i]!;
+    if (is_instant(tokens, i, env)) {
+        i--;
+        while (i >= 0 && (is_whitespace(tokens[i]!.ident, accept_separator) || is_instant(tokens, i, env))) i--;
+    } else while (i >= 0 && is_whitespace(tokens[i]!.ident, accept_separator)) i--;
+    return i < 0 ? [eof(), i] : [tokens[i]!, i];
+}
+
 export const enum NodeType {
     // Literal value
     Instant,
@@ -138,8 +150,9 @@ function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], num
     }
 
     // The group is empty, the last element is an instant / not attached to an operator, a colon does not mark the beginning.
-    instant = build.length == 0 || is_instant(build, build.length - 1, env) &&
-        build[0]!.ident != TokenIdent.Colon && (build.length < 2 || build[build.length - 2]!.ident != TokenIdent.Operator);
+    if (!build.length) return [true, build, i];
+    instant = is_instant(build, build.length - 1, env) && nnw(build, 0, false)[0]!.ident != TokenIdent.Colon &&
+        (build.length < 2 || pnws(build, build.length - 1, false, env)[0]!.ident != TokenIdent.Operator);
 
     return [instant, build, i];
 }
