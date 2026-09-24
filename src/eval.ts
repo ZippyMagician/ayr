@@ -20,8 +20,14 @@ export function is_instant(node: Node, env: Env): boolean {
     return false;
 }
 
-function as_val(node: Node): Value {
-    return node[1]! as Value;
+function as_val(node: Node, env: Env): Value {
+    if (node[0] == NodeType.LazyLit) return as_val(node[1] as Node, env);
+    else if (node[0] == NodeType.Instant) return node[1] as Value;
+    else if (node[0] == NodeType.Literal) {
+        let lit = env.get(node[1] as string);
+        if (lit.is_instant()) return lit.eval<Value>();
+        else err(-1, "eval.ts::as_val | Unreachable.");
+    } else err(-1, "eval.ts::as_val | Unreachable.");
 }
 
 function as_mod(node: Node): Module {
@@ -54,7 +60,7 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
             let node = nodes[i]!;
             switch (node[0]!) {
                 case NodeType.Instant:
-                    stack.push(as_val(node));
+                    stack.push(node[1] as Value);
                     break;
                 case NodeType.LazyLit:
                     if (i == 0) break;
@@ -73,7 +79,7 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
                     let right = stack.pop()!;
                     if (i == 0 || !is_instant(nodes[i - 1]!, env)) stack.push(as_mod(node)(right));
                     else {
-                        let left = as_val(nodes[--i]!);
+                        let left = as_val(nodes[--i]!, env);
                         stack.push(as_mod(node)(left, right));
                     }
                     break;
@@ -85,7 +91,6 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
                     } // else if (!preserve) stack = [];
                     break;
                 case NodeType.IfStatement:
-                    console.log(nodes, stack);
                     err(-1, "eval.ts::ayr_eval | Unreachable.");
                 default:
                     err(-1, `TODO: Implement evaluation for node '${node}'`);
