@@ -238,9 +238,10 @@ export const Symbols: SymbolMap = {
         let flat = prim(a.as_list());
         return a.is_str() ? flat.as_str() : flat;
     }, 1, (a, b) => {
+        console.log("concat", a, b);
         let values = [
-            ...a.boxed() ? [a] : b.boxed() ? a.to_list().map(Value.new_box) : a.to_list(),
-            ...b.boxed() ? [b] : a.boxed() ? b.to_list().map(Value.new_box) : b.to_list(),
+            ...a.boxed() ? [a] : b.boxed() ? [a.box()] : a.to_list(),
+            ...b.boxed() ? [b] : a.boxed() ? [b.box()] : b.to_list(),
         ];
         let ib = false;
         for (let i = 0; i < values.length; i++) 
