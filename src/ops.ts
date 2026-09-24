@@ -75,17 +75,23 @@ export const Operators: OpsMap = {
     }],
 
     // Compose / Atop / Bind (inst. arg)
-    "&": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) => {
+    "&": [2, (l: MaybeInstant, r: MaybeInstant) => {
         if (l.is_instant() && r.is_instant()) err(5, "Cannot bind an instant to an instant.");
-        if (l.is_instant()) return r.as_module()(l.eval<Value>(), b ?? a);
-        else if (r.is_instant()) return l.as_module()(b ?? a, r.eval<Value>()); // b ? l.as_module()(a, r.eval<Value>()) : l.as_module()(r.eval<Value>());
-        return b ? l.as_module()(r.as_module()(a, b)) : l.as_module()(r.as_module()(a))
+        if (l.is_instant()) return (a, b?, o?) => r.eval<Module>()(l.eval<Value>(), b ?? a, o);
+        else if (r.is_instant()) return (a, b?, o?) => l.eval<Module>()(b ?? a, r.eval<Value>(), o); 
+        return (a, b?, o?) => l.eval<Module>()(r.eval<Module>()(a, b, o))
     }],
 
-    // Hook
-    "&:": [2, (l: MaybeInstant, r: MaybeInstant) => (a, b?) =>
-        b ? l.as_module()(a, r.as_module()(b)) : l.as_module()(clone(a), r.as_module()(a))
-    ],
+    // Hook / Bind default (inst. arg)
+    "&:": [2, (l: MaybeInstant, r: MaybeInstant) => {
+        if (l.is_instant() && r.is_instant()) err(5, "Cannot bind an instant to an instant.");
+        if (l.is_instant()) return (a, b?, o?) => b
+            ? r.eval<Module>()(a, b, o) : r.eval<Module>()(l.eval<Value>(), a, o);
+        else if (r.is_instant()) return (a, b?, o?) => l.eval<Module>()(a, b ?? r.eval<Value>(), o);
+        return (a, b?) => b
+            ? l.eval<Module>()(a, r.eval<Module>()(b))
+            : l.eval<Module>()(clone(a), r.eval<Module>()(a));
+    }],
 
     // Tie / Commute
     "`": [1, (f: MaybeInstant) => ((a, b?, override?) => {
