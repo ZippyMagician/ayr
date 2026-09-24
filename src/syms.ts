@@ -241,19 +241,27 @@ export const Symbols: SymbolMap = {
         let flat = prim(a.as_list());
         return a.is_str() ? flat.as_str() : flat;
     }, 1, (a, b) => {
-        let values = [
-            ...a.boxed() ? [a] : b.boxed() ? [a.box()] : 
-                a.to_list().map(n => Value.maybe_num(n).as_str(a.is_str())),
-            ...b.boxed() ? [b] : a.boxed() ? [b.box()] : 
-                b.to_list().map(n => Value.maybe_num(n).as_str(b.is_str())),
-        ];
+        let valuesl = [...a.boxed() ? [a] : b.boxed() ? [a.box()] : a.to_list()];
+        let valuesr = [...b.boxed() ? [b] : a.boxed() ? [b.box()] : b.to_list()];
+
         let ib = false;
-        for (let i = 0; i < values.length; i++) 
-            if (values[i]!.boxed()) { ib = true; break; }
-        if (ib) for (let i = 0; i < values.length; i++) 
-            if (!values[i]!.boxed())
-                values[i] = Value.new_box(values[i]!);
-        return prim(values).as_str(a.is_str() && b.is_str());
+        for (let i = 0; !ib && i < valuesl.length; i++) 
+            if (valuesl[i]!.boxed()) ib = true;
+        for (let i = 0; !ib && i < valuesr.length; i++)
+            if (valuesr[i]!.boxed()) ib = true;
+        if (ib) {
+            for (let i = 0; i < valuesl.length; i++) 
+                if (!valuesl[i]!.boxed()) {
+                    let tmp = a.is_str() ? Value.maybe_num(valuesl[i]!).as_str() : valuesl[i]!;
+                    valuesl[i] = Value.new_box(tmp);
+                }
+            for (let i = 0; i < valuesr.length; i++)
+                if (!valuesr[i]!.boxed()) {
+                    let tmp = b.is_str() ? Value.maybe_num(valuesr[i]!).as_str() : valuesr[i]!;
+                    valuesr[i] = Value.new_box(tmp);
+                }
+        }
+        return prim(valuesl.concat(...valuesr)).as_str(a.is_str() && b.is_str());
     }, true, true),
     // Mold (1) / Laminate (99, 99)
     ";": mod(1, a => {
