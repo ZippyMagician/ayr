@@ -221,7 +221,7 @@ export const Symbols: SymbolMap = {
         if (a.is_str()) return range(n < 97 ? 65 : 97, n + 1).as_str();
         return range(s, s + n);
     }, [99, 0], (a, b) => {
-        if (!b.boxed()) return a.ranked(a.get_dims() - 1)[+b]!.as_str(a.is_str());
+        if (!b.boxed()) return (a.ranked(a.get_dims() - 1)[+b] ?? err(4, `Index does not exist.`)).as_str(a.is_str());
         let index = Value.maybe_num(b.as_list()[0]!).to_list().map(n => +n);
 
         if (a.get_dims() < index.length) err(4, `Index does not exist.`);
