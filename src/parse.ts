@@ -132,12 +132,10 @@ function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], num
     let node: Token;
 
     while (([node, i] = nnw(tokens, ++i, false), node.ident != TokenIdent.EOF)) {
-        console.log("check", node);
         if (node.ident == TokenIdent.LParen) ++parens;
         else if (node.ident == TokenIdent.RParen && --parens == 0) break;
         build.push(clone(node));
     }
-    console.log("is_instant group?", build);
 
     // The group is empty, the last element is an instant / not attached to an operator, a colon does not mark the beginning.
     instant = build.length == 0 || is_instant(build, build.length - 1, env) &&
@@ -342,9 +340,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
         // Pass right operand to partial operator
         if (stream.length > 1 && stream[stream.length - 2]![0] == NodeType.PartialOperator) {
             if (stream[stream.length - 1]![0] == NodeType.Line) err(1, "Dyadic operator missing right operand");
-            console.log("maybe_instant");
             let right = maybe_instant(stream.pop()!, env);
-            console.log("op, left");
             let [_, op, left] = stream.pop()!;
             stream.push([NodeType.Executable, (op as OpDyad)(left!, right)]);
         }
@@ -355,7 +351,6 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
 
 // Parses a potential train (a list of nodes within parenthesis) into a single executable (Module)
 function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Module {
-    console.log("train:", nodes);
     if (nodes.length == 1 && 
         (nodes[0]![0] == NodeType.Executable || nodes[0]![0] == NodeType.LazyExecutable)
     ) return nodes[0]![1]! as Module;
