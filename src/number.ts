@@ -119,6 +119,10 @@ export class Num {
         return n instanceof Num ? n : new Num(n);
     }
 
+    public boxed(): boolean {
+        return false;
+    }
+
     public add(other: Num): Num {
         if (typeof this.wrap != "number") return Num.from(this.wrap.add(other.wrap));
         else if (typeof other.wrap != "number") return Num.from(other.wrap.add(this.wrap));
