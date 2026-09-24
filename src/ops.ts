@@ -21,7 +21,57 @@ export const Operators: OpsMap = {
     // Each
     "\"": [1, (f: MaybeInstant) => {
         const fn = f.as_module();
-        return mod(-1, a => fn(a), -1, (a, b) => fn(a, b), true, true);
+        return mod(-1, fn, -1, fn, true, true);
+    }],
+
+    // Repeat / Until
+    "\".": [2, (l: MaybeInstant, r: MaybeInstant) => {
+        const fn = l.as_module();
+
+        // Repeat
+        if (r.is_instant()) {
+            const counts = r.eval<Value>().to_list().map(n => +n);
+            if (counts.length == 1) return mod(
+                99, a => { let v = a; for (let i = 0; i < counts[0]!; i++) v = fn(v); return v },
+                99, (a, b) => { let v = b; for (let i = 0; i < counts[0]!; i++) v = fn(a, v); return v },
+                true, true
+            ); else return mod(
+                99, a => {
+                    let bl = [...Array(counts.length).keys().map(_ => clone(a))];
+                    for (let c in counts) for (let i = 0; i < counts[c]!; i++) {
+                        bl[c] = fn(bl[c]!);
+                    }
+                    return Value.unranked(a.get_dims(), [], bl);
+                },
+                99, (a, b) => {
+                    let bl: Value[] = [...Array(counts.length).keys().map(_ => clone(b))];
+                    for (let c in counts) for (let i = 0; i < counts[c]!; i++) {
+                        bl[c] = fn(a, bl[c]!);
+                    }
+                    return Value.unranked(a.get_dims(), [], bl);
+                }
+            );
+        }
+
+        // Until
+        const cond = r.as_module();
+        return mod(99, a => {
+            let p, v = a;
+            let condition;
+            do {
+                p = clone(v);
+                v = fn(v);
+                let t = cond(p, v).to_list();
+                condition = t.length == 0 || !+t[0]!.as_num();
+            } while (condition);
+            return v;
+        }, 99, (_a, _b) => err(7), true);
+    }],
+
+    // Tie (Each atom)
+    "\":": [1, (f: MaybeInstant) => {
+        const fn = f.as_module();
+        return mod(0, fn, 0, fn, true, true);
     }],
 
     // Compose / Atop / Bind (inst. arg)
