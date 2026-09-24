@@ -1,0 +1,9 @@
+DS. Matrix multiplication
+mmu:+/&*&:=@1 2@2
+
+DS. Monadic binary encode ('#:')
+encode:{{(y):(x,`2|y)v 0!`y%2)x}}@1 0&`.E
+
+DS. Join list of strings on separator
+jn:{{([,x,])/y}}
+
