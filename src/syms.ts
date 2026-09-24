@@ -3,7 +3,7 @@ const clone = require("lodash.clonedeep");
 import { ayrfn } from "./eval"
 import { Num } from "./number"
 import { Value } from "./value"
-import { equal, err, Module, Module2, ord, pad_rank, primitive as prim, range } from "./utils"
+import { equal, err, INTERNAL, Module, Module2, ord, pad_rank, primitive as prim, range } from "./utils"
 
 interface SymEnv {
     preserve_str?: boolean,
@@ -217,8 +217,9 @@ export const Symbols: SymbolMap = {
     // 1-Range (0) / Index (99, 0)
     "~": mod(0, a => {
         let n = +a.as_num();
+        const s = INTERNAL.get_range();
         if (a.is_str()) return range(n < 97 ? 65 : 97, n + 1).as_str();
-        return range(1, n + 1);
+        return range(s, s + n);
     }, [99, 0], (a, b) => {
         if (!b.boxed()) return a.ranked(a.get_dims() - 1)[+b]!.as_str(a.is_str());
         let index = Value.maybe_num(b.as_list()[0]!).to_list().map(n => +n);

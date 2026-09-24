@@ -12,13 +12,16 @@ const program = new Command();
 import * as readline from "node:readline/promises"
 const pkg = require('../package.json');
 
-async function cli(_options: { string: string[] }) {
+async function cli(_: Args) {
     console.log("ayr: type 'exit' to exit.");
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
     rl.on('SIGINT', () => rl.close());
+
+    const mainopts = program.opts();
+    if (mainopts['0']) INTERNAL.set_key("RANGE", primitive(0));
 
     let env = new Env();
     while (true) {
@@ -36,11 +39,22 @@ async function cli(_options: { string: string[] }) {
     process.exit(0);
 }
 
-function run_file(file: string, options: { input?: string, e: boolean, string: string }) {
-    const program = fs.readFileSync(process.cwd() + "/" + file, "utf8");
+type Args = {
+    '0': boolean,
+}
+
+type RunArgs = {
+    input?: string,
+    e: boolean,
+}
+
+function run_file(file: string, options: RunArgs) {
+    const mainopts = program.opts();
+    const prg = fs.readFileSync(process.cwd() + "/" + file, "utf8");
 
     if (options.input) INTERNAL.set_key("I", options.e ? ayr(options.input) : primitive(options.input));
-    ayr(program.replace(/\r?\n/g, "\n").replace(/\#\!\/.+\n/, "").trim());
+    if (mainopts['0']) INTERNAL.set_key("RANGE", primitive(0));
+    ayr(prg.replace(/\r?\n/g, "\n").replace(/\#\!\/.+\n/, "").trim());
     process.exit(0);
 }
 
@@ -50,7 +64,7 @@ program
     .version(pkg.version);
 
 program
-    .option('-0', '0-indexed lists instead of 1');
+    .option('-0', '0-indexed ranges');
 
 program.command('run')
     .description('Run from a file')
