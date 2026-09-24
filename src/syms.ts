@@ -146,7 +146,10 @@ export const Symbols: SymbolMap = {
     "<": mod(99, a => Value.new_box(a), 0, (a, b) => prim(+(ord(a, b) == -1))),
     // Unbox (99) / Greater Than (0, 0)
     ">": mod(
-        99, a => Value.maybe_num(a.to_list()[0] ?? err(4, "Take first of empty list.")),
+        99, a => {
+            let first = Value.maybe_num(a.to_list()[0] ?? err(4, "Take first of empty list."));
+            return first.as_str(a.is_str() || a.boxed() && first.is_str());
+        },
         0, (a, b) => prim(+(ord(a, b) == 1)), true
     ),
     // Exp (0) / And (0, 0)
@@ -238,18 +241,17 @@ export const Symbols: SymbolMap = {
         let flat = prim(a.as_list());
         return a.is_str() ? flat.as_str() : flat;
     }, 1, (a, b) => {
-        console.log("concat", a, b);
         let values = [
-            ...a.boxed() ? [a] : b.boxed() ? [a.box()] : a.to_list(),
-            ...b.boxed() ? [b] : a.boxed() ? [b.box()] : b.to_list(),
+            ...a.boxed() ? [a] : b.boxed() ? [a.box()] : 
+                a.to_list().map(n => Value.maybe_num(n).as_str(a.is_str())),
+            ...b.boxed() ? [b] : a.boxed() ? [b.box()] : 
+                b.to_list().map(n => Value.maybe_num(n).as_str(b.is_str())),
         ];
         let ib = false;
         for (let i = 0; i < values.length; i++) 
-            if (values[i] instanceof Value && (values[i] as Value).boxed()) {
-                ib = true; break;
-            }
+            if (values[i]!.boxed()) { ib = true; break; }
         if (ib) for (let i = 0; i < values.length; i++) 
-            if (values[i] instanceof Num || !(values[i] as Value).boxed())
+            if (!values[i]!.boxed())
                 values[i] = Value.new_box(values[i]!);
         return prim(values).as_str(a.is_str() && b.is_str());
     }, true, true),

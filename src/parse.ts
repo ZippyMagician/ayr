@@ -383,10 +383,16 @@ function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Modul
         // A f
         //   f g
         // f g h
+        // ([,' ',])/
         if (is_node_instant(node, env)) {
             let top = build.pop()!;
             let left = clone(node[0] == NodeType.Instant ? node[1] as Value : env.get(node[1] as string).eval<Value>());
-            build.push(mod_prim(a => top(clone(left), a), (_, b) => top(clone(left), b)));
+            if (build.length == 1) {
+                let rightfn = build.pop()!;
+                build.push(mod_prim(a => top(left, rightfn(a)), (a, b) => top(left, rightfn(a, b))));
+            } else {
+                build.push(mod_prim(a => top(left, a), (_, b) => top(left, b)));
+            }
         } else if (node[0] == NodeType.Executable) {
             inner(node[1]);
         } else if (node[0] == NodeType.Literal) {

@@ -98,7 +98,7 @@ export const Operators: OpsMap = {
         const arr = a.to_list();
         const fn = f.as_module();
         let acc = Value.maybe_num(arr[0]!).as_str(a.is_str());
-        for (let i = 1; i < arr.length; i++) acc = fn(acc, Value.maybe_num(arr[i]!));
+        for (let i = 1; i < arr.length; i++) acc = fn(acc, Value.maybe_num(arr[i]!).as_str(a.is_str()));
         return acc;
     }, [0, 99], (a, b) => {
         if (b.is_single()) return b.as_value();
@@ -129,7 +129,8 @@ export const Operators: OpsMap = {
         if (!r.is_instant()) {
             // Compose / Over
             const lm = l.as_module(), rm = r.as_module();
-            return (a: Value, b?: Value) => b ? lm(rm(a), rm(b)) : lm(rm(a));
+            return (a: Value, b?: Value, override?: number | [number, number]) => 
+                b ? lm(rm(a), rm(b), override) : lm(rm(a), undefined, override);
         }
         // Rank
         const rank = r.eval<Value>().as_list().map(n => +n);
