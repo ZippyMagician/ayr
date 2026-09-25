@@ -68,6 +68,22 @@ export function eof(): Token {
     return { ident: TokenIdent.EOF, value: new TokenValue(0) };
 }
 
+export function lparen(): Token {
+    return { ident: TokenIdent.LParen, value: new TokenValue('(') };
+}
+
+export function rparen(): Token {
+    return { ident: TokenIdent.RParen, value: new TokenValue(')') };
+}
+
+export function lcurly(): Token {
+    return { ident: TokenIdent.LCurly, value: new TokenValue('{{') };
+}
+
+export function rcurly(): Token {
+    return { ident: TokenIdent.RCurly, value: new TokenValue('}}') };
+}
+
 export type Token = {
     ident: TokenIdent,
     value: TokenValue,

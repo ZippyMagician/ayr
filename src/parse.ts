@@ -1,7 +1,7 @@
 import { err, INTERNAL, Module, mod_prim, primitive, str } from "./utils"
 import { Value } from "./value"
 import { Num } from "./number"
-import { eof, Token, TokenIdent } from "./lex"
+import { eof, lparen, rparen, lcurly, rcurly, Token, TokenIdent } from "./lex"
 import { mod, Symbols } from "./syms"
 import { ayr_partial, is_instant as is_node_instant } from "./eval"
 import { Env, MaybeInstant } from "./env"
@@ -138,15 +138,20 @@ function maybe_instant(node: Node, env: Env): MaybeInstant {
 
 // Parse a group of tokens (parenthesis)
 function get_group(tokens: Token[], i: number, env: Env): [boolean, Token[], number] {
-    let parens: number = 1;
     let instant: boolean = true;
     let build: Token[] = [];
     let node: Token;
 
+    let inner: Token[];
     while (([node, i] = nnw(tokens, ++i, false), node.ident != TokenIdent.EOF)) {
-        if (node.ident == TokenIdent.LParen) ++parens;
-        else if (node.ident == TokenIdent.RParen && --parens == 0) break;
-        build.push(clone(node));
+        if (node.ident == TokenIdent.LParen) {
+            [, inner, i] = get_group(tokens, i, env);
+            build = build.concat(lparen(), ...inner, rparen());
+        } else if (node.ident == TokenIdent.LCurly) {
+            [inner, i] = get_block(tokens, i);
+            build = build.concat(lcurly(), ...inner, rcurly());
+        } else if (node.ident == TokenIdent.RParen) break;
+        else build.push(clone(node));
     }
 
     // The group is empty, the last element is an instant / not attached to an operator, a colon does not mark the beginning.
