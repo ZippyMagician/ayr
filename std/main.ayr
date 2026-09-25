@@ -2,8 +2,17 @@ DS. Matrix multiplication
 mmu:+/&*&:=@1 2@2
 
 DS. Monadic binary encode ('#:')
-encode:{{(y):(x,`2|y)v 0!`y%2)x}}@1 0&`E.
+enc:{{(y):(x,`2|y)v 0!`y%2)x}}@1 0&`E.
 
 DS. Join list of strings on separator
 jn:' '&:{{>(<[,x,])@>/y}}
+
+DS. Maximum
+max:{{(0>y-x):x)y}}@0
+
+DS. Minimum
+min:{{(0>y-x):y)x}}@0
+
+DS. Binary Encode+ (from ayr.js)
+ENC::(0&#,>&[)"&:(-`"&:(max/)#&>")@1#:
 
