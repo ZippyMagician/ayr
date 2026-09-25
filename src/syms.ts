@@ -293,7 +293,7 @@ export const Symbols: SymbolMap = {
         return prim(new_values, false, dims + 1, [...rank, 2], a.is_str() && b.is_str());
     }, true, true),
     // Tally (99) / Replicate (99, 1)
-    "#": mod(99, a => Value.new_scalar(Num.from(a.get_rank()[a.get_dims() - 1]!)), [99, 1], (a, b) => {
+    "#": mod(99, a => prim(a.is_single() ? 1 : a.get_rank()[a.get_dims()-1]!), [99, 1], (a, b) => {
         if (b.boxed()) err(2, "Boxed replication count.");
         const axis = Math.max(0, a.get_dims() - 1);
         let elements = a.ranked(axis);
