@@ -140,6 +140,8 @@ export function lex(str: string): Token[] {
         else if (match = /^(\s)/.exec(str)) 
             push(match[0] == " " ? TokenIdent.Space : TokenIdent.Separator, match[1]!);
         else if (match = /^(NL\.)/.exec(str)) push(TokenIdent.Separator, "\n");
+        // Comment
+        else if (match = /^(DS\..*\n*)/.exec(str)) {}
         // Literals (environment variables & user defined variables
         else if (match = /^([a-zA-Z][a-zA-Z_]*)\./.exec(str)) push(TokenIdent.InternalLit, match[1]!);
         else if (match = /^([a-zA-Z][a-zA-Z_]*)/.exec(str)) push(TokenIdent.Literal, match[1]!);
