@@ -3,7 +3,8 @@ const clone = require("lodash.clonedeep");
 import { ayrfn } from "./eval"
 import { Num } from "./number"
 import { Value } from "./value"
-import { equal, err, INTERNAL, Module, Module2, ord, pad_rank, primitive as prim, range } from "./utils"
+import { err, INTERNAL, Module, Module2, primitive as prim } from "./utils"
+import * as util from "./utils"
 
 interface SymEnv {
     preserve_str?: boolean,
@@ -107,7 +108,7 @@ export const Symbols: SymbolMap = {
         let sum = a.map_num(l => l.add(b.as_num()));
         return b.is_str() ? sum.as_str() : sum;
     }, false, true),
-    // TODO / GCD (0, 0)
+    // TODO / TODO
     "+.": mod_todo("+."),
     // Double (0) / Abs Add (0, 0)
     "+:": mod(0, a => a.map_num(n => n.muli(2)), 0, (a, b) => a.map_num(n => n.add(b.as_num()).abs()), true, true),
@@ -131,6 +132,8 @@ export const Symbols: SymbolMap = {
     }, 0, (a, b) => a.map_num(n => n.mul(b.as_num())), true),
     // Reciprocal (0) / Divide (0, 0)
     "%": mod(0, a => a.map_num(n => n.recip()), 0, (a, b) => a.map_num(n => n.div(b.as_num()))),
+    // TODO / GCD (0, 0)
+    "%.": mod_todo("%."),
     // Not (0) / Residue (0, 0)
     "|": mod(0, a => a.map_num(n => Num.from(+!+n)), 0, (a, b) => b.map_num(n => Num.from(+n % +a.as_num()))),
     // Factorial (0) / Or (0, 0)
@@ -143,14 +146,14 @@ export const Symbols: SymbolMap = {
         return Num.from(s);
     }), 0, (a, b) => a.map_num(n => Num.from(+n | +b.as_num()))),
     // Box (99) / Less Than (0, 0)
-    "<": mod(99, a => Value.new_box(a), 0, (a, b) => prim(+(ord(a, b) == -1))),
+    "<": mod(99, a => Value.new_box(a), 0, (a, b) => prim(+(util.ord(a, b) == -1))),
     // Unbox (99) / Greater Than (0, 0)
     ">": mod(
         99, a => {
             let first = Value.maybe_num(a.to_list()[0] ?? err(4, "Take first of empty list."));
             return first.as_str(a.is_str() || a.boxed() && first.is_str());
         },
-        0, (a, b) => prim(+(ord(a, b) == 1)), true
+        0, (a, b) => prim(+(util.ord(a, b) == 1)), true
     ),
     // Exp (0) / And (0, 0)
     "^": mod(0, a => a.map_num(n => Num.from(Math.E ** +n)), 0, (a, b) => a.map_num(n => Num.from(+n & +b.as_num()))),
@@ -181,7 +184,7 @@ export const Symbols: SymbolMap = {
         const spl = a.ranked(a.get_dims() - 1);
         let ret = Array(spl.length);
         for (let i = 0; i < spl.length; i++) {
-            if (s.some(v => equal(v, spl[i]!))) ret[i] = 0;
+            if (s.some(v => util.equal(v, spl[i]!))) ret[i] = 0;
             else {
                 s.push(spl[i]!);
                 ret[i] = 1;
@@ -213,13 +216,13 @@ export const Symbols: SymbolMap = {
 
         let rows = a.ranked(1).map(x => x.as_list());
         return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
-    }, 0, (a, b) => Value.new_scalar(Num.from(+equal(a, b))), true),
+    }, 0, (a, b) => Value.new_scalar(Num.from(+util.equal(a, b))), true),
     // 1-Range (0) / Index (99, 0)
     "~": mod(0, a => {
         let n = +a.as_num();
         const s = INTERNAL.get_range();
-        if (a.is_str()) return range(n < 97 ? 65 : 97, n + 1).as_str();
-        return range(s, s + n);
+        if (a.is_str()) return util.range(n < 97 ? 65 : 97, n + 1).as_str();
+        return util.range(s, s + n);
     }, [99, 0], (a, b) => {
         if (!b.boxed()) return (a.ranked(a.get_dims() - 1)[+b] ?? err(4, `Index does not exist.`)).as_str(a.is_str());
         let index = Value.maybe_num(b.as_list()[0]!).to_list().map(n => +n);
@@ -264,6 +267,16 @@ export const Symbols: SymbolMap = {
         }
         return prim(valuesl.concat(...valuesr)).as_str(a.is_str() && b.is_str());
     }, true, true),
+    // Determinant (2) / Dot Product (1, 1)
+    ",.": mod(2, a => {
+        return prim(util.det(a.ranked(1).map(n => n.to_list())));
+    }, 1, (a, b) => {
+        let l = a.to_list(), r = b.to_list();
+        if (l.length != r.length) err(4, "Vectors must match.");
+        let p = Num.from(0);
+        for (let i = 0; i < l.length; i++) p = p.addi(+l[i]! * +r[i]!);
+        return prim(p);
+    }),
     // Mold (1) / Laminate (99, 99)
     ";": mod(1, a => {
         let values = a.as_list();
@@ -276,7 +289,7 @@ export const Symbols: SymbolMap = {
                 max_rank[j] = Math.max(max_rank[j] ?? 1, rank[j]!);
         }
 
-        let new_values = unboxed.flatMap(value => pad_rank(value, max_rank).to_list() as Num[]);
+        let new_values = unboxed.flatMap(value => util.pad_rank(value, max_rank).to_list() as Num[]);
         return prim(new_values, false, max_rank.length + 1, [...max_rank, values.length], unboxed[0]!.is_str());
     }, 99, (a, b) => {
         let left_dims = a.get_dims();
@@ -289,7 +302,7 @@ export const Symbols: SymbolMap = {
         for (let i in (left_dims - right_dims ? left_rank : right_rank))
             rank[i] = Math.max(left_rank[i] ?? 1, right_rank[i] ?? 1);
 
-        let new_values = [...pad_rank(a, rank).to_list(), ...pad_rank(b, rank).to_list()];
+        let new_values = [...util.pad_rank(a, rank).to_list(), ...util.pad_rank(b, rank).to_list()];
         return prim(new_values, false, dims + 1, [...rank, 2], a.is_str() && b.is_str());
     }, true, true),
     // Tally (99) / Replicate (99, 1)

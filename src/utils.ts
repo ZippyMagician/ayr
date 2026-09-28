@@ -130,6 +130,21 @@ export function equal(a: Value, b: Value): boolean {
     }
 }
 
+export function det(a: (Num | Value)[][]): number {
+    if (a[0] && a[0]![0] instanceof Num) return detn(a as Num[][]);
+    err(4);
+}
+
+function detn(m: Num[][]): number {
+    if (m.length == 1) return +m[0]![0]!;
+    if (m[0]!.length == 2 && m.length == 2) return +m[0]![0]! * +m[1]![1]! - +m[0]![1]! * +m[1]![0]!;
+    return +m[0]!.reduce((r, e, i) => {
+        return r.addi((-1) ** (i + 2) * +e * det(
+            m.slice(1).map(c => c.filter((_, j) => i != j))
+        ));
+    }, Num.from(0));
+}
+
 export function pad_rank(data: Value, target: number[]): Value {
     const dims = data.get_dims();
     const orig_rank = data.get_rank();
