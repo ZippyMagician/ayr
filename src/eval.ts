@@ -34,6 +34,18 @@ function as_mod(node: Node): Module {
     return node[1]! as Module;
 }
 
+function ifhelper(nodes: Node[], env: Env, lineskip: number): [boolean, number] {
+    let skip = false;
+    if (nodes[0] && nodes[0]![0] == NodeType.IfStatement) {
+        let top: Node = nodes.shift()!;
+        let l = (top[1] as ((_: Env) => Value))(env).to_list();
+        if (l.length && !+l[0]!.as_num()) skip = true;
+        else lineskip = 1;
+    } else if (lineskip) return [true, 0];
+
+    return [skip, lineskip];
+}
+
 // TODO: Currently line-by-line basic. Keep?
 export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false): Value {
     let stack: Value[] = [];
@@ -50,12 +62,10 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
         const nodes = nodes_parsed[line]!;
 
         // If statements
-        if (nodes[0] && nodes[0]![0] == NodeType.IfStatement) {
-            let top: Node = nodes.shift()!;
-            let l = (top[1] as ((_: Env) => Value))(env).to_list();
-            if (l.length && !+l[0]!.as_num()) continue;
-            else lineskip++;
-        }
+        let skip: boolean;
+        [skip, lineskip] = ifhelper(nodes, env, lineskip);
+        if (skip) continue;
+
         for (let i = nodes.length - 1; i >= 0; i--) {
             let node = nodes[i]!;
             switch (node[0]!) {
@@ -63,6 +73,7 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
                     stack.push(node[1] as Value);
                     break;
                 case NodeType.LazyLit:
+                    env.set(node[1] as string, node[2] as Value);
                     if (i == 0) break;
                     node = node[1] as Node;
                 case NodeType.Literal:
@@ -85,10 +96,8 @@ export function ayr_eval(node_lines: Node[], env: Env, preserve: boolean = false
                     break;
                 case NodeType.Line:
                     // Clear stack.
-                    if (lineskip > 0) {
-                        lineskip--;
-                        line++;
-                    } // else if (!preserve) stack = [];
+                    if (lineskip > 0 && nodes.length > 1) line++;
+                    // else if (!preserve) stack = [];
                     break;
                 case NodeType.IfStatement:
                     err(-1, "eval.ts::ayr_eval | Unreachable.");

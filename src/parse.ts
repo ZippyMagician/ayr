@@ -100,7 +100,7 @@ export type Node =
     [NodeType.Instant, Value] |
     [NodeType.Literal, string] |
     [NodeType.LitInternal, string] |
-    [NodeType.LazyLit, Node] |
+    [NodeType.LazyLit, Node, Value] |
     [NodeType.Executable, Module] |
     [NodeType.LazyExecutable, Module] |
     [NodeType.PartialOperator, OpDyad, MaybeInstant] |
@@ -274,7 +274,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                 stream.push([
                     NodeType.PartialOperator,
                     (u: MaybeInstant, v: MaybeInstant) => (left[1] as OpDyad)(v, u),
-                    left[2]!
+                    left[2] as MaybeInstant
                 ]);
             } else {
                 let left_value = maybe_instant(left, env);
@@ -316,10 +316,12 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                     if (colon) err(1, "Invalid use of the colon token.");
                     else if (head.ident == TokenIdent.Literal) {
                         env.set(name, ayr_partial(nodes, env));
-                        stream.push([NodeType.LazyLit, [NodeType.Literal, name]]);
+                        let value = env.get(name).eval<Value>();
+                        stream.push([NodeType.LazyLit, [NodeType.Literal, name], value]);
                     } else {
                         INTERNAL.set_key(name, ayr_partial(nodes, env));
-                        stream.push([NodeType.LazyLit, [NodeType.LitInternal, name]]);
+                        let value = INTERNAL.get_key(name);
+                        stream.push([NodeType.LazyLit, [NodeType.LitInternal, name], value]);
                     }
                 } else if (head.ident == TokenIdent.Literal) {
                     let train = parse_train(nodes, env, colon) ?? err(7);
@@ -361,7 +363,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             if (stream[stream.length - 1]![0] == NodeType.Line) err(1, "Dyadic operator missing right operand");
             let right = maybe_instant(stream.pop()!, env);
             let [_, op, left] = stream.pop()!;
-            stream.push([NodeType.Executable, (op as OpDyad)(left!, right)]);
+            stream.push([NodeType.Executable, (op as OpDyad)(left as MaybeInstant, right)]);
         }
     }
 
