@@ -1,5 +1,7 @@
 # ts-rewrite
 
+Currently in progress rewrite of ayr in `Typescript`. See the `master` branch for the original codebase.
+
  - [x] Rewrite core functionality
  - [x] Proper literal support
  - [x] Defining literals
