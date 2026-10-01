@@ -145,6 +145,22 @@ function detn(m: Num[][]): number {
     }, Num.from(0));
 }
 
+export function rotate<T>(m: T[], n: number): T[] {
+    let rev = Math.sign(n) == -1;
+    let i = Math.abs(n) % m.length;
+    if (!i) return m;
+
+    if (!rev) {
+        let elements = m.splice(0, i);
+        m.push(...elements);
+    } else {
+        let elements = m.splice(-i, i);
+        m.unshift(...elements);
+    }
+
+    return m;
+}
+
 export function pad_rank(data: Value, target: number[]): Value {
     const dims = data.get_dims();
     const orig_rank = data.get_rank();

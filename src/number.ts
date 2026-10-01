@@ -193,6 +193,10 @@ export class Num {
         return this;
     }
 
+    public is_type_num(): boolean {
+        return true;
+    }
+
     public is_inf(): boolean {
         return this.wrap == Infinity;
     }

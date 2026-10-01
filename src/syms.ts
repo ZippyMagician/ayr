@@ -152,6 +152,20 @@ export const Symbols: SymbolMap = {
     }),
     // Not (0) / Residue (0, 0)
     "|": mod(0, a => a.map_num(n => Num.from(+!+n)), 0, (a, b) => b.map_num(n => Num.from(+n % +a.as_num()))),
+    // Reverse (1) / Rotate (0, 99)
+    "|.": mod(1, a => Value.unranked(
+        a.get_dims(),
+        a.get_rank().slice(-1),
+        a.ranked(a.get_dims() - 1).reverse()
+            .flatMap(n => n.boxed() ? [n] : n.to_list().map(Value.maybe_num)),
+        a.is_str(),
+    ), [0, 99], (a, b) => Value.unranked(
+        b.get_dims(),
+        b.get_rank().slice(-1),
+        util.rotate(b.ranked(b.get_dims() - 1), +a.as_num())
+            .flatMap(n => n.boxed() ? [n] : n.to_list().map(Value.maybe_num)),
+        b.is_str(),
+    ), true, true),
     // Factorial (0) / Or (0, 0)
     "!": mod(0, a => a.map_num(n => {
         const val = +n;
@@ -265,12 +279,12 @@ export const Symbols: SymbolMap = {
         let valuesr = [...b.boxed() ? [b] : a.boxed() ? [b.box()] : b.to_list()];
 
         let ib = false;
-        for (let i = 0; !ib && i < valuesl.length; i++) 
+        for (let i = 0; !ib && i < valuesl.length; i++)
             if (valuesl[i]!.boxed()) ib = true;
         for (let i = 0; !ib && i < valuesr.length; i++)
             if (valuesr[i]!.boxed()) ib = true;
         if (ib) {
-            for (let i = 0; i < valuesl.length; i++) 
+            for (let i = 0; i < valuesl.length; i++)
                 if (!valuesl[i]!.boxed()) {
                     let tmp = a.is_str() ? Value.maybe_num(valuesl[i]!).as_str() : valuesl[i]!;
                     valuesl[i] = Value.new_box(tmp);
@@ -322,7 +336,7 @@ export const Symbols: SymbolMap = {
         return prim(new_values, false, dims + 1, [...rank, 2], a.is_str() && b.is_str());
     }, true, true),
     // Tally (99) / Replicate (99, 1)
-    "#": mod(99, a => prim(a.is_single() ? 1 : a.get_rank()[a.get_dims()-1]!), [99, 1], (a, b) => {
+    "#": mod(99, a => prim(a.is_single() ? 1 : a.get_rank()[a.get_dims() - 1]!), [99, 1], (a, b) => {
         if (b.boxed()) err(2, "Boxed replication count.");
         const axis = Math.max(0, a.get_dims() - 1);
         let elements = a.ranked(axis);
@@ -382,7 +396,7 @@ export const Symbols: SymbolMap = {
             let sz = lrk[0]!;
             let count = rrk[0] || 0;
             return prim([
-                ...values.slice(0, Math.min(count, sz)), 
+                ...values.slice(0, Math.min(count, sz)),
                 ...Array(Math.max(0, sz - count)).fill(Num.from(b.is_str() ? 32 : 0))
             ], false, 1, [sz], b.is_str());
         }

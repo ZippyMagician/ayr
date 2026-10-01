@@ -166,6 +166,10 @@ export class Value {
         return new Value(Type.Scalar, [fn(v)], 0, [1], this.str);
     }
 
+    public is_type_num(): boolean {
+        return false;
+    }
+
     // Convert to specific dimension count
     public ranked(dims: number = 0): Value[] {
         if (this.boxed() || dims >= this.dims) {
