@@ -103,7 +103,7 @@ export type Node =
     [NodeType.LazyLit, Node, Value] |
     [NodeType.Executable, Module] |
     [NodeType.LazyExecutable, Module] |
-    [NodeType.PartialOperator, OpDyad, MaybeInstant] |
+    [NodeType.PartialOperator, OpDyad, MaybeInstant, string] |
     [NodeType.IfStatement, (env: Env) => Value] |
     [NodeType.Line]
 
@@ -183,6 +183,16 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
     let stream: Node[] = [];
     let i = 0;
 
+    // Pass right operand to partial operator
+    const check_op = () => {
+        if (stream.length > 1 && stream[stream.length - 2]![0] == NodeType.PartialOperator) {
+            if (stream[stream.length - 1]![0] == NodeType.Line) err(1, "Dyadic operator missing right operand");
+            let right = maybe_instant(stream.pop()!, env);
+            let [_, op, left] = stream.pop()!;
+            stream.push([NodeType.Executable, (op as OpDyad)(left as MaybeInstant, right)]);
+        }
+    }
+
     while (i < tokens.length) {
         let [head, j] = nnw(tokens, i, false);
         if (is_instant(tokens, j, env)) {
@@ -212,15 +222,16 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             }
 
             // Parse list. Single string, list of numbers, list of numbers + strings, list of boxed elements
+            let raw_list = false;
             let is_string = list.length == 1 && !intermediary.length && list[0]!.ident == TokenIdent.String;
             intermediary = intermediary.concat(list.map(eval_instant.bind(env)));
             let values: Num[] | Value[] = [];
             if (intermediary.some(n => n instanceof Value)) values = intermediary.map(Value.new_box);
-            else values = intermediary as Num[];
+            else { raw_list = true; values = intermediary as Num[]; }
 
             // Lists of single numbers or single values (1 elem list of boxed list) handled differently.
             // A 1 elem list of a Value should not be boxed. A single number is a scalar.
-            stream.push([
+            const push = (values: Num[] | Value[]) => stream.push([
                 NodeType.Instant,
                 is_string ? (values[0]! as Value).to_list()[0] as Value :
                     values.some(n => n instanceof Num) ? primitive(
@@ -228,6 +239,18 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                     ) : values.length == 1 ? Value.maybe_num((values[0] as Value).to_list()[0] ?? primitive([])) :
                         primitive(values)
             ]);
+            // For '@' operator, special case. This is because the way I handle parsing is garbage
+            if (raw_list && values.length > 2
+                && stream.length && stream[stream.length - 1]![0]! == NodeType.PartialOperator
+                && stream[stream.length - 1]![3]! == "@") {
+                if (stream.length == 1) push(values.splice(0, 1));
+                else if (is_node_instant(stream[stream.length - 2]!, env)) push(values.splice(0, 2));
+                else if (stream[stream.length - 2]![0]! == NodeType.PartialOperator
+                    && (stream[stream.length - 2]![2] as MaybeInstant).is_instant()) push(values.splice(0, 2));
+                else push(values.splice(0, 1));
+                check_op();
+            }
+            push(values);
 
             i = j;
             if (is_line_end(tokens, i)) stream.push([NodeType.Line]); // Add trailing newline
@@ -274,12 +297,13 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                 stream.push([
                     NodeType.PartialOperator,
                     (u: MaybeInstant, v: MaybeInstant) => (left[1] as OpDyad)(v, u),
-                    left[2] as MaybeInstant
+                    left[2] as MaybeInstant,
+                    "`"
                 ]);
             } else {
                 let left_value = maybe_instant(left, env);
                 if (args == 1) stream.push([NodeType.Executable, (op as OpMonad)(left_value)]);
-                else stream.push([NodeType.PartialOperator, op as OpDyad, left_value]);
+                else stream.push([NodeType.PartialOperator, op as OpDyad, left_value, head.value.as_str()]);
             }
             i = j;
         } else if (is_line_end(tokens, j) || head.ident == TokenIdent.RParen) {
@@ -357,14 +381,8 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             err(-1, `TODO: Parse token '${head.value.as_str()}'.`);
         }
         i++;
-
-        // Pass right operand to partial operator
-        if (stream.length > 1 && stream[stream.length - 2]![0] == NodeType.PartialOperator) {
-            if (stream[stream.length - 1]![0] == NodeType.Line) err(1, "Dyadic operator missing right operand");
-            let right = maybe_instant(stream.pop()!, env);
-            let [_, op, left] = stream.pop()!;
-            stream.push([NodeType.Executable, (op as OpDyad)(left as MaybeInstant, right)]);
-        }
+        
+        check_op();
     }
 
     return stream;
@@ -372,7 +390,7 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
 
 // Parses a potential train (a list of nodes within parenthesis) into a single executable (Module)
 function parse_train(nodes: Node[], env: Env, has_colon: boolean = false): Module {
-    if (nodes.length == 1 && 
+    if (nodes.length == 1 &&
         (nodes[0]![0] == NodeType.Executable || nodes[0]![0] == NodeType.LazyExecutable)
     ) return nodes[0]![1]! as Module;
     let build: Module[] = [];
