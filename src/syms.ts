@@ -111,7 +111,7 @@ export const Symbols: SymbolMap = {
     // TODO / TODO
     "+.": mod_todo("+."),
     // Double (0) / Abs Add (0, 0)
-    "+:": mod(0, a => a.map_num(n => n.muli(2)), 0, (a, b) => a.map_num(n => n.add(b.as_num()).abs()), true, true),
+    "+:": mod(0, a => a.map_num(n => n.muli(2)), 0, (a, b) => a.map_num(n => n.add(b.as_num()).abs())),
     // Negate | Swap case [strings] (0) / Subtract (0, 0)
     "-": mod(0, a => {
         if (a.is_str()) {
@@ -122,6 +122,10 @@ export const Symbols: SymbolMap = {
         let sub = a.map_num(n => n.sub(b.as_num()));
         return b.is_str() ? sub.as_str() : sub;
     }, false, true),
+    // Permute (99) / Unintersect (99, 99)
+    "-.": mod_todo("-."),
+    // Halve (0) / Abs Diff (0, 0)
+    "-:": mod(0, a => a.map_num(n => n.divi(2)), 0, (a, b) => a.map_num(n => n.sub(b.as_num()).abs())),
     // Signum | Identify case [strings] (0) / Multiply (0, 0)
     "*": mod(0, a => {
         if (a.is_str()) {
@@ -130,6 +134,10 @@ export const Symbols: SymbolMap = {
             return prim(lower == upper ? 0 : char == lower ? -1 : 1);
         } return a.map_num(n => Num.from(Math.sign(+n)));
     }, 0, (a, b) => a.map_num(n => n.mul(b.as_num())), true),
+    // Factors (0) / LCM (0, 0)
+    "*.": mod_todo("*."),
+    // Square (0) / N * |N| (0, 0)
+    "*:": mod(0, a => a.map_num(n => n.mul(n)), 0, (a, b) => a.map_num(n => n.mul(b.as_num().abs()))),
     // Reciprocal (0) / Divide (0, 0)
     "%": mod(0, a => a.map_num(n => n.recip()), 0, (a, b) => a.map_num(n => n.div(b.as_num()))),
     // TODO / GCD (0, 0)
