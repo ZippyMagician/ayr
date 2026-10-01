@@ -80,7 +80,7 @@ export class Rational {
     }
 
     public pow(other: number | Rational): Rational {
-        return new Rational(this.numer ** +other, this.denom ** +other);
+        return new Rational(Math.pow(this.numer, +other), Math.pow(this.denom, +other));
     }
 
     public neg(): Rational {
@@ -166,12 +166,12 @@ export class Num {
 
     public pow(other: Num): Num {
         if (typeof this.wrap != "number") return Num.from(this.wrap.pow(other.wrap));
-        else return Num.from(this.wrap ** +other.wrap);
+        else return Num.from(Math.pow(this.wrap, +other.wrap));
     }
 
     public powi(other: number): Num {
         if (typeof this.wrap != "number") return Num.from(this.wrap.pow(other));
-        else return Num.from(this.wrap ** other);
+        else return Num.from(Math.pow(this.wrap, other));
     }
 
     public neg(): Num {

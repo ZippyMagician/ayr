@@ -142,6 +142,14 @@ export const Symbols: SymbolMap = {
     "%": mod(0, a => a.map_num(n => n.recip()), 0, (a, b) => a.map_num(n => n.div(b.as_num()))),
     // TODO / GCD (0, 0)
     "%.": mod_todo("%."),
+    // Sqrt (0) / Nth root (0, 0)
+    "%:": mod(0, a => prim(Math.sqrt(+a)), 0, (a, b) => {
+        const root = +a;
+        let n = b.as_num().abs();
+        let ret = root == 2 ? Math.sqrt(+n) : root == 3 ? Math.cbrt(+n) : (+n) ** (1 / root);
+        if (root % 2 == 1 && Math.sign(+b) == -1) ret = -ret;
+        return prim(ret);
+    }),
     // Not (0) / Residue (0, 0)
     "|": mod(0, a => a.map_num(n => Num.from(+!+n)), 0, (a, b) => b.map_num(n => Num.from(+n % +a.as_num()))),
     // Factorial (0) / Or (0, 0)
