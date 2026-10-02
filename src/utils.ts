@@ -185,7 +185,7 @@ export function pad_rank(data: Value, target: number[]): Value {
         new_offsets[i] = new_offsets[i - 1]! * new_rank[i - 1]!;
     }
 
-    const values = data.as_list();
+    const values = data.to_list();
     const old_len = rank.reduce((a, b) => a * b, 1);
     const len = new_rank.reduce((a, b) => a * b, 1);
     const new_values = new Array(len).fill(data.is_str() ? 32 : 0);

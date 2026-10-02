@@ -139,7 +139,7 @@ export const Operators: OpsMap = {
                 b ? lm(rm(a), rm(b), override) : lm(rm(a), undefined, override);
         }
         // Rank
-        const rank = r.eval<Value>().as_list().map(n => +n);
+        const rank = r.eval<Value>().to_list().map(n => +n);
         const fn = l.as_module();
         return (a: Value, b?: Value) => {
             const parsed_rank = b

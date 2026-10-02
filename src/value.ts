@@ -77,11 +77,7 @@ export class Value {
         return this.type == Type.Scalar || this.dims == 0 || this.dims == 1 && this.rank[0] == 1;
     }
 
-    // Return a clone of the internal array
-    public as_list(): Value[] | Num[] {
-        return clone(this.inner);
-    }
-
+    // Into internal list representation
     public to_list(): Value[] | Num[] {
         return this.inner;
     }
@@ -220,7 +216,7 @@ export class Value {
             ...partial_rank,
             values.length / partial_rank.reduce((a, b) => a * b, 1)
         ];
-        if (is_str) return Value.new_string(values.flatMap((n: Value) => n.as_list() as Num[]), original_dims, rank)
+        if (is_str) return Value.new_string(values.flatMap((n: Value) => n.to_list() as Num[]), original_dims, rank)
         else if (raw_value) {
             return Value.new_list(values.flatMap((n: Value): Num[] => n.inner as Num[]), rank.length, rank);
         } else return Value.new_list(values.flatMap((n: Value): Value[] => n.inner.map(Value.maybe_num)), rank.length, rank);

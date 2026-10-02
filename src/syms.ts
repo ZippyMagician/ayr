@@ -32,8 +32,8 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
     if (b) {
         // Dyadic call
         let temp;
-        let is_rawl = (temp = a.as_list(), temp.length > 0 && temp[0] instanceof Num);
-        let is_rawr = (temp = b.as_list(), temp.length > 0 && temp[0] instanceof Num);
+        let is_rawl = (temp = a.to_list(), temp.length > 0 && temp[0] instanceof Num);
+        let is_rawr = (temp = b.to_list(), temp.length > 0 && temp[0] instanceof Num);
 
         let left_rank = a.get_rank().slice(rank[0]);
         let right_rank = b.get_rank().slice(rank[1]);
@@ -70,7 +70,7 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
     } else {
         // Monadic call
         let temp;
-        let is_raw = (temp = a.as_list(), temp.length > 0 && temp[0] instanceof Num);
+        let is_raw = (temp = a.to_list(), temp.length > 0 && temp[0] instanceof Num);
 
         let left_rank = a.get_rank().slice(rank[0]);
         let left = a.ranked(rank[0]);
@@ -189,7 +189,7 @@ export const Symbols: SymbolMap = {
     "^": mod(0, a => a.map_num(n => Num.from(Math.E ** +n)), 0, (a, b) => a.map_num(n => Num.from(+n & +b.as_num()))),
     // Shape (99) / Reshape (1, 99) -- _, _1 are wildcards
     "$": mod(99, a => prim(a.get_rank()), [1, 99], (a, b) => {
-        const list = a.as_list();
+        const list = a.to_list();
         if (list[0] instanceof Value) err(4, "Rank must be list of literal numbers.");
         let rank = list.map(a => +a);
 
@@ -244,7 +244,7 @@ export const Symbols: SymbolMap = {
             return a.with_rank(rank);
         }
 
-        let rows = a.ranked(1).map(x => x.as_list());
+        let rows = a.ranked(1).map(x => x.to_list());
         return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
     }, 0, (a, b) => Value.new_scalar(Num.from(+util.equal(a, b))), true),
     // 1-Range (0) / Index (99, 0)
@@ -255,7 +255,7 @@ export const Symbols: SymbolMap = {
         return util.range(s, s + n);
     }, [99, 0], (a, b) => {
         if (!b.boxed()) return (a.ranked(a.get_dims() - 1)[+b] ?? err(4, `Index does not exist.`)).as_str(a.is_str());
-        let index = Value.maybe_num(b.as_list()[0]!).to_list().map(n => +n);
+        let index = Value.maybe_num(b.to_list()[0]!).to_list().map(n => +n);
 
         if (a.get_dims() < index.length) err(4, `Index does not exist.`);
         let rank = a.get_rank();
@@ -272,7 +272,7 @@ export const Symbols: SymbolMap = {
     }, true, true),
     // Flatten [Ravel] (99) / Concatenate (1, 1)
     ",": mod(99, a => {
-        let flat = prim(a.as_list());
+        let flat = prim(a.to_list());
         return a.is_str() ? flat.as_str() : flat;
     }, 1, (a, b) => {
         let valuesl = [...a.boxed() ? [a] : b.boxed() ? [a.box()] : a.to_list()];
@@ -309,7 +309,7 @@ export const Symbols: SymbolMap = {
     }),
     // Mold (1) / Laminate (99, 99)
     ";": mod(1, a => {
-        let values = a.as_list();
+        let values = a.to_list();
         if (values[0] && values[0]! instanceof Num) return a;
         let unboxed = values.map(n => (n as Value).unbox());
 
