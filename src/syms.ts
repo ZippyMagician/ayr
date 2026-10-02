@@ -1,6 +1,6 @@
 const clone = require("lodash.clonedeep");
 
-import { ayrfn } from "./eval"
+import { ayrfn, ayr } from "./eval"
 import { Num } from "./number"
 import { Value } from "./value"
 import { err, INTERNAL, Module, Module2, primitive as prim } from "./utils"
@@ -247,6 +247,15 @@ export const Symbols: SymbolMap = {
         let rows = a.ranked(1).map(x => x.to_list());
         return Value.new_ls(rows[0]!.flatMap((_, i) => rows.map(x => x[i]!)) as Value[] | Num[], dims, rank, a.is_str());
     }, 0, (a, b) => Value.new_scalar(Num.from(+util.equal(a, b))), true),
+    // All Equal (99) / XOR (0, 0)
+    "=.": mod(99, a => {
+        let l = a.to_list();
+        if (l.length < 2) return prim(1);
+        const f = Value.maybe_num(l[0]!);
+        return prim(+l.map(n => util.equal(f, Value.maybe_num(n))).reduce((a, b) => a && b, true));
+    }, 0, (a, b) => a.map_num(n => Num.from(+n ^ +b.as_num()))),
+    // Eval (99) / Match (99, 99)
+    "=:": mod(99, a => ayr(a.toString()), 99, (a, b) => Value.new_scalar(Num.from(+util.equal(a, b)))),
     // 1-Range (0) / Index (99, 0)
     "~": mod(0, a => {
         let n = +a.as_num();
