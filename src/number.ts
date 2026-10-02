@@ -1,7 +1,5 @@
 import { err, str } from "./utils"
 
-const clone = require('lodash.clonedeep');
-
 function gcd(a: number, b: number): number {
     while (a !== b) {
         if (a > b) a -= b;

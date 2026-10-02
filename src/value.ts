@@ -2,7 +2,7 @@ import { box_text, err, INTERNAL, str } from "./utils"
 import { Num } from "./number"
 
 const clone = require('lodash.clonedeep');
-const is_equal = require('lodash.isequal');
+const is_equal = require('node:util').isDeepStrictEqual;
 
 const enum Type {
     // Single Value
