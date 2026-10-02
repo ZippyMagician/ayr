@@ -222,12 +222,9 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
             }
 
             // Parse list. Single string, list of numbers, list of numbers + strings, list of boxed elements
-            let raw_list = false;
             let is_string = list.length == 1 && !intermediary.length && list[0]!.ident == TokenIdent.String;
             intermediary = intermediary.concat(list.map(eval_instant.bind(env)));
             let values: Num[] | Value[] = [];
-            if (intermediary.some(n => n instanceof Value)) values = intermediary.map(Value.new_box);
-            else { raw_list = true; values = intermediary as Num[]; }
 
             // Lists of single numbers or single values (1 elem list of boxed list) handled differently.
             // A 1 elem list of a Value should not be boxed. A single number is a scalar.
@@ -240,16 +237,22 @@ export function parse_nodes(tokens: Token[], env?: Env): Node[] {
                         primitive(values)
             ]);
             // For '@' operator, special case. This is because the way I handle parsing is garbage
-            if (raw_list && values.length > 2
+            if (intermediary.length > 1
                 && stream.length && stream[stream.length - 1]![0]! == NodeType.PartialOperator
-                && stream[stream.length - 1]![3]! == "@") {
-                if (stream.length == 1) push(values.splice(0, 1));
-                else if (is_node_instant(stream[stream.length - 2]!, env)) push(values.splice(0, 2));
+                && stream[stream.length - 1]![3]! == "@"
+                && intermediary[0] instanceof Num
+            ) {
+                let t;
+                if (intermediary[1] instanceof Value || stream.length == 1) t = intermediary.splice(0, 1);
+                else if (is_node_instant(stream[stream.length - 2]!, env)) t = intermediary.splice(0, 2);
                 else if (stream[stream.length - 2]![0]! == NodeType.PartialOperator
-                    && (stream[stream.length - 2]![2] as MaybeInstant).is_instant()) push(values.splice(0, 2));
-                else push(values.splice(0, 1));
+                    && (stream[stream.length - 2]![2] as MaybeInstant).is_instant()) t = intermediary.splice(0, 2);
+                else t = values.splice(0, 1);
+                push(t as Value[]);
                 check_op();
             }
+            if (intermediary.some(n => n instanceof Value)) values = intermediary.map(Value.new_box);
+            else values = intermediary as Num[];
             push(values);
 
             i = j;
