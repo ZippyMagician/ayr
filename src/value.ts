@@ -110,7 +110,7 @@ export class Value {
         let dims = rank.length;
         if (rank.some((a: number) => !Number.isInteger(a))) err(4);
         let count = rank.reduce((a, b) => a * b, 1);
-        let inner = this.boxed() ? [clone(this)] : clone(this.inner);
+        let inner = this.boxed() ? [this] : this.inner;
 
         if (count > inner.length) {
             let i = 0;
@@ -120,6 +120,11 @@ export class Value {
             dims == 0 || dims == 1 && rank[0] == 1 ? Type.Scalar : Type.List,
             inner, dims, rank, this.str
         );
+    }
+
+    public reversed(): Value {
+        this.inner.reverse();
+        return this;
     }
 
     // Return this Value's dimensions

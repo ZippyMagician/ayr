@@ -153,7 +153,7 @@ export const Symbols: SymbolMap = {
     // Not (0) / Residue (0, 0)
     "|": mod(0, a => a.map_num(n => Num.from(+!+n)), 0, (a, b) => b.map_num(n => Num.from(+n % +a.as_num()))),
     // Reverse (1) / Rotate (0, 99)
-    "|.": mod(1, a => Value.unranked(
+    "|.": mod(1, a => a.get_dims() < 2 ? a.reversed() : Value.unranked(
         a.get_dims(),
         a.get_rank().slice(-1),
         a.ranked(a.get_dims() - 1).reverse()
@@ -166,6 +166,21 @@ export const Symbols: SymbolMap = {
             .flatMap(n => n.boxed() ? [n] : n.to_list().map(Value.maybe_num)),
         b.is_str(),
     ), true, true),
+    // Descend (0) / Axes (1, 99)
+    "|:": mod(0, a => {
+        let n = +a.as_num();
+        const s = INTERNAL.get_range();
+        if (a.is_str()) return util.range(n < 97 ? 65 : 97, n + 1).as_str().reversed();
+        return util.range(s, s + n).reversed();
+    }, [1, 99], (a, b) => {
+        let rank = b.get_rank();
+        let dims = a.get_dims();
+        for (let i of a.to_list()) {
+            let [n] = rank.splice(dims - +i.as_num() - 1, 1);
+            rank.push(n ?? err(4));
+        }
+        return b.with_rank(rank);
+    }, true, true),
     // Factorial (0) / Or (0, 0)
     "!": mod(0, a => a.map_num(n => {
         const val = +n;
