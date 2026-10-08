@@ -63,6 +63,8 @@ function sym(this: SymEnv, r: number | [number, number], fn: Module, a: Value, b
                 vstr && this.preserve_str ? value[i]!.as_str() : (value[i] ?? (left_is_mapper ? b : a)),
             ];
             if (!left_is_mapper) args = args.reverse() as [Value, Value];
+            if (rank[0] == 0 && args[0].boxed()) args[0] = args[0].unbox();
+            if (rank[1] == 0 && args[1].boxed()) args[1] = args[1].unbox();
             return fn(args[0], args[1]);
         });
         return left_is_mapper ? Value.unranked(a.get_dims(), left_rank, mapper, is_rawl)
